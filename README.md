@@ -27,7 +27,7 @@ simple that *just works*.
 
 ```ruby
 class MyModel < ActiveRecord::Base
-  crypt_keeper :field, :other_field, :encryptor => :aes, passphrase: 'super_good_password'
+  crypt_keeper :field, :other_field, :encryptor => :aes, :passphrase => 'super_good_password'
 end
 
 model = MyModel.new(field: 'sometext')
@@ -65,7 +65,7 @@ as an underscored symbol
 
 ```ruby
 class MyModel < ActiveRecord::Base
-  crypt_keeper :field, :other_field, :encryptor => :my_encryptor, passphrase: 'super_good_password'
+  crypt_keeper :field, :other_field, :encryptor => :my_encryptor, :passphrase => 'super_good_password'
 end
 ```
 
