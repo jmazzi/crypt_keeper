@@ -22,10 +22,11 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'rspec', '~> 2.10.0'
   gem.add_development_dependency 'guard', '~> 1.2.0'
   gem.add_development_dependency 'guard-rspec', '~> 1.1.0'
-  gem.add_development_dependency 'sqlite3'
   gem.add_development_dependency 'rake', '~> 0.9.2.2'
   if RUBY_PLATFORM == 'java'
     gem.add_development_dependency 'jruby-openssl', '~> 0.7.7'
     gem.add_development_dependency 'activerecord-jdbcsqlite3-adapter'
+  else
+    gem.add_development_dependency 'sqlite3'
   end
 end
