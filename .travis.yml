@@ -1,5 +1,9 @@
+branches: master
 language: ruby
-script: "bundle exec rake spec"
+gemfile:
+  - gemfiles/activerecord_3_0.gemfile
+  - gemfiles/activerecord_3_1.gemfile
+  - gemfiles/activerecord_3_2.gemfile
 notifications:
   email:
     recipients:
