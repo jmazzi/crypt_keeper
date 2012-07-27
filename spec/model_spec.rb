@@ -81,6 +81,25 @@ module CryptKeeper
           subject.storage.should == plain_text
         end
       end
+
+      describe "#encryptor" do
+        let(:encryptor) do
+          Class.new do
+            def initialize(options = {})
+              options.delete :passphrase
+            end
+          end
+        end
+
+        before do
+          SensitiveData.crypt_keeper :storage, passphrase: 'tool', encryptor: encryptor
+        end
+
+        it "should dup the options" do
+          SensitiveData.send :encryptor
+          SensitiveData.crypt_keeper_options.should include(passphrase: 'tool')
+        end
+      end
     end
   end
 end
