@@ -4,8 +4,8 @@ require File.expand_path('../lib/crypt_keeper/version', __FILE__)
 Gem::Specification.new do |gem|
   gem.authors       = ["Justin Mazzi"]
   gem.email         = ["jmazzi@gmail.com"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
+  gem.description   = %q{Transparent encryption for ActiveRecord that isn't over-engineered}
+  gem.summary       = gem.description
   gem.homepage      = ""
 
   gem.files         = `git ls-files`.split($\)
