@@ -1,4 +1,6 @@
-# CryptKeeper
+![CryptKeeper](http://i.imgur.com/qf0aD.jpg)
+
+# CryptKeeper 
 
 Provides transparent encryption for ActiveRecord. It is encryption agnostic. 
 You can guard your data with any encryption algorithm you want. All you need
