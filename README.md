@@ -46,7 +46,14 @@ under the `CryptKeeperProviders` namespace, like this:
 ```ruby
 module CryptKeeperProviders
   class MyEncryptor
-    # methods
+    def initialize(options ={})
+    end
+
+    def encrypt(value)
+    end
+
+    def decrypt(value)
+    end
   end
 end
 
