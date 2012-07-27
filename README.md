@@ -60,7 +60,7 @@ end
 ```
 
 Just require your code and setup your model to use it. Just pass the class name
-as an underscored symbol
+as a string or an underscored symbol
 
 
 ```ruby
