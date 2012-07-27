@@ -10,6 +10,12 @@ is a simple class that does 3 things.
 
 Use can see an AES example here [here](https://github.com/jmazzi/crypt_keeper_providers/blob/master/lib/crypt_keeper_providers/aes.rb)
 
+## Why?
+
+The options available were either too complicated under the hood or had weird 
+edge cases that made the library hard to use. I wanted to write something
+simple that *just works*.
+
 ## Installation
 
 Add this line to your application's Gemfile:
