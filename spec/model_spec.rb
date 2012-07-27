@@ -3,55 +3,33 @@ require 'spec_helper'
 module CryptKeeper
   describe Model do
     subject { SensitiveData }
-    let(:encryptor) do
-      mock('Encryptor').tap do |m|
-        m.stub :new
-      end
-    end
-
     describe "#crypt_keeper" do
       context "Fields" do
         it "should set the fields" do
-          subject.crypt_keeper :storage, :secret, encryptor: encryptor
+          subject.crypt_keeper :storage, :secret, encryptor: :fake_encryptor
           subject.crypt_keeper_fields.should == [:storage, :secret]
         end
 
         it "should raise an exception with wrong field type" do
           msg = ":name must be of type 'text' to be used for encryption"
-          expect { subject.crypt_keeper :name, encryptor: encryptor }.to raise_error(ArgumentError, msg)
+          expect { subject.crypt_keeper :name, encryptor: :fake_encryptor }.to raise_error(ArgumentError, msg)
         end
       end
 
       context "Options" do
         it "should set the options" do
-          subject.crypt_keeper :storage, :secret, key1: 1, key2: 2, encryptor: encryptor
+          subject.crypt_keeper :storage, :secret, key1: 1, key2: 2, encryptor: :fake_encryptor
           subject.crypt_keeper_options.should == { key1: 1, key2: 2  }
         end
       end
     end
 
     context "Encryption" do
-      let(:encryptor) do
-        Class.new do
-          def initialize(options = {})
-            @passphrase = options[:passphrase]
-          end
-
-          def encrypt(data)
-            @passphrase + data.reverse
-          end
-
-          def decrypt(data)
-            data.sub(/^#{@passphrase}/, '').reverse
-          end
-        end
-      end
-
       let(:plain_text) { 'plain_text' }
       let(:cipher_text) { 'tooltxet_nialp' }
 
       before do
-        SensitiveData.crypt_keeper :storage, passphrase: 'tool', encryptor: encryptor
+        SensitiveData.crypt_keeper :storage, passphrase: 'tool', encryptor: :encryptor
       end
 
       subject { SensitiveData.new }

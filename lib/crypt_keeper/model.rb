@@ -64,12 +64,17 @@ module CryptKeeper
 
       # Private: An instance of the encryptor class
       def encryptor
-        crypt_keeper_encryptor.new(crypt_keeper_options.dup)
+        encryptor_klass.new(crypt_keeper_options.dup)
+      end
+
+      # Private: The encryptor class
+      def encryptor_klass
+        @encryptor_klass ||= "CryptKeeperProviders::#{crypt_keeper_encryptor.to_s.camelize}".constantize
       end
 
       # Private: Ensure that the encryptor responds to new
       def ensure_valid_encryptor!
-        unless crypt_keeper_encryptor.respond_to?(:new)
+        unless defined? encryptor_klass
           raise "You must specify an encryption class `crypt_keeper encryptor: EncryptionClass`"
         end
       end
