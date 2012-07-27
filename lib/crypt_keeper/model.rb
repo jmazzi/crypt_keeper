@@ -32,9 +32,7 @@ module CryptKeeper
       # Example
       #
       #   class MyModel < ActiveRecord::Base
-      #     crypt_keeper :field, :other_field, encryptor: EncryptionClass,
-      #       passphrase: 'super_good_password'
-      #
+      #     crypt_keeper :field, :other_field, encryptor: Aes, passphrase: 'super_good_password'
       #   end
       #
       def crypt_keeper(*args)
