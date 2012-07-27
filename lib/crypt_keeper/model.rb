@@ -33,8 +33,7 @@ module CryptKeeper
       # Example
       #
       #   class MyModel < ActiveRecord::Base
-      #     crypt_keeper :field, :other_field, encryptor: CryptKeeperProviders::Aes,
-      #       passphrase: 'super_good_password'
+      #     crypt_keeper :field, :other_field, :encryptor => :aes, passphrase: 'super_good_password'
       #   end
       #
       def crypt_keeper(*args)
@@ -75,7 +74,7 @@ module CryptKeeper
       # Private: Ensure that the encryptor responds to new
       def ensure_valid_encryptor!
         unless defined? encryptor_klass
-          raise "You must specify an encryption class `crypt_keeper encryptor: EncryptionClass`"
+          raise "You must specify a valid encryptor `crypt_keeper :encryptor => :aes`"
         end
       end
 

@@ -26,20 +26,41 @@ simple that *just works*.
 ## Usage
 
 ```ruby
-
 class MyModel < ActiveRecord::Base
-  crypt_keeper :field, :other_field, encryptor: CryptKeeperProviders::Aes, 
-    passphrase: 'super_good_password'
+  crypt_keeper :field, :other_field, :encryptor => :aes, passphrase: 'super_good_password'
 end
 
 model = MyModel.new(field: 'sometext')
 model.save! #=> Your data is now encrypted
 model.field #=> 'sometext'
-
 ```
 
 It works with all persistences methods: `update_attribute`, `update_attributes`,
 and save.
+
+## Creating your own encryptor
+
+Creating your own encryptor is easy. All you have to do is create a class 
+under the `CryptKeeperProviders` namespace, like this:
+
+```ruby
+module CryptKeeperProviders
+  class MyEncryptor
+    # methods
+  end
+end
+
+```
+
+Just require your code and setup your model to use it. Just pass the class name
+as an underscored symbol
+
+
+```ruby
+class MyModel < ActiveRecord::Base
+  crypt_keeper :field, :other_field, :encryptor => :my_encryptor, passphrase: 'super_good_password'
+end
+```
 
 ## Installation
 
