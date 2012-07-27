@@ -35,8 +35,8 @@ model.save! #=> Your data is now encrypted
 model.field #=> 'sometext'
 ```
 
-It works with all persistences methods: `update_attribute`, `update_attributes`,
-and save.
+It works with all persistences methods: `update_attribute`, `update_attributes`, 
+`create`, `save` etc.
 
 ## Creating your own encryptor
 
