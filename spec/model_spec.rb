@@ -4,6 +4,11 @@ module CryptKeeper
   describe Model do
     subject { SensitiveData }
     describe "#crypt_keeper" do
+      after(:each) do
+        subject.instance_variable_set(:@encryptor_klass, nil)
+        subject.instance_variable_set(:@encryptor, nil)
+      end
+
       context "Fields" do
         it "should set the fields" do
           subject.crypt_keeper :storage, :secret, encryptor: :fake_encryptor
@@ -20,6 +25,13 @@ module CryptKeeper
         it "should set the options" do
           subject.crypt_keeper :storage, :secret, key1: 1, key2: 2, encryptor: :fake_encryptor
           subject.crypt_keeper_options.should == { key1: 1, key2: 2  }
+        end
+
+        it "should accept class name (as string) for encryptor option" do
+          subject.crypt_keeper :storage, :secret, key1: 1, key2: 2, encryptor: "FakeEncryptor"
+          subject.send(:encryptor_klass).should == CryptKeeperProviders::FakeEncryptor
+
+          subject.instance_variable_set(:@encryptor_klass, nil)
         end
       end
     end

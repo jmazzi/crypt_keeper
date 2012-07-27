@@ -15,7 +15,7 @@ is a simple class that does 3 things.
 Note: Any options defined using `crypt_keeper` will be passed to `new` as a 
 hash.
 
-Use can see an AES example here [here](https://github.com/jmazzi/crypt_keeper_providers/blob/master/lib/crypt_keeper_providers/aes.rb)
+You can see an AES example here [here](https://github.com/jmazzi/crypt_keeper_providers/blob/master/lib/crypt_keeper_providers/aes.rb)
 
 ## Why?
 
@@ -60,7 +60,7 @@ end
 ```
 
 Just require your code and setup your model to use it. Just pass the class name
-as an underscored symbol
+as a string or an underscored symbol
 
 
 ```ruby
