@@ -77,6 +77,11 @@ class MyModel < ActiveRecord::Base
 end
 ```
 
+## Requirements
+
+Crypt Keeper has been tested against ActiveRecord 3.0, 3.1, and 3.2 using ruby
+1.9.2, 1.9.3 and jruby in 1.9 mode.
+
 ## Installation
 
 Add this line to your application's Gemfile:
