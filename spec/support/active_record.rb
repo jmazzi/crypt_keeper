@@ -2,7 +2,7 @@ require 'active_record'
 require 'logger'
 
 ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => ':memory:')
-ActiveRecord::Base.logger       = Logger.new SPEC_ROOT.join 'debug.log'
+ActiveRecord::Base.logger       = Logger.new SPEC_ROOT.join('debug.log').to_s
 ActiveRecord::Migration.verbose = false
 
 ActiveRecord::Schema.define do

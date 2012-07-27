@@ -17,7 +17,6 @@ Gem::Specification.new do |gem|
 
   gem.add_runtime_dependency 'activerecord', '>= 3.0'
   gem.add_runtime_dependency 'activesupport', '>= 3.0'
-  gem.add_runtime_dependency 'jruby-openssl', '~> 0.7.7' if RUBY_PLATFORM == 'java'
 
   gem.add_development_dependency 'rspec', '~> 2.10.0'
   gem.add_development_dependency 'factory_girl'
@@ -25,4 +24,8 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'guard-rspec', '~> 1.1.0'
   gem.add_development_dependency 'sqlite3'
   gem.add_development_dependency 'rake'
+  if RUBY_PLATFORM == 'java'
+    gem.add_development_dependency 'jruby-openssl', '~> 0.7.7'
+    gem.add_development_dependency 'activerecord-jdbcsqlite3-adapter'
+  end
 end
