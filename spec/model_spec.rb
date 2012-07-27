@@ -4,6 +4,11 @@ module CryptKeeper
   describe Model do
     subject { SensitiveData }
     describe "#crypt_keeper" do
+      after(:each) do
+        subject.instance_variable_set(:@encryptor_klass, nil)
+        subject.instance_variable_set(:@encryptor, nil)
+      end
+
       context "Fields" do
         it "should set the fields" do
           subject.crypt_keeper :storage, :secret, encryptor: :fake_encryptor
