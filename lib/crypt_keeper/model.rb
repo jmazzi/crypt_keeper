@@ -9,14 +9,14 @@ module CryptKeeper
     private
 
     # Private: Encrypt each crypt_keeper_fields
-    def before_save_encrypt
+    def encrypt_callback
       crypt_keeper_fields.each do |field|
         self[field] = self.class.encrypt read_attribute(field)
       end
     end
 
     # Private: Decrypt each crypt_keeper_fields
-    def after_save_decrypt
+    def decrypt_callback
       crypt_keeper_fields.each do |field|
         self[field] = self.class.decrypt read_attribute(field)
       end
@@ -76,9 +76,9 @@ module CryptKeeper
 
       # Private: Define callbacks for encryption
       def define_crypt_keeper_callbacks
-        after_save :after_save_decrypt
-        after_find :after_save_decrypt
-        before_save :before_save_encrypt
+        after_save :decrypt_callback
+        after_find :decrypt_callback
+        before_save :encrypt_callback
 
         crypt_keeper_fields.each do |field|
           ensure_field_is_encryptable! field
