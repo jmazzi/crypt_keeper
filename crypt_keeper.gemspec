@@ -17,6 +17,7 @@ Gem::Specification.new do |gem|
 
   gem.add_runtime_dependency 'activerecord', '>= 3.0'
   gem.add_runtime_dependency 'activesupport', '>= 3.0'
+  gem.add_runtime_dependency 'jruby-openssl', '~> 0.7.7' if RUBY_PLATFORM == 'java'
 
   gem.add_development_dependency 'rspec', '~> 2.10.0'
   gem.add_development_dependency 'factory_girl'
