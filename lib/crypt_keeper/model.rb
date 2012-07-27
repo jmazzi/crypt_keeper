@@ -63,7 +63,7 @@ module CryptKeeper
 
       # Private: An instance of the encryptor class
       def encryptor
-        encryptor_klass.new(crypt_keeper_options.dup)
+        @encryptor ||= encryptor_klass.new(crypt_keeper_options.dup)
       end
 
       # Private: The encryptor class
