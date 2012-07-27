@@ -16,20 +16,6 @@ The options available were either too complicated under the hood or had weird
 edge cases that made the library hard to use. I wanted to write something
 simple that *just works*.
 
-## Installation
-
-Add this line to your application's Gemfile:
-
-    gem 'crypt_keeper'
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install crypt_keeper
-
 ## Usage
 
 ```ruby
@@ -46,6 +32,21 @@ model.field #=> 'sometext'
 
 It works with all persistences methods: `update_attribute`, `update_attributes`,
 and save.
+
+## Installation
+
+Add this line to your application's Gemfile:
+
+    gem 'crypt_keeper'
+
+And then execute:
+
+    $ bundle
+
+Or install it yourself as:
+
+    $ gem install crypt_keeper
+
 
 ## Contributing
 
