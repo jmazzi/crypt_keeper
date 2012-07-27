@@ -1,5 +1,6 @@
 require 'active_support/concern'
 require 'active_support/core_ext/array/extract_options'
+require 'crypt_keeper_providers'
 
 module CryptKeeper
   module Model
@@ -32,7 +33,8 @@ module CryptKeeper
       # Example
       #
       #   class MyModel < ActiveRecord::Base
-      #     crypt_keeper :field, :other_field, encryptor: Aes, passphrase: 'super_good_password'
+      #     crypt_keeper :field, :other_field, encryptor: CryptKeeperProviders::Aes,
+      #       passphrase: 'super_good_password'
       #   end
       #
       def crypt_keeper(*args)
