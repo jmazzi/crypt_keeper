@@ -8,6 +8,9 @@ is a simple class that does 3 things.
 2. Provides an `encrypt` method that returns the encrypted string
 3. Provides a `decrypt` method that returns the plaintext
 
+Note: Any options defined using `crypt_keeper` will be passed to `new` as a 
+hash.
+
 Use can see an AES example here [here](https://github.com/jmazzi/crypt_keeper_providers/blob/master/lib/crypt_keeper_providers/aes.rb)
 
 ## Why?
