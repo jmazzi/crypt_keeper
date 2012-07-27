@@ -15,7 +15,7 @@ is a simple class that does 3 things.
 Note: Any options defined using `crypt_keeper` will be passed to `new` as a 
 hash.
 
-You can see an AES example here [here](https://github.com/jmazzi/crypt_keeper_providers/blob/master/lib/crypt_keeper_providers/aes.rb)
+You can see an AES example [here](https://github.com/jmazzi/crypt_keeper_providers/blob/master/lib/crypt_keeper_providers/aes.rb).
 
 ## Why?
 
@@ -35,8 +35,16 @@ model.save! #=> Your data is now encrypted
 model.field #=> 'sometext'
 ```
 
-It works with all persistences methods: `update_attribute`, `update_attributes`, 
-`create`, `save` etc.
+It works with all persistences methods: `update_attributes`, `create`, `save` 
+etc.
+
+Note: `update_attribute` is deprecated in ActiveRecord 3.2.7. It is superseded
+by [update_column](http://apidock.com/rails/ActiveRecord/Persistence/update_column) which _skips_ all validations, callbacks.
+
+That means using `update_column` will not perform any encryption. This is 
+expected behavior, and has it's use cases. An example would be migrating from
+one type of encryption to another. Using `update_column` would allow you to
+update the content without going through the current encryptor.
 
 ## Creating your own encryptor
 
