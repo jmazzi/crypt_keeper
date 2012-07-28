@@ -87,6 +87,7 @@ There are two included encryptors.
 * [PostgreSQL PGP](https://github.com/jmazzi/crypt_keeper_providers/blob/master/lib/crypt_keeper_providers/postgres_pgp.rb). 
  * Encryption is performed using PostgresSQL's native [PGP functions](http://www.postgresql.org/docs/9.1/static/pgcrypto.html).
  * It requires the `pgcrypto` PostgresSQL extension. `CREATE EXTENSION IF NOT EXISTS pgcrypto`
+ * ActiveRecord logs are [automatically](https://github.com/jmazzi/crypt_keeper_providers/blob/master/lib/crypt_keeper_providers/postgres_pgp_log_subscriber.rb) filtered for you to protect senitive data from being logged.
 
 ## Requirements
 
