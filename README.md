@@ -77,6 +77,17 @@ class MyModel < ActiveRecord::Base
 end
 ```
 
+## Available Encryptors
+
+There are two included encryptors. 
+
+* [AES](https://github.com/jmazzi/crypt_keeper_providers/blob/master/lib/crypt_keeper_providers/aes.rb)
+  * Encryption is peformed using AES-256 via OpenSSL.
+
+* [PostgreSQL PGP](https://github.com/jmazzi/crypt_keeper_providers/blob/master/lib/crypt_keeper_providers/postgres_pgp.rb). 
+ * Encryption is performed using PostgresSQL's native [PGP functions](http://www.postgresql.org/docs/9.1/static/pgcrypto.html).
+ * It requires the `pgcrypto` PostgresSQL extension. `CREATE EXTENSION IF NOT EXISTS pgcrypto`
+
 ## Requirements
 
 Crypt Keeper has been tested against ActiveRecord 3.0, 3.1, and 3.2 using ruby
