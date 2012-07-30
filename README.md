@@ -2,9 +2,9 @@
 
 ![CryptKeeper](http://i.imgur.com/qf0aD.jpg)
 
-# CryptKeeper 
+# CryptKeeper
 
-Provides transparent encryption for ActiveRecord. It is encryption agnostic. 
+Provides transparent encryption for ActiveRecord. It is encryption agnostic.
 You can guard your data with any encryption algorithm you want. All you need
 is a simple class that does 3 things.
 
@@ -12,14 +12,14 @@ is a simple class that does 3 things.
 2. Provides an `encrypt` method that returns the encrypted string
 3. Provides a `decrypt` method that returns the plaintext
 
-Note: Any options defined using `crypt_keeper` will be passed to `new` as a 
+Note: Any options defined using `crypt_keeper` will be passed to `new` as a
 hash.
 
 You can see an AES example [here](https://github.com/jmazzi/crypt_keeper_providers/blob/master/lib/crypt_keeper_providers/aes.rb).
 
 ## Why?
 
-The options available were either too complicated under the hood or had weird 
+The options available were either too complicated under the hood or had weird
 edge cases that made the library hard to use. I wanted to write something
 simple that *just works*.
 
@@ -35,26 +35,27 @@ model.save! #=> Your data is now encrypted
 model.field #=> 'sometext'
 ```
 
-It works with all persistences methods: `update_attributes`, `create`, `save` 
+It works with all persistences methods: `update_attributes`, `create`, `save`
 etc.
 
 Note: `update_attribute` is deprecated in ActiveRecord 3.2.7. It is superseded
-by [update_column](http://apidock.com/rails/ActiveRecord/Persistence/update_column) which _skips_ all validations, callbacks.
+by [update_column](http://apidock.com/rails/ActiveRecord/Persistence/update_column)
+which _skips_ all validations, callbacks.
 
-That means using `update_column` will not perform any encryption. This is 
-expected behavior, and has it's use cases. An example would be migrating from
+That means using `update_column` will not perform any encryption. This is
+expected behavior, and has its use cases. An example would be migrating from
 one type of encryption to another. Using `update_column` would allow you to
 update the content without going through the current encryptor.
 
 ## Creating your own encryptor
 
-Creating your own encryptor is easy. All you have to do is create a class 
+Creating your own encryptor is easy. All you have to do is create a class
 under the `CryptKeeperProviders` namespace, like this:
 
 ```ruby
 module CryptKeeperProviders
   class MyEncryptor
-    def initialize(options ={})
+    def initialize(options = {})
     end
 
     def encrypt(value)
@@ -70,7 +71,6 @@ end
 Just require your code and setup your model to use it. Just pass the class name
 as a string or an underscored symbol
 
-
 ```ruby
 class MyModel < ActiveRecord::Base
   crypt_keeper :field, :other_field, :encryptor => :my_encryptor, :key => 'super_good_password'
@@ -79,19 +79,21 @@ end
 
 ## Available Encryptors
 
-There are two included encryptors. 
+There are two included encryptors.
 
 * [AES](https://github.com/jmazzi/crypt_keeper_providers/blob/master/lib/crypt_keeper_providers/aes.rb)
   * Encryption is peformed using AES-256 via OpenSSL.
 
-* [PostgreSQL PGP](https://github.com/jmazzi/crypt_keeper_providers/blob/master/lib/crypt_keeper_providers/postgres_pgp.rb). 
- * Encryption is performed using PostgresSQL's native [PGP functions](http://www.postgresql.org/docs/9.1/static/pgcrypto.html).
- * It requires the `pgcrypto` PostgresSQL extension. `CREATE EXTENSION IF NOT EXISTS pgcrypto`
- * ActiveRecord logs are [automatically](https://github.com/jmazzi/crypt_keeper_providers/blob/master/lib/crypt_keeper_providers/postgres_pgp/log_subscriber.rb) filtered for you to protect senitive data from being logged.
+* [PostgreSQL PGP](https://github.com/jmazzi/crypt_keeper_providers/blob/master/lib/crypt_keeper_providers/postgres_pgp.rb).
+  * Encryption is performed using PostgresSQL's native [PGP functions](http://www.postgresql.org/docs/9.1/static/pgcrypto.html).
+  * It requires the `pgcrypto` PostgresSQL extension:
+    `CREATE EXTENSION IF NOT EXISTS pgcrypto`
+  * ActiveRecord logs are [automatically](https://github.com/jmazzi/crypt_keeper_providers/blob/master/lib/crypt_keeper_providers/postgres_pgp/log_subscriber.rb)
+    filtered for you to protect senitive data from being logged.
 
 ## Requirements
 
-Crypt Keeper has been tested against ActiveRecord 3.0, 3.1, and 3.2 using ruby
+CryptKeeper has been tested against ActiveRecord 3.0, 3.1, and 3.2 using ruby
 1.9.2, 1.9.3 and jruby in 1.9 mode.
 
 ## Installation
