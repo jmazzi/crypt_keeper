@@ -34,7 +34,7 @@
 
 <h1>CryptKeeper</h1>
 
-<p>Provides transparent encryption for ActiveRecord. It is encryption agnostic. 
+<p>Provides transparent encryption for ActiveRecord. It is encryption agnostic.
 You can guard your data with any encryption algorithm you want. All you need
 is a simple class that does 3 things.</p>
 
@@ -43,22 +43,21 @@ is a simple class that does 3 things.</p>
 </li>
 <li>Provides an <code>encrypt</code> method that returns the encrypted string</li>
 <li>Provides a <code>decrypt</code> method that returns the plaintext</li>
-</ol><p>Note: Any options defined using <code>crypt_keeper</code> will be passed to <code>new</code> as a 
+</ol><p>Note: Any options defined using <code>crypt_keeper</code> will be passed to <code>new</code> as a
 hash.</p>
 
 <p>You can see an AES example <a href="https://github.com/jmazzi/crypt_keeper_providers/blob/master/lib/crypt_keeper_providers/aes.rb">here</a>.</p>
 
 <h2>Why?</h2>
 
-<p>The options available were either too complicated under the hood or had weird 
+<p>The options available were either too complicated under the hood or had weird
 edge cases that made the library hard to use. I wanted to write something
 simple that <em>just works</em>.</p>
 
 <h2>Usage</h2>
 
 <div class="highlight"><pre><span class="k">class</span> <span class="nc">MyModel</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
-  <span class="n">crypt_keeper</span> <span class="ss">:field</span><span class="p">,</span> <span class="ss">:other_field</span><span class="p">,</span> <span class="ss">:encryptor</span> <span class="o">=&gt;</span> <span class="ss">:aes</span><span class="p">,</span>
-    <span class="ss">:key</span> <span class="o">=&gt;</span> <span class="s1">'super_good_password'</span>
+  <span class="n">crypt_keeper</span> <span class="ss">:field</span><span class="p">,</span> <span class="ss">:other_field</span><span class="p">,</span> <span class="ss">:encryptor</span> <span class="o">=&gt;</span> <span class="ss">:aes</span><span class="p">,</span> <span class="ss">:key</span> <span class="o">=&gt;</span> <span class="s1">'super_good_password'</span>
 <span class="k">end</span>
 
 <span class="n">model</span> <span class="o">=</span> <span class="no">MyModel</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">field</span><span class="p">:</span> <span class="s1">'sometext'</span><span class="p">)</span>
@@ -66,25 +65,26 @@ simple that <em>just works</em>.</p>
 <span class="n">model</span><span class="o">.</span><span class="n">field</span> <span class="c1">#=&gt; 'sometext'</span>
 </pre></div>
 
-<p>It works with all persistences methods: <code>update_attributes</code>, <code>create</code>, <code>save</code> 
+<p>It works with all persistences methods: <code>update_attributes</code>, <code>create</code>, <code>save</code>
 etc.</p>
 
 <p>Note: <code>update_attribute</code> is deprecated in ActiveRecord 3.2.7. It is superseded
-by <a href="http://apidock.com/rails/ActiveRecord/Persistence/update_column">update_column</a> which <em>skips</em> all validations, callbacks.</p>
+by <a href="http://apidock.com/rails/ActiveRecord/Persistence/update_column">update_column</a>
+which <em>skips</em> all validations, callbacks.</p>
 
-<p>That means using <code>update_column</code> will not perform any encryption. This is 
-expected behavior, and has it's use cases. An example would be migrating from
+<p>That means using <code>update_column</code> will not perform any encryption. This is
+expected behavior, and has its use cases. An example would be migrating from
 one type of encryption to another. Using <code>update_column</code> would allow you to
 update the content without going through the current encryptor.</p>
 
 <h2>Creating your own encryptor</h2>
 
-<p>Creating your own encryptor is easy. All you have to do is create a class 
+<p>Creating your own encryptor is easy. All you have to do is create a class
 under the <code>CryptKeeperProviders</code> namespace, like this:</p>
 
 <div class="highlight"><pre><span class="k">module</span> <span class="nn">CryptKeeperProviders</span>
   <span class="k">class</span> <span class="nc">MyEncryptor</span>
-    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">options</span> <span class="o">=</span><span class="p">{})</span>
+    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">options</span> <span class="o">=</span> <span class="p">{})</span>
     <span class="k">end</span>
 
     <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
@@ -94,20 +94,20 @@ under the <code>CryptKeeperProviders</code> namespace, like this:</p>
     <span class="k">end</span>
   <span class="k">end</span>
 <span class="k">end</span>
+
 </pre></div>
 
 <p>Just require your code and setup your model to use it. Just pass the class name
 as a string or an underscored symbol</p>
 
 <div class="highlight"><pre><span class="k">class</span> <span class="nc">MyModel</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
-  <span class="n">crypt_keeper</span> <span class="ss">:field</span><span class="p">,</span> <span class="ss">:other_field</span><span class="p">,</span> <span class="ss">:encryptor</span> <span class="o">=&gt;</span> <span class="ss">:my_encryptor</span><span class="p">,</span> 
-    <span class="ss">:key</span> <span class="o">=&gt;</span> <span class="s1">'super_good_password'</span>
+  <span class="n">crypt_keeper</span> <span class="ss">:field</span><span class="p">,</span> <span class="ss">:other_field</span><span class="p">,</span> <span class="ss">:encryptor</span> <span class="o">=&gt;</span> <span class="ss">:my_encryptor</span><span class="p">,</span> <span class="ss">:key</span> <span class="o">=&gt;</span> <span class="s1">'super_good_password'</span>
 <span class="k">end</span>
 </pre></div>
 
 <h2>Available Encryptors</h2>
 
-<p>There are two included encryptors. </p>
+<p>There are two included encryptors.</p>
 
 <ul>
 <li>
@@ -118,18 +118,20 @@ as a string or an underscored symbol</p>
 </ul>
 </li>
 <li>
-<p><a href="https://github.com/jmazzi/crypt_keeper_providers/blob/master/lib/crypt_keeper_providers/postgres_pgp.rb">PostgreSQL PGP</a>. </p>
+<p><a href="https://github.com/jmazzi/crypt_keeper_providers/blob/master/lib/crypt_keeper_providers/postgres_pgp.rb">PostgreSQL PGP</a>.</p>
 
 <ul>
 <li>Encryption is performed using PostgresSQL's native <a href="http://www.postgresql.org/docs/9.1/static/pgcrypto.html">PGP functions</a>.</li>
-<li>It requires the <code>pgcrypto</code> PostgresSQL extension. <code>CREATE EXTENSION IF NOT EXISTS pgcrypto</code>
+<li>It requires the <code>pgcrypto</code> PostgresSQL extension:
+<code>CREATE EXTENSION IF NOT EXISTS pgcrypto</code>
 </li>
-<li>ActiveRecord logs are <a href="https://github.com/jmazzi/crypt_keeper_providers/blob/master/lib/crypt_keeper_providers/postgres_pgp/log_subscriber.rb">automatically</a> filtered for you to protect senitive data from being logged.</li>
+<li>ActiveRecord logs are <a href="https://github.com/jmazzi/crypt_keeper_providers/blob/master/lib/crypt_keeper_providers/postgres_pgp/log_subscriber.rb">automatically</a>
+filtered for you to protect senitive data from being logged.</li>
 </ul>
 </li>
 </ul><h2>Requirements</h2>
 
-<p>Crypt Keeper has been tested against ActiveRecord 3.0, 3.1, and 3.2 using ruby
+<p>CryptKeeper has been tested against ActiveRecord 3.0, 3.1, and 3.2 using ruby
 1.9.2, 1.9.3 and jruby in 1.9 mode.</p>
 
 <h2>Installation</h2>
