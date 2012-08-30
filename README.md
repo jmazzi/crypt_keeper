@@ -84,6 +84,9 @@ There are two included encryptors.
 * [AES](https://github.com/jmazzi/crypt_keeper_providers/blob/master/lib/crypt_keeper_providers/aes.rb)
   * Encryption is peformed using AES-256 via OpenSSL.
 
+* [MySQL AES](https://github.com/jmazzi/crypt_keeper_providers/blob/master/lib/crypt_keeper_providers/mysql_aes.rb)
+  * Encryption is peformed MySQL's native AES functions.
+
 * [PostgreSQL PGP](https://github.com/jmazzi/crypt_keeper_providers/blob/master/lib/crypt_keeper_providers/postgres_pgp.rb).
   * Encryption is performed using PostgresSQL's native [PGP functions](http://www.postgresql.org/docs/9.1/static/pgcrypto.html).
   * It requires the `pgcrypto` PostgresSQL extension:
