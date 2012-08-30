@@ -1,7 +1,7 @@
 PATH
   remote: /home/justin/work/ruby/crypt_keeper
   specs:
-    crypt_keeper (0.3.0)
+    crypt_keeper (0.4.1)
       activerecord (>= 3.0)
       activesupport (>= 3.0)
       appraisal (~> 0.4.1)
