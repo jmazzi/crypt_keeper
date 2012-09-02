@@ -1,6 +1,5 @@
 require 'active_support/concern'
 require 'active_support/core_ext/array/extract_options'
-require 'crypt_keeper_providers'
 
 module CryptKeeper
   module Model
@@ -68,7 +67,7 @@ module CryptKeeper
 
       # Private: The encryptor class
       def encryptor_klass
-        @encryptor_klass ||= "CryptKeeperProviders::#{crypt_keeper_encryptor.to_s.camelize}".constantize
+        @encryptor_klass ||= "CryptKeeper::Provider::#{crypt_keeper_encryptor.to_s.camelize}".constantize
       end
 
       # Private: Ensure that the encryptor responds to new

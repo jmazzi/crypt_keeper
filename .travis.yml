@@ -4,6 +4,11 @@ gemfile:
   - gemfiles/activerecord_3_0.gemfile
   - gemfiles/activerecord_3_1.gemfile
   - gemfiles/activerecord_3_2.gemfile
+before_script:
+  - cp spec/default.database.yml spec/database.yml
+  - psql -c 'CREATE DATABASE crypt_keeper_providers;' -U postgres
+  - psql crypt_keeper_providers -c 'CREATE EXTENSION IF NOT EXISTS pgcrypto;' -U postgres
+  - mysql -e 'CREATE DATABASE crypt_keeper_providers'
 notifications:
   email:
     recipients:
