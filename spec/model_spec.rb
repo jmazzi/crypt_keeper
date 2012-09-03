@@ -56,6 +56,13 @@ module CryptKeeper
           subject.save!
           subject.storage.should == cipher_text
         end
+
+        it "should not encrypt nil" do
+          subject.storage = nil
+          subject.stub :decrypt_callback
+          subject.save!
+          subject.storage.should be_nil
+        end
       end
 
       describe "#decrypt" do
@@ -64,6 +71,13 @@ module CryptKeeper
           subject.stub :encrypt_callback
           subject.save!
           subject.storage.should == plain_text
+        end
+
+        it "should not decrypt nil" do
+          subject.storage = nil
+          subject.stub :encrypt_callback
+          subject.save!
+          subject.storage.should be_nil
         end
       end
 
