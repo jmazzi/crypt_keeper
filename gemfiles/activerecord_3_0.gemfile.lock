@@ -1,5 +1,5 @@
 PATH
-  remote: /home/justin/work/Site5/crypt_keeper
+  remote: /home/justin/work/ruby/crypt_keeper
   specs:
     crypt_keeper (0.4.2)
       activerecord (>= 3.0)
