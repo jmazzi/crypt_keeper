@@ -15,7 +15,7 @@ is a simple class that does 3 things.
 Note: Any options defined using `crypt_keeper` will be passed to `new` as a
 hash.
 
-You can see an AES example [here](/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/aes.rb).
+You can see an AES example [here](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/aes.rb).
 
 ## Why?
 
