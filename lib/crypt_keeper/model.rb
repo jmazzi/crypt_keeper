@@ -1,6 +1,5 @@
 require 'active_support/concern'
 require 'active_support/core_ext/array/extract_options'
-require 'crypt_keeper_providers'
 
 module CryptKeeper
   module Model
@@ -11,14 +10,18 @@ module CryptKeeper
     # Private: Encrypt each crypt_keeper_fields
     def encrypt_callback
       crypt_keeper_fields.each do |field|
-        self[field] = self.class.encrypt read_attribute(field)
+        if !self[field].nil?
+          self[field] = self.class.encrypt read_attribute(field)
+        end
       end
     end
 
     # Private: Decrypt each crypt_keeper_fields
     def decrypt_callback
       crypt_keeper_fields.each do |field|
-        self[field] = self.class.decrypt read_attribute(field)
+        if !self[field].nil?
+          self[field] = self.class.decrypt read_attribute(field)
+        end
       end
     end
 
@@ -68,7 +71,7 @@ module CryptKeeper
 
       # Private: The encryptor class
       def encryptor_klass
-        @encryptor_klass ||= "CryptKeeperProviders::#{crypt_keeper_encryptor.to_s.camelize}".constantize
+        @encryptor_klass ||= "CryptKeeper::Provider::#{crypt_keeper_encryptor.to_s.camelize}".constantize
       end
 
       # Private: Ensure that the encryptor responds to new

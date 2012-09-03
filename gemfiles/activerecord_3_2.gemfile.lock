@@ -5,7 +5,6 @@ PATH
       activerecord (>= 3.0)
       activesupport (>= 3.0)
       appraisal (~> 0.4.1)
-      crypt_keeper_providers (= 0.5.2)
 
 GEM
   remote: https://rubygems.org/
@@ -26,7 +25,6 @@ GEM
       rake
     arel (3.0.2)
     builder (3.0.0)
-    crypt_keeper_providers (0.5.2)
     diff-lcs (1.1.3)
     ffi (1.1.5)
     guard (1.3.2)
@@ -40,6 +38,8 @@ GEM
       rb-fsevent (~> 0.9.1)
       rb-inotify (~> 0.8.8)
     multi_json (1.3.6)
+    mysql2 (0.3.11)
+    pg (0.14.0)
     rake (0.9.2.2)
     rb-fchange (0.0.5)
       ffi
@@ -67,6 +67,8 @@ DEPENDENCIES
   crypt_keeper!
   guard (~> 1.3.0)
   guard-rspec (~> 1.2.0)
+  mysql2 (~> 0.3.11)
+  pg (~> 0.14.0)
   rake (~> 0.9.2.2)
   rspec (~> 2.11.0)
   sqlite3
