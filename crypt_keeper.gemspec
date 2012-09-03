@@ -17,7 +17,6 @@ Gem::Specification.new do |gem|
 
   gem.add_runtime_dependency 'activerecord',           '>= 3.0'
   gem.add_runtime_dependency 'activesupport',          '>= 3.0'
-  gem.add_runtime_dependency 'crypt_keeper_providers', '0.5.2'
   gem.add_runtime_dependency 'appraisal',              '~> 0.4.1'
 
   gem.add_development_dependency 'rspec',       '~> 2.11.0'
@@ -28,7 +27,11 @@ Gem::Specification.new do |gem|
   if RUBY_PLATFORM == 'java'
     gem.add_development_dependency 'jruby-openssl', '~> 0.7.7'
     gem.add_development_dependency 'activerecord-jdbcsqlite3-adapter'
+    gem.add_development_dependency 'activerecord-jdbcpostgresql-adapter'
+    gem.add_development_dependency 'activerecord-jdbcmysql-adapter'
   else
     gem.add_development_dependency 'sqlite3'
+    gem.add_development_dependency 'pg', '~> 0.14.0'
+    gem.add_development_dependency 'mysql2', '~> 0.3.11'
   end
 end

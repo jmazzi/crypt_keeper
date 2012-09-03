@@ -2,7 +2,10 @@ require 'spec_helper'
 
 module CryptKeeper
   describe Model do
+    use_sqlite
+
     subject { SensitiveData }
+
     describe "#crypt_keeper" do
       after(:each) do
         subject.instance_variable_set(:@encryptor_klass, nil)
@@ -29,7 +32,7 @@ module CryptKeeper
 
         it "should accept class name (as string) for encryptor option" do
           subject.crypt_keeper :storage, :secret, key1: 1, key2: 2, encryptor: "FakeEncryptor"
-          subject.send(:encryptor_klass).should == CryptKeeperProviders::FakeEncryptor
+          subject.send(:encryptor_klass).should == CryptKeeper::Provider::FakeEncryptor
 
           subject.instance_variable_set(:@encryptor_klass, nil)
         end
@@ -53,6 +56,13 @@ module CryptKeeper
           subject.save!
           subject.storage.should == cipher_text
         end
+
+        it "should not encrypt nil" do
+          subject.storage = nil
+          subject.stub :decrypt_callback
+          subject.save!
+          subject.storage.should be_nil
+        end
       end
 
       describe "#decrypt" do
@@ -61,6 +71,13 @@ module CryptKeeper
           subject.stub :encrypt_callback
           subject.save!
           subject.storage.should == plain_text
+        end
+
+        it "should not decrypt nil" do
+          subject.storage = nil
+          subject.stub :encrypt_callback
+          subject.save!
+          subject.storage.should be_nil
         end
       end
 

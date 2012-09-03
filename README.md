@@ -15,7 +15,7 @@ is a simple class that does 3 things.
 Note: Any options defined using `crypt_keeper` will be passed to `new` as a
 hash.
 
-You can see an AES example [here](https://github.com/jmazzi/crypt_keeper_providers/blob/master/lib/crypt_keeper_providers/aes.rb).
+You can see an AES example [here](/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/aes.rb).
 
 ## Why?
 
@@ -50,18 +50,20 @@ update the content without going through the current encryptor.
 ## Creating your own encryptor
 
 Creating your own encryptor is easy. All you have to do is create a class
-under the `CryptKeeperProviders` namespace, like this:
+under the `CryptKeeper::Provider` namespace, like this:
 
 ```ruby
-module CryptKeeperProviders
-  class MyEncryptor
-    def initialize(options = {})
-    end
+module CryptKeeper
+  module Provider
+    class MyEncryptor
+      def initialize(options = {})
+      end
 
-    def encrypt(value)
-    end
+      def encrypt(value)
+      end
 
-    def decrypt(value)
+      def decrypt(value)
+      end
     end
   end
 end
@@ -81,19 +83,19 @@ end
 
 There are two included encryptors.
 
-* [AES](https://github.com/jmazzi/crypt_keeper_providers/blob/master/lib/crypt_keeper_providers/aes.rb)
+* [AES](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/aes.rb)
   * Encryption is peformed using AES-256 via OpenSSL.
 
 
-* [MySQL AES](https://github.com/jmazzi/crypt_keeper_providers/blob/master/lib/crypt_keeper_providers/mysql_aes.rb)
+* [MySQL AES](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/mysql_aes.rb)
   * Encryption is peformed MySQL's native AES functions.
 
 
-* [PostgreSQL PGP](https://github.com/jmazzi/crypt_keeper_providers/blob/master/lib/crypt_keeper_providers/postgres_pgp.rb).
+* [PostgreSQL PGP](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/postgres_pgp.rb).
   * Encryption is performed using PostgresSQL's native [PGP functions](http://www.postgresql.org/docs/9.1/static/pgcrypto.html).
   * It requires the `pgcrypto` PostgresSQL extension:
     `CREATE EXTENSION IF NOT EXISTS pgcrypto`
-  * ActiveRecord logs are [automatically](https://github.com/jmazzi/crypt_keeper_providers/blob/master/lib/crypt_keeper_providers/postgres_pgp/log_subscriber.rb)
+  * ActiveRecord logs are [automatically](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/log_subscriber/postgres_pgp.rb)
     filtered for you to protect senitive data from being logged.
 
 ## Requirements
