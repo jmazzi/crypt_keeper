@@ -50,7 +50,11 @@ module CryptKeeper
       #   If :private_key HAS NOT been set, return encrypted bytes (pass-through mode)
       def decrypt(value)
         return value if private_key == nil
-        escape_and_execute_sql(["SELECT pgp_pub_decrypt(?, dearmor(?), ?)", value, private_key, password])['pgp_pub_decrypt']
+        if password
+          escape_and_execute_sql(["SELECT pgp_pub_decrypt(?, dearmor(?), ?)", value, private_key, password])['pgp_pub_decrypt']
+        else
+          escape_and_execute_sql(["SELECT pgp_pub_decrypt(?, dearmor(?))", value, private_key])['pgp_pub_decrypt']
+        end
       end
 
       private
