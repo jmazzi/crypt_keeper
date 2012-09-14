@@ -11,7 +11,7 @@ module CryptKeeper
       # into a spec :). This is a Base64 encoded string of 'test' AES encrypted
       # by AES_ENCRYPT()
       let(:cipher_text) do
-        Base64.decode64 "nbKOoWn8kvAw9k/C2Mex6Q==\n"
+        "nbKOoWn8kvAw9k/C2Mex6Q==\n"
       end
 
       subject { MysqlAes.new key: 'candy' }
