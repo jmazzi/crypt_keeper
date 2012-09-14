@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-module CryptKeeperProviders
-  describe PostgresPgpLogSubscriber do
+module CryptKeeper::LogSubscriber
+  describe PostgresPgp do
     use_postgres
 
     subject { ::ActiveRecord::LogSubscriber.new }

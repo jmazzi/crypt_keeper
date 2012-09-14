@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-module CryptKeeperProviders
-  describe MysqlAesLogSubscriber do
+module CryptKeeper::LogSubscriber
+  describe MysqlAes do
     use_postgres
 
     subject { ::ActiveRecord::LogSubscriber.new }
