@@ -8,10 +8,29 @@ module CryptKeeper
       # Public: Initializes the encryptor
       #
       #  options - A hash, :public_key is required
+      #
+      # NOTE:
+      #  :public_key and :private_key are expected to be in ASCII Armor format
+      #  see: http://tools.ietf.org/html/rfc4880#section-6.2
+      #
+      # EXAMPLES:
+      #  Encrypt & Decrypt (standard mode:
+      #   PostgresPgpPubKey.new public_key: pub, private_key: priv
+      #   - or -
+      #   PostgresPgpPubKey.new public_key: pub, private_key: priv, password: psswd
+      #
+      #  Encrypt-only (pass-through mode):
+      #   PostgresPgpPubKey.new public_key: pub
+      #   NOTE:
+      #    'Pass-through mode' is convenient for storage of asymmetrically-encrypted
+      #    data within the database. When :private_key is not provided, the
+      #    encrypted data will be 'passed-through' in the #decrypt method.
+      #    This mode allows for offline decryption of data.
       def initialize(options = {})
         @public_key = options.fetch(:public_key) do
           raise ArgumentError, "Missing :public_key"
         end
+        # :private_key and :password are not required (pass-through mode)
         @private_key, @password = options.fetch(:private_key, nil),
                                   options.fetch(:password, nil)
         raise ArgumentError, "Provided :password but missing :private_key" if password && private_key.blank?
@@ -26,8 +45,9 @@ module CryptKeeper
 
       # Public: Decrypts a string
       #
-      # Returns a plaintext string if :private_key is present and
-      #         the encrypted value if :private_key is not present
+      # Returns:
+      #   If :private_key HAS been set, returns a plaintext string
+      #   If :private_key HAS NOT been set, return encrypted bytes (pass-through mode)
       def decrypt(value)
         return value if private_key == nil
         escape_and_execute_sql(["SELECT pgp_pub_decrypt(?, dearmor(?), ?)", value, private_key, password])['pgp_pub_decrypt']
