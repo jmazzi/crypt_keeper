@@ -47,7 +47,9 @@ expected behavior, and has its use cases. An example would be migrating from
 one type of encryption to another. Using `update_column` would allow you to
 update the content without going through the current encryptor.
 
-### Using the PostgreSQL PGP Encryptor
+### Using the PostgreSQL PGP Public-Key Encryptor/Decyptor
+
+**NOTE:** `:public_key` and `:private_key` are expected to be in ASCII Armor format.
 
 **Encrypt/Decrypt Mode:**
 
@@ -89,7 +91,7 @@ model.save!   #=> Your data is now encrypted.
 model.field   #=> '\\x..................'
 model.field64 #=> Base64-encoded version of encrypted text
 ```
-*NOTE:* To use PostgreSQL's PGP functions, you must enable the `pgcrypto`
+**NOTE:** To use PostgreSQL's PGP functions, you must enable the `pgcrypto`
 extension for the database(s) in your application:
 
 ```
