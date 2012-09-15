@@ -12,7 +12,7 @@ module CryptKeeper
 
       # Public: Prevents sensitive data from being logged
       def sql_with_postgres_pgp_pub_key(event)
-        filter = /(pgp_pub_(encrypt|decrypt))\(((.|\n)*?)\)/i
+        filter = /(pgp_pub_(encrypt|decrypt)|dearmor)\(((.|\n)*?)\)/i
 
         event.payload[:sql] = event.payload[:sql].gsub(filter) do |_|
           "#{$1}([FILTERED])"
