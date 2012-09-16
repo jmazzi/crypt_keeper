@@ -18,15 +18,17 @@ module CryptKeeper::LogSubscriber
     end
 
     let(:output_query) do
-      "SELECT pgp_pub_encrypt([FILTERED]), pgp_pub_decrypt([FILTERED]) FROM DUAL;"
+      "SELECT pgp_pub_encrypt([FILTERED])"
     end
 
+    # sql_without_postgres_pgp_pub_key
+
     it "filters pgp functions" do
-      subject.should_receive(:sql_without_postgres_pgp) do |event|
+      subject.should_receive(:sql_without_postgres_pgp_pub_key) do |event|
         event.payload[:sql].should == output_query
       end
 
-      subject.sql(ActiveSupport::Notifications::Event.new(:sql, 1, 1, 1, { sql: output_query }))
+      subject.sql(ActiveSupport::Notifications::Event.new(:sql, 1, 1, 1, { sql: input_query }))
     end
   end
 end

@@ -19,7 +19,7 @@ module CryptKeeper::LogSubscriber
         event.payload[:sql].should == output_query
       end
 
-      subject.sql(ActiveSupport::Notifications::Event.new(:sql, 1, 1, 1, { sql: output_query }))
+      subject.sql(ActiveSupport::Notifications::Event.new(:sql, 1, 1, 1, { sql: input_query }))
     end
   end
 end
