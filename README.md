@@ -134,30 +134,31 @@ end
 
 ## Available Encryptors
 
-There are two included encryptors.
+There are four (4) included encryptors:
 
-* [AES](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/aes.rb)
+- [AES](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/aes.rb)
   * Encryption is peformed using AES-256 via OpenSSL.
 
-
-* [MySQL AES](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/mysql_aes.rb)
+- [MySQL AES](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/mysql_aes.rb)
   * Encryption is peformed MySQL's native AES functions.
   * ActiveRecord logs are [automatically](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/log_subscriber/mysql_aes.rb)
     filtered for you to protect senitive data from being logged.
 
-
-* [PostgreSQL PGP Symmetric-Key Encryption](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/postgres_pgp.rb).
-  * Encryption is performed using PostgresSQL's native [PGP symmetric-key functions](http://www.postgresql.org/docs/9.1/static/pgcrypto.html).
+- [PostgreSQL PGP Symmetric-Key Encryption](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/postgres_pgp.rb).
+  * Encryption is performed using PostgresSQL's native [PGP symmetric-key functions](http://www.postgresql.org/docs/9.1/static/pgcrypto.html#AEN136344).
   * It requires the `pgcrypto` PostgresSQL extension:
+
     `CREATE EXTENSION IF NOT EXISTS pgcrypto`
+
   * ActiveRecord logs are [automatically](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/log_subscriber/postgres_pgp.rb)
     filtered for you to protect senitive data from being logged.
 
-
-* [PostgreSQL PGP Public-Key Encryption](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/postgres_pgp_pub_key.rb).
+- [PostgreSQL PGP Public-Key Encryption](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/postgres_pgp_pub_key.rb).
   * Encryption is performed using PostgresSQL's native [PGP asymmetrical public-key functions](http://www.postgresql.org/docs/9.1/static/pgcrypto.html#AEN136363).
   * It requires the `pgcrypto` PostgresSQL extension:
+
     `CREATE EXTENSION IF NOT EXISTS pgcrypto`
+
   * ActiveRecord logs are [automatically](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/log_subscriber/postgres_pgp_pub_key.rb)
     filtered for you to protect senitive data from being logged.
 
