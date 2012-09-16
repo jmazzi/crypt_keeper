@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-module CryptKeeperProviders
-  describe PostgresPgpPubKeyLogSubscriber do
+module CryptKeeper::LogSubscriber
+  describe PostgresPgpPubKey do
     use_postgres
 
     # load key pairs from YAML
