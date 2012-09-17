@@ -13,12 +13,14 @@ module CryptKeeper
       pass_options        = { public_key:   pass_hash['public_key'],
                               private_key:  pass_hash['private_key'],
                               password:     pass_hash['password'] }
+      pass_key_id         = '2349BC8B89E5B5E8'
       pass_provider       = PostgresPgpPubKey.new pass_options
 
       # non-password-protected keys
       nopass_hash         = keys_file['without_password']
       nopass_options      = { public_key:   nopass_hash['public_key'],
                               private_key:  nopass_hash['private_key'] }
+      nopass_key_id       = '1188D4BEB4B433F8'
       nopass_provider     = PostgresPgpPubKey.new nopass_options
 
       # sample data to be encrypted/decrypted
@@ -111,6 +113,42 @@ module CryptKeeper
             subject.private_key = nil
             cipher_payload = subject.encrypt(plain_text)
             subject.decrypt(cipher_payload).should == cipher_payload
+          end
+        end
+      end
+
+      describe "#public_key_id" do
+        describe "password-protected key pairs" do
+          subject { pass_provider }
+
+          it "should return proper key ID" do
+            subject.public_key_id.should == pass_key_id
+          end
+        end
+
+        describe "non-password-protected key pairs" do
+          subject { nopass_provider }
+
+          it "should return proper key ID" do
+            subject.public_key_id.should == nopass_key_id
+          end
+        end
+      end
+
+      describe "#private_key_id" do
+        describe "password-protected key pairs" do
+          subject { pass_provider }
+
+          it "should return proper key ID" do
+            subject.private_key_id.should == pass_key_id
+          end
+        end
+
+        describe "non-password-protected key pairs" do
+          subject { nopass_provider }
+
+          it "should return proper key ID" do
+            subject.private_key_id.should == nopass_key_id
           end
         end
       end

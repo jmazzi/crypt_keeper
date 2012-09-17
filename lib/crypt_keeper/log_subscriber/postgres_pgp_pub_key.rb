@@ -14,7 +14,7 @@ module CryptKeeper
       def sql_with_postgres_pgp_pub_key(event)
         # this is a very aggressive regular expression due to variety of
         # ASCII Armor character sequences
-        filter = /(pgp_pub_encrypt|pgp_pub_decrypt).*/mix
+        filter = /(pgp_pub_(encrypt|decrypt)|pgp_key_id).*/mix
 
         event.payload[:sql] = event.payload[:sql].gsub(filter) do |_|
           "#{$1}([FILTERED])"

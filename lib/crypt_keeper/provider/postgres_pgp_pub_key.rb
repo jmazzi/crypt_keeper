@@ -57,6 +57,14 @@ module CryptKeeper
         end
       end
 
+      def public_key_id
+        escape_and_execute_sql(["SELECT pgp_key_id(dearmor(?))", public_key])['pgp_key_id']
+      end
+
+      def private_key_id
+        escape_and_execute_sql(["SELECT pgp_key_id(dearmor(?))", private_key])['pgp_key_id']
+      end
+
       private
 
       # Private: Sanitize an sql query and then execute it
