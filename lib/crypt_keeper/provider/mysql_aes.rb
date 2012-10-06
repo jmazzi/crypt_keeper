@@ -3,6 +3,8 @@ require 'crypt_keeper/log_subscriber/mysql_aes'
 module CryptKeeper
   module Provider
     class MysqlAes
+      include CryptKeeper::Helper::SQL
+
       attr_accessor :key
 
       # Public: Initializes the encryptor
@@ -28,14 +30,6 @@ module CryptKeeper
       def decrypt(value)
         escape_and_execute_sql(
           ["SELECT AES_DECRYPT(?, ?)", Base64.decode64(value), key]).first
-      end
-
-      private
-
-      # Private: Sanitize an sql query and then execute it
-      def escape_and_execute_sql(query)
-        query = ::ActiveRecord::Base.send :sanitize_sql_array, query
-        ::ActiveRecord::Base.connection.execute(query).first
       end
     end
   end
