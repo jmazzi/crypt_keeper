@@ -9,7 +9,3 @@ require 'crypt_keeper/provider/postgres_pgp'
 
 module CryptKeeper
 end
-
-ActiveSupport.on_load :active_record do
-  include CryptKeeper::Model
-end
