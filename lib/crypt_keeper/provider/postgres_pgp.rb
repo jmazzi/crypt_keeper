@@ -19,7 +19,7 @@ module CryptKeeper
       #
       # Returns an encrypted string
       def encrypt(value)
-        escape_and_execute_sql(["SELECT pgp_sym_encrypt(?, ?)", value, key])['pgp_sym_encrypt']
+        escape_and_execute_sql(["SELECT pgp_sym_encrypt(?, ?)", value.to_s, key])['pgp_sym_encrypt']
       end
 
       # Public: Decrypts a string
