@@ -18,8 +18,13 @@ module CryptKeeper
           subject.crypt_keeper_fields.should == [:storage, :secret]
         end
 
+        it "should raise an exception with missing field" do
+          msg = "Column :none does not exist"
+          expect { subject.crypt_keeper :none, encryptor: :fake_encryptor }.to raise_error(ArgumentError, msg)
+        end
+
         it "should raise an exception with wrong field type" do
-          msg = ":name must be of type 'text' to be used for encryption"
+          msg = "Column :name must be of type 'text' to be used for encryption"
           expect { subject.crypt_keeper :name, encryptor: :fake_encryptor }.to raise_error(ArgumentError, msg)
         end
       end
