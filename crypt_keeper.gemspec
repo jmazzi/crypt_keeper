@@ -17,7 +17,7 @@ Gem::Specification.new do |gem|
 
   gem.add_runtime_dependency 'activerecord',           '>= 3.0'
   gem.add_runtime_dependency 'activesupport',          '>= 3.0'
-  gem.add_runtime_dependency 'appraisal',              '~> 0.4.1'
+  gem.add_runtime_dependency 'appraisal',              '~> 0.5.1'
 
   gem.add_development_dependency 'rspec',       '~> 2.11.0'
   gem.add_development_dependency 'guard',       '~> 1.3.0'
