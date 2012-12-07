@@ -5,6 +5,16 @@ module CryptKeeper
   module Model
     extend ActiveSupport::Concern
 
+    # Public: Ensures that each field exist and is of type text. This prevents
+    # encrypted data from being truncated.
+    def ensure_valid_field!(field)
+      if self.class.columns_hash["#{field}"].nil?
+        raise ArgumentError, "Column :#{field} does not exist"
+      elsif self.class.columns_hash["#{field}"].type != :text
+        raise ArgumentError, "Column :#{field} must be of type 'text' to be used for encryption"
+      end
+    end
+
     private
 
     # Private: Encrypt each crypt_keeper_fields
@@ -22,6 +32,13 @@ module CryptKeeper
         if !self[field].nil?
           self[field] = self.class.decrypt read_attribute(field)
         end
+      end
+    end
+
+    # Private: Run each crypt_keeper_fields through ensure_valid_field!
+    def enforce_column_types_callback
+      crypt_keeper_fields.each do |field|
+        ensure_valid_field! field
       end
     end
 
@@ -86,20 +103,7 @@ module CryptKeeper
         after_save :decrypt_callback
         after_find :decrypt_callback
         before_save :encrypt_callback
-
-        crypt_keeper_fields.each do |field|
-          ensure_valid_field! field
-        end
-      end
-
-      # Private: Ensures that each field exist and is of type text. This prevents
-      # encrypted data from being truncated.
-      def ensure_valid_field!(field)
-        if columns_hash["#{field}"].nil?
-          raise ArgumentError, "Column :#{field} does not exist"
-        elsif columns_hash["#{field}"].type != :text
-          raise ArgumentError, "Column :#{field} must be of type 'text' to be used for encryption"
-        end
+        before_save :enforce_column_types_callback
       end
     end
   end
