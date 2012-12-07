@@ -88,15 +88,17 @@ module CryptKeeper
         before_save :encrypt_callback
 
         crypt_keeper_fields.each do |field|
-          ensure_field_is_encryptable! field
+          ensure_valid_field! field
         end
       end
 
-      # Private: Ensures that each field is of type text. This prevents
-      # encrypted data from being truncated
-      def ensure_field_is_encryptable!(field)
-        unless columns_hash["#{field}"].type == :text
-          raise ArgumentError, ":#{field} must be of type 'text' to be used for encryption"
+      # Private: Ensures that each field exist and is of type text. This prevents
+      # encrypted data from being truncated.
+      def ensure_valid_field!(field)
+        if columns_hash["#{field}"].nil?
+          raise ArgumentError, "Column :#{field} does not exist"
+        elsif columns_hash["#{field}"].type != :text
+          raise ArgumentError, "Column :#{field} must be of type 'text' to be used for encryption"
         end
       end
     end
