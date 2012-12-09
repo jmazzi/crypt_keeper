@@ -172,7 +172,7 @@ module CryptKeeper
   end
 
   describe Model, "with AES provider" do
-    use_mysql
+    use_mysql(true)
 
     let(:record) { SensitiveData.create! storage: "100", secret: "2010-01-01" }
 
@@ -196,7 +196,7 @@ module CryptKeeper
   end
 
   describe Model, "with MySQL AES provider" do
-    use_mysql
+    use_mysql(true)
 
     let(:record) { SensitiveData.create! storage: "100", secret: "2010-01-01" }
 
@@ -219,8 +219,8 @@ module CryptKeeper
     end
   end
 
-  describe Model, "with MySQL AES provider" do
-    use_postgres
+  describe Model, "with Postgres PGP provider" do
+    use_postgres(true)
 
     let(:record) { SensitiveData.create! storage: "100", secret: "2010-01-01" }
 
