@@ -9,19 +9,35 @@ module CryptKeeper
 
   module ConnectionHelpers
 
-    def use_postgres
+    def use_postgres(define_schema = false)
       before :all do
         ::ActiveRecord::Base.clear_active_connections!
         config = YAML.load_file SPEC_ROOT.join('database.yml')
         ::ActiveRecord::Base.establish_connection(config['postgres'])
+
+        ::ActiveRecord::Schema.define do
+          create_table :sensitive_data, :force => true do |t|
+            t.column :name, :string
+            t.column :storage, :text
+            t.column :secret, :text
+          end
+        end if define_schema
       end
     end
 
-    def use_mysql
+    def use_mysql(define_schema = false)
       before :all do
         ::ActiveRecord::Base.clear_active_connections!
         config = YAML.load_file SPEC_ROOT.join('database.yml')
         ::ActiveRecord::Base.establish_connection(config['mysql'])
+
+        ::ActiveRecord::Schema.define do
+          create_table :sensitive_data, :force => true do |t|
+            t.column :name, :string
+            t.column :storage, :text
+            t.column :secret, :text
+          end
+        end if define_schema
       end
     end
 
@@ -43,7 +59,6 @@ module CryptKeeper
 
   end
 end
-
 
 RSpec.configure do |config|
   config.extend CryptKeeper::ConnectionHelpers
