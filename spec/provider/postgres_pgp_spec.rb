@@ -38,6 +38,12 @@ module CryptKeeper
           subject.decrypt(cipher_text).should == plain_text
         end
       end
+
+      describe "#column_for_select" do
+        it "should apply pgp_sym_decrypt function to given column an alias it as given alias" do
+          subject.column_for_select("column", "alias").should == "pgp_sym_decrypt(column::bytea, 'candy') AS \"alias\""
+        end
+      end
     end
   end
 end

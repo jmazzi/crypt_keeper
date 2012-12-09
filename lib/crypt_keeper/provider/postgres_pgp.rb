@@ -28,6 +28,15 @@ module CryptKeeper
       def decrypt(value)
         escape_and_execute_sql(["SELECT pgp_sym_decrypt(?, ?)", value, key])['pgp_sym_decrypt']
       end
+
+      # Public: Creates SQL string for selecting decrypted value
+      #
+      # column - column to decorate
+      # alias - column alias
+      # Returns SQL string with decrypt function applied to column name and aliased to column alias
+      def column_for_select(column, column_alias)
+        escape_sql(["pgp_sym_decrypt(#{column}::bytea, ?) AS \"#{column_alias}\"", key])
+      end
     end
   end
 end

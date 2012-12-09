@@ -5,8 +5,12 @@ module CryptKeeper
 
       # Private: Sanitize an sql query and then execute it
       def escape_and_execute_sql(query)
-        query = ::ActiveRecord::Base.send :sanitize_sql_array, query
-        ::ActiveRecord::Base.connection.execute(query).first
+        ::ActiveRecord::Base.connection.execute(escape_sql(query)).first
+      end
+      
+      # Private: Sanitize an sql query
+      def escape_sql(query)
+        ::ActiveRecord::Base.send :sanitize_sql_array, query
       end
     end
   end
