@@ -43,6 +43,12 @@ module CryptKeeper
 
           subject.instance_variable_set(:@encryptor_klass, nil)
         end
+
+        it "raises an error on missing encryptor" do
+          msg = "You must specify an encryptor"
+          subject.crypt_keeper :storage, :secret
+          expect { subject.create! storage: 'asdf' }.to raise_error(ArgumentError, msg)
+        end
       end
     end
 

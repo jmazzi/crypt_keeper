@@ -83,7 +83,11 @@ module CryptKeeper
 
       # Private: An instance of the encryptor class
       def encryptor
-        @encryptor ||= encryptor_klass.new(crypt_keeper_options.dup)
+        @encryptor ||= if crypt_keeper_encryptor.blank?
+                         raise ArgumentError.new('You must specify an encryptor')
+                       else
+                         encryptor_klass.new(crypt_keeper_options.dup)
+                       end
       end
 
       # Private: The encryptor class
