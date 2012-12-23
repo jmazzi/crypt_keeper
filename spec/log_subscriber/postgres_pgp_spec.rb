@@ -4,6 +4,11 @@ module CryptKeeper::LogSubscriber
   describe PostgresPgp do
     use_postgres
 
+    # Fire the ActiveSupport.on_load
+    before do
+      CryptKeeper::Provider::PostgresPgp.new key: 'secret'
+    end
+
     subject { ::ActiveRecord::LogSubscriber.new }
 
     let(:input_query) do
