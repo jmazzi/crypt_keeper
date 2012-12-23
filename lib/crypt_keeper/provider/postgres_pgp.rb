@@ -10,6 +10,8 @@ module CryptKeeper
       #
       #  options - A hash, :key is required
       def initialize(options = {})
+        ActiveSupport.run_load_hooks(:crypt_keeper_posgres_pgp_log, self)
+
         @key = options.fetch(:key) do
           raise ArgumentError, "Missing :key"
         end

@@ -24,6 +24,6 @@ module CryptKeeper
   end
 end
 
-ActiveSupport.on_load :active_record do
+ActiveSupport.on_load :crypt_keeper_posgres_pgp_log do
   ActiveRecord::LogSubscriber.send :include, CryptKeeper::LogSubscriber::PostgresPgp
 end
