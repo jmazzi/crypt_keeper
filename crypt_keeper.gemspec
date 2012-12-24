@@ -19,10 +19,11 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency 'activesupport',          '>= 3.0'
   gem.add_runtime_dependency 'appraisal',              '~> 0.5.1'
 
-  gem.add_development_dependency 'rspec',       '~> 2.11.0'
-  gem.add_development_dependency 'guard',       '~> 1.3.0'
-  gem.add_development_dependency 'guard-rspec', '~> 1.2.0'
-  gem.add_development_dependency 'rake',        '~> 0.9.2.2'
+  gem.add_development_dependency 'rspec',       '~> 2.12.0'
+  gem.add_development_dependency 'guard',       '~> 1.6.0'
+  gem.add_development_dependency 'guard-rspec', '~> 2.3.0'
+  gem.add_development_dependency 'rake',        '~> 10.0.3'
+  gem.add_development_dependency 'rb-fsevent',  '~> 0.9.1'
 
   if RUBY_PLATFORM == 'java'
     gem.add_development_dependency 'jruby-openssl', '~> 0.7.7'
