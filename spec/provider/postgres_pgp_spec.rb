@@ -16,27 +16,23 @@ module CryptKeeper
       its(:key) { should == 'candy' }
 
       describe "#initialize" do
-        it "should raise an exception with a missing key" do
-          expect { PostgresPgp.new }.to raise_error(ArgumentError, "Missing :key")
-        end
+        specify { expect { PostgresPgp.new }.to raise_error(ArgumentError, "Missing :key") }
       end
 
       describe "#encrypt" do
-        it "should encrypt the string" do
-          subject.encrypt(plain_text).should_not == plain_text
-          subject.encrypt(plain_text).should_not be_empty
+        context "Strings" do
+          specify { subject.encrypt(plain_text).should_not == plain_text }
+          specify { subject.encrypt(plain_text).should_not be_empty }
         end
 
-        it "encrypts integers" do
-          subject.encrypt(integer_plain_text).should_not == integer_plain_text
-          subject.encrypt(integer_plain_text).should_not be_empty
+        context "Integers" do
+          specify { subject.encrypt(integer_plain_text).should_not == integer_plain_text }
+          specify { subject.encrypt(integer_plain_text).should_not be_empty }
         end
       end
 
       describe "#decrypt" do
-        it "should decrypt the string" do
-          subject.decrypt(cipher_text).should == plain_text
-        end
+        specify { subject.decrypt(cipher_text).should == plain_text }
       end
     end
   end

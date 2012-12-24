@@ -10,13 +10,8 @@ module CryptKeeper
           Digest::SHA256.digest('cake')
         end
 
-        it "should extract the key and digest it" do
-          subject.key.should == hexed_key
-        end
-
-        it "should raise an exception with a missing key" do
-          expect { Aes.new }.to raise_error(ArgumentError, "Missing :key")
-        end
+        its(:key) { should == hexed_key }
+        specify { expect { Aes.new }.to raise_error(ArgumentError, "Missing :key") }
       end
 
       describe "#encrypt" do
@@ -24,11 +19,8 @@ module CryptKeeper
           subject.encrypt 'string'
         end
 
-        it "should encrypt the string" do
-          encrypted.should_not == 'string'
-          encrypted.should_not be_nil
-          encrypted.should_not be_empty
-        end
+        specify { encrypted.should_not == 'string' }
+        specify { encrypted.should_not be_blank }
       end
 
       describe "#decrypt" do
@@ -36,9 +28,7 @@ module CryptKeeper
           subject.decrypt "MC41MDk5MjI2NjgxMDI1MDI2OmNyeXB0X2tlZXBlcjpPI/8dCqWXDMVj7Jqs\nuwf/\n"
         end
 
-        it "should decrypt the string" do
-          decrypted.should == 'string'
-        end
+        specify { decrypted.should == 'string' }
       end
     end
   end
