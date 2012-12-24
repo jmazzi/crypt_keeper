@@ -57,7 +57,8 @@ simple that <em>just works</em>.</p>
 <h2>Usage</h2>
 
 <div class="highlight"><pre><span class="k">class</span> <span class="nc">MyModel</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
-  <span class="n">crypt_keeper</span> <span class="ss">:field</span><span class="p">,</span> <span class="ss">:other_field</span><span class="p">,</span> <span class="ss">:encryptor</span> <span class="o">=&gt;</span> <span class="ss">:aes</span><span class="p">,</span> <span class="ss">:key</span> <span class="o">=&gt;</span> <span class="s1">'super_good_password'</span>
+  <span class="n">crypt_keeper</span> <span class="ss">:field</span><span class="p">,</span> <span class="ss">:other_field</span><span class="p">,</span> <span class="ss">:encryptor</span> <span class="o">=&gt;</span> <span class="ss">:aes</span><span class="p">,</span> 
+    <span class="ss">:key</span> <span class="o">=&gt;</span> <span class="s1">'super_good_password'</span>
 <span class="k">end</span>
 
 <span class="n">model</span> <span class="o">=</span> <span class="no">MyModel</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">field</span><span class="p">:</span> <span class="s1">'sometext'</span><span class="p">)</span>
@@ -103,7 +104,8 @@ under the <code>CryptKeeper::Provider</code> namespace, like this:</p>
 as a string or an underscored symbol</p>
 
 <div class="highlight"><pre><span class="k">class</span> <span class="nc">MyModel</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
-  <span class="n">crypt_keeper</span> <span class="ss">:field</span><span class="p">,</span> <span class="ss">:other_field</span><span class="p">,</span> <span class="ss">:encryptor</span> <span class="o">=&gt;</span> <span class="ss">:my_encryptor</span><span class="p">,</span> <span class="ss">:key</span> <span class="o">=&gt;</span> <span class="s1">'super_good_password'</span>
+  <span class="n">crypt_keeper</span> <span class="ss">:field</span><span class="p">,</span> <span class="ss">:other_field</span><span class="p">,</span> <span class="ss">:encryptor</span> <span class="o">=&gt;</span> <span class="ss">:my_encryptor</span><span class="p">,</span> 
+    <span class="ss">:key</span> <span class="o">=&gt;</span> <span class="s1">'super_good_password'</span>
 <span class="k">end</span>
 </pre></div>
 
