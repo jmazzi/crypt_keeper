@@ -19,22 +19,16 @@ module CryptKeeper
       its(:key) { should == 'candy' }
 
       describe "#initialize" do
-        it "should raise an exception with a missing key" do
-          expect { MysqlAes.new }.to raise_error(ArgumentError, "Missing :key")
-        end
+        specify { expect { MysqlAes.new }.to raise_error(ArgumentError, "Missing :key") }
       end
 
       describe "#encrypt" do
-        it "should encrypt the string" do
-          subject.encrypt(plain_text).should_not == plain_text
-          subject.encrypt(plain_text).should_not be_empty
-        end
+        specify { subject.encrypt(plain_text).should_not == plain_text }
+        specify { subject.encrypt(plain_text).should_not be_blank }
       end
 
       describe "#decrypt" do
-        it "should decrypt the string" do
-          subject.decrypt(cipher_text).should == plain_text
-        end
+        specify { subject.decrypt(cipher_text).should == plain_text }
       end
     end
   end
