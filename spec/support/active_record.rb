@@ -8,7 +8,6 @@ module CryptKeeper
   class SensitiveData < ActiveRecord::Base; end
 
   module ConnectionHelpers
-
     def use_postgres
       before :all do
         ::ActiveRecord::Base.clear_active_connections!
@@ -29,7 +28,7 @@ module CryptKeeper
       before :all do
         ::ActiveRecord::Base.clear_active_connections!
         ::ActiveRecord::Base.establish_connection(:adapter => 'sqlite3',
-                                                  :database => ':memory:')
+          :database => ':memory:')
 
         ::ActiveRecord::Schema.define do
           create_table :sensitive_data, :force => true do |t|
@@ -40,7 +39,6 @@ module CryptKeeper
         end
       end
     end
-
   end
 end
 
