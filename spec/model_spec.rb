@@ -47,6 +47,35 @@ module CryptKeeper
           subject.crypt_keeper :storage, :secret
           expect { subject.create! storage: 'asdf' }.to raise_error(ArgumentError, msg)
         end
+
+        it "should defaults type casts hash to empty hash" do
+          subject.crypt_keeper :storage, :secret, encryptor: "FakeEncryptor"
+          subject.crypt_keeper_type_casts.should == {}
+        end
+
+        it "should set type casts if provided" do
+          subject.crypt_keeper :storage, :secret, encryptor: "FakeEncryptor", type_casts: {storage: :date, secret: :integer}
+          subject.crypt_keeper_type_casts.should == {
+            storage: :date,
+            secret: :integer
+          }
+        end
+      end
+    end
+
+    context "Readers" do
+      let(:plain_text) { 'plain_text' }
+      let(:cipher_text) { 'tooltxet_nialp' }
+
+      before do
+        SensitiveData.crypt_keeper :storage, passphrase: 'tool', encryptor: :encryptor, type_casts: {storage: :integer}
+      end
+
+      subject { SensitiveData.new }
+
+      it "should perform type cast on type casted attributes" do
+        subject.storage = "123"
+        subject.storage.should == 123
       end
     end
 
