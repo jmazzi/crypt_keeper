@@ -60,13 +60,28 @@ module CryptKeeper
         class_attribute :crypt_keeper_options
         class_attribute :crypt_keeper_fields
         class_attribute :crypt_keeper_encryptor
+        class_attribute :crypt_keeper_columns_for_select
 
         self.crypt_keeper_options   = args.extract_options!
         self.crypt_keeper_encryptor = crypt_keeper_options.delete(:encryptor)
         self.crypt_keeper_fields    = args
+        self.crypt_keeper_columns_for_select = if encryptor.respond_to?(:column_for_select)
+          self.column_names.map do |column|
+            if crypt_keeper_fields.map(&:to_s).include?(column)
+              encryptor.column_for_select("#{table_name}.#{column}", "#{table_name}.#{column}")
+            else
+              "#{table_name}.#{column}"
+            end
+          end
+        else
+          self.column_names.map{|column_name| "#{table_name}.#{column_name}"}
+        end
 
         ensure_valid_encryptor!
         define_crypt_keeper_callbacks
+        define_crypt_keeper_readers
+        
+        scope :decrypted, lambda { select(crypt_keeper_columns_for_select) }
       end
 
       # Public: Encrypts a string with the encryptor
@@ -108,6 +123,19 @@ module CryptKeeper
         after_find :decrypt_callback
         before_save :encrypt_callback
         before_save :enforce_column_types_callback
+      end
+
+      # Private: Define attribute readers
+      def define_crypt_keeper_readers
+        crypt_keeper_fields.each do |field|
+          define_method field do
+            if attributes.has_key?("#{self.class.table_name}.#{field}")
+              self["#{self.class.table_name}.#{field}"]
+            else
+              super()
+            end
+          end
+        end
       end
     end
   end

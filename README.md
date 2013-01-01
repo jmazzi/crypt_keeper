@@ -11,6 +11,7 @@ is a simple class that does 3 things.
 1. Takes a hash argument for `initialize`
 2. Provides an `encrypt` method that returns the encrypted string
 3. Provides a `decrypt` method that returns the plaintext
+4. Optionally you can define `column_for_select` method that gets two arguments: column name and column alias and returns sql string that contains decrypt function applied to given column name and aliased to given column alias. This is helpful when you have multiple encrypted columns and would like to retrieve all decrypted values in one query (see `PostgresPgp` class sources for an example).
 
 Note: Any options defined using `crypt_keeper` will be passed to `new` as a
 hash.
