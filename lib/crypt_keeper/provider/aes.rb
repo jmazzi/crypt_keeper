@@ -33,9 +33,7 @@ module CryptKeeper
       def encrypt(value)
         aes.encrypt
         aes.key = key
-        iv      = rand.to_s
-        aes.iv  = iv
-        Base64::encode64("#{iv}#{SEPARATOR}#{aes.update(value.to_s) + aes.final}")
+        Base64::encode64("#{aes.random_iv}#{SEPARATOR}#{aes.update(value.to_s) + aes.final}")
       end
 
       # Public: Decrypt a string
