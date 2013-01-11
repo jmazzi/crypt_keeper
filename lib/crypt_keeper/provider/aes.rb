@@ -24,6 +24,7 @@ module CryptKeeper
           raise ArgumentError, "Missing :key"
         end
 
+        key = key.call if key.respond_to?(:call)
         @key = Digest::SHA256.digest(key)
       end
 

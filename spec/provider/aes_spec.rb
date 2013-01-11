@@ -12,6 +12,12 @@ module CryptKeeper
 
         its(:key) { should == hexed_key }
         specify { expect { Aes.new }.to raise_error(ArgumentError, "Missing :key") }
+
+        context "key is a proc" do
+          subject { Aes.new key: -> { 'cake' } }
+          its(:key) { should == hexed_key }
+        end
+
       end
 
       describe "#encrypt" do
