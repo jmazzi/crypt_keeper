@@ -18,6 +18,11 @@ module CryptKeeper
 
       its(:key) { should == 'candy' }
 
+      context "key is a proc" do
+        subject { MysqlAes.new key: -> { 'candy' } }
+        its(:key) { should == 'candy' }
+      end
+
       describe "#initialize" do
         specify { expect { MysqlAes.new }.to raise_error(ArgumentError, "Missing :key") }
       end
