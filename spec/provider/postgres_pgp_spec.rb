@@ -15,6 +15,11 @@ module CryptKeeper
 
       its(:key) { should == 'candy' }
 
+      context "key is a proc" do
+        subject { PostgresPgp.new key: -> { 'candy' } }
+        its(:key) { should == 'candy' }
+      end
+
       describe "#initialize" do
         specify { expect { PostgresPgp.new }.to raise_error(ArgumentError, "Missing :key") }
       end

@@ -35,6 +35,16 @@ model.save! #=> Your data is now encrypted
 model.field #=> 'sometext'
 ```
 
+The `key` option may be defined as a Proc, allowing you to store your key
+outside of your model and outside of your repository. If your key is stored
+in `config/crypt_keeper.key`:
+
+```ruby
+class MyModel < ActiveRecord::Base
+  crypt_keeper :field, :other_field, :encryptor => :aes, :key => lambda { File.read(File.join(Rails.root, 'config', 'crypt_keeper.key')).chop }
+end
+```
+
 It works with all persistences methods: `update_attributes`, `create`, `save`
 etc.
 

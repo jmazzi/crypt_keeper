@@ -13,9 +13,12 @@ module CryptKeeper
       def initialize(options = {})
         ActiveSupport.run_load_hooks(:crypt_keeper_mysql_aes_log, self)
 
-        @key = options.fetch(:key) do
+        key = options.fetch(:key) do
           raise ArgumentError, "Missing :key"
         end
+
+        @key = key.respond_to?(:call) ? key.call : key
+
       end
 
       # Public: Encrypts a string
