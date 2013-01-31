@@ -14,3 +14,9 @@ mysql:
   pool: 5
   username: root
   password:
+mongoid:
+  sessions:
+    default:
+      database: crypt_keeper_providers
+      hosts:
+        - localhost:27017
