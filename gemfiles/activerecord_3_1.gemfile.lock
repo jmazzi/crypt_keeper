@@ -1,5 +1,15 @@
+GIT
+  remote: https://github.com/mongoid/mongoid
+  revision: c0cb8acd9144d05bf33e5503bc2b819240986997
+  specs:
+    mongoid (3.1.0)
+      activemodel (~> 3.1)
+      moped (~> 1.2)
+      origin (~> 1.0)
+      tzinfo (~> 0.3.22)
+
 PATH
-  remote: /Users/justin/work/Personal/crypt_keeper
+  remote: /home/opahk/code/crypt_keeper
   specs:
     crypt_keeper (0.8.0)
       activerecord (>= 3.0)
@@ -39,8 +49,10 @@ GEM
     listen (0.6.0)
     lumberjack (1.0.2)
     method_source (0.8.1)
+    moped (1.3.2)
     multi_json (1.5.0)
     mysql2 (0.3.11)
+    origin (1.0.11)
     pg (0.14.1)
     pry (0.9.10)
       coderay (~> 1.0.5)
@@ -70,6 +82,7 @@ DEPENDENCIES
   crypt_keeper!
   guard (~> 1.6.0)
   guard-rspec (~> 2.3.0)
+  mongoid!
   mysql2 (~> 0.3.11)
   pg (~> 0.14.0)
   rake (~> 10.0.3)
