@@ -1,3 +1,5 @@
+require 'active_support'
+
 require 'crypt_keeper/version'
 require 'crypt_keeper/model'
 require 'crypt_keeper/persistence'

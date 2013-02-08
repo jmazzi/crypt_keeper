@@ -2,7 +2,7 @@ module CryptKeeper
   module Persistence
     module MongoidPersistence
 
-      # Public: Ensures that each field exist and is of type text. This prevents
+      # Public: Ensures that each field exist and is of type String. This prevents
       # encrypted data from being truncated.
       def ensure_valid_field!(field)
         if self.fields["#{field}"].nil?

@@ -106,3 +106,7 @@ module CryptKeeper
     end
   end
 end
+
+ActiveSupport.on_load :active_record do
+  include CryptKeeper::Model
+end

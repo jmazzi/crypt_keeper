@@ -2,6 +2,8 @@ module CryptKeeper
   module Persistence
     module ActiveRecordPersistence
 
+      # Public: Ensures that each field exist and is of type text. This prevents
+      # encrypted data from being truncated.
       def ensure_valid_field!(field)
         if self.class.columns_hash["#{field}"].nil?
           raise ArgumentError, "Column :#{field} does not exist"
