@@ -5,7 +5,9 @@ require 'logger'
 ::ActiveRecord::Migration.verbose = false
 
 module CryptKeeper
-  class SensitiveData < ActiveRecord::Base; end
+  class SensitiveData < ActiveRecord::Base
+    include CryptKeeper::Model
+  end
 
   module ConnectionHelpers
     def use_postgres
