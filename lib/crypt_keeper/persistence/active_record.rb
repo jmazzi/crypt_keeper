@@ -1,6 +1,6 @@
 module CryptKeeper
   module Persistence
-    module ActiveRecordPersistence
+    module ActiveRecord
 
       # Public: Ensures that each field exist and is of type text. This prevents
       # encrypted data from being truncated.

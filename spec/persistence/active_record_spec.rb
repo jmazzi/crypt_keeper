@@ -2,7 +2,7 @@ require 'spec_helper'
 
 module CryptKeeper
   module Persistence
-    describe ActiveRecordPersistence do
+    describe ActiveRecord do
       use_sqlite
 
       subject { SensitiveData }

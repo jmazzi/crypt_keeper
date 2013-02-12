@@ -1,6 +1,6 @@
 module CryptKeeper
   module Persistence
-    module MongoidPersistence
+    module Mongoid
 
       # Public: Ensures that each field exist and is of type String. This prevents
       # encrypted data from being truncated.
