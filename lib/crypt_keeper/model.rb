@@ -107,6 +107,5 @@ module CryptKeeper
   end
 end
 
-ActiveSupport.on_load :active_record do
-  include CryptKeeper::Model
-end
+ActiveSupport.on_load(:active_record) { include CryptKeeper::Model }
+ActiveSupport.on_load(:mongoid) { include CryptKeeper::Model }

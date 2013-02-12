@@ -7,7 +7,6 @@ unless RUBY_VERSION == '1.9.2'
   module CryptKeeper
     class SensitiveMongo
       include Mongoid::Document
-      include CryptKeeper::Model
 
       field :storage, type: String
       field :secret, type: String
