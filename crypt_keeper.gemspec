@@ -15,10 +15,11 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.version       = CryptKeeper::VERSION
 
-  gem.add_runtime_dependency 'activerecord',           '>= 3.0'
   gem.add_runtime_dependency 'activesupport',          '>= 3.0'
   gem.add_runtime_dependency 'appraisal',              '~> 0.5.1'
 
+  gem.add_development_dependency 'activerecord', '>= 3.0'
+  gem.add_development_dependency 'mongoid',     '~> 3.1.0'
   gem.add_development_dependency 'rspec',       '~> 2.12.0'
   gem.add_development_dependency 'guard',       '~> 1.6.0'
   gem.add_development_dependency 'guard-rspec', '~> 2.3.0'
