@@ -4,7 +4,7 @@ require File.expand_path('../lib/crypt_keeper/version', __FILE__)
 Gem::Specification.new do |gem|
   gem.authors       = ["Justin Mazzi"]
   gem.email         = ["jmazzi@gmail.com"]
-  gem.description   = %q{Transparent encryption for ActiveRecord that isn't over-engineered}
+  gem.description   = %q{Transparent encryption for ActiveRecord/Mongoid that isn't over-engineered}
   gem.summary       = gem.description
   gem.homepage      = "http://jmazzi.github.com/crypt_keeper/"
 
