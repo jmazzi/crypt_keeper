@@ -5,16 +5,6 @@ module CryptKeeper
   module Model
     extend ActiveSupport::Concern
 
-    # Public: Ensures that each field exist and is of type text. This prevents
-    # encrypted data from being truncated.
-    def ensure_valid_field!(field)
-      if self.class.columns_hash["#{field}"].nil?
-        raise ArgumentError, "Column :#{field} does not exist"
-      elsif self.class.columns_hash["#{field}"].type != :text
-        raise ArgumentError, "Column :#{field} must be of type 'text' to be used for encryption"
-      end
-    end
-
     private
 
     # Private: Encrypt each crypt_keeper_fields
@@ -65,6 +55,7 @@ module CryptKeeper
         self.crypt_keeper_encryptor = crypt_keeper_options.delete(:encryptor)
         self.crypt_keeper_fields    = args
 
+        set_persistence_layer!
         ensure_valid_encryptor!
         define_crypt_keeper_callbacks
       end
@@ -80,6 +71,16 @@ module CryptKeeper
       end
 
       private
+
+      # Private: include appropriate persistence layer
+      def set_persistence_layer!
+        include "CryptKeeper::Persistence::#{persistence.camelize}".constantize
+      end
+
+      # Private: persistence layer to use (default: ActiveRecord)
+      def persistence
+        self.crypt_keeper_options.fetch(:persistence, :active_record).to_s
+      end
 
       # Private: An instance of the encryptor class
       def encryptor
@@ -113,6 +114,6 @@ module CryptKeeper
   end
 end
 
-ActiveSupport.on_load :active_record do
-  include CryptKeeper::Model
+[:active_record, :mongoid].each do |orm|
+  ActiveSupport.on_load(orm) { include CryptKeeper::Model }
 end

@@ -4,9 +4,9 @@
 
 # CryptKeeper
 
-Provides transparent encryption for ActiveRecord. It is encryption agnostic.
-You can guard your data with any encryption algorithm you want. All you need
-is a simple class that does 3 things.
+Provides transparent encryption for ActiveRecord/Mongoid. It is encryption
+agnostic.  You can guard your data with any encryption algorithm you want. All
+you need is a simple class that does 3 things.
 
 1. Takes a hash argument for `initialize`
 2. Provides an `encrypt` method that returns the encrypted string
@@ -46,6 +46,11 @@ That means using `update_column` will not perform any encryption. This is
 expected behavior, and has its use cases. An example would be migrating from
 one type of encryption to another. Using `update_column` would allow you to
 update the content without going through the current encryptor.
+
+## Mongoid support
+
+You can use CryptKeeper in your Mongoid documents by passing the `persistence:
+:mongoid` option to `crypt_keeper`.
 
 ## Creating your own encryptor
 
