@@ -23,7 +23,7 @@ module CryptKeeper
       # Returns an encrypted string
       def encrypt(value)
         Base64.encode64 escape_and_execute_sql(
-          ["SELECT AES_ENCRYPT(?, ?)", value, key]).first
+          ["SELECT AES_ENCRYPT(?, ?)", value.to_s, key]).first
       end
 
       # Public: Decrypts a string

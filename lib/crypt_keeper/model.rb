@@ -30,7 +30,7 @@ module CryptKeeper
     def decrypt_callback
       crypt_keeper_fields.each do |field|
         if !self[field].nil?
-          self[field] = self.class.decrypt read_attribute(field)
+          self[field] = self.class.type_cast(field, self.class.decrypt(read_attribute(field)))
         end
       end
     end
@@ -69,7 +69,6 @@ module CryptKeeper
 
         ensure_valid_encryptor!
         define_crypt_keeper_callbacks
-        define_crypt_keeper_readers
       end
 
       # Public: Encrypts a string with the encryptor
@@ -80,6 +79,25 @@ module CryptKeeper
       # Public: Decrypts a string with the encryptor
       def decrypt(value)
         encryptor.decrypt value
+      end
+
+      # Public: Casts value (which is a String) to appropriate instance
+      def type_cast(field, value)
+        return nil if value.nil?
+
+        klass = ::ActiveRecord::ConnectionAdapters::Column
+        case crypt_keeper_type_casts[field]
+          when :string, :text        then value
+          when :integer              then klass.respond_to?(:value_to_integer) ? klass.value_to_integer(value) : (value.to_i rescue value ? 1 : 0)
+          when :float                then value.to_f
+          when :decimal              then klass.value_to_decimal(value)
+          when :datetime, :timestamp then klass.string_to_time(value)
+          when :time                 then klass.string_to_dummy_time(value)
+          when :date                 then klass.respond_to?(:value_to_date) ? klass.value_to_date(value) : klass.string_to_date(value)
+          when :binary               then klass.binary_to_string(value)
+          when :boolean              then klass.value_to_boolean(value)
+          else value
+        end
       end
 
       private
@@ -111,38 +129,6 @@ module CryptKeeper
         after_find :decrypt_callback
         before_save :encrypt_callback
         before_save :enforce_column_types_callback
-      end
-
-      # Private: Define attribute readers
-      def define_crypt_keeper_readers
-        crypt_keeper_fields.each do |field|
-          define_method field do
-            self.class.send :type_cast, field, if attributes.has_key?("#{self.class.table_name}.#{field}")
-              self["#{self.class.table_name}.#{field}"]
-            else
-              super()
-            end
-          end
-        end
-      end
-
-      # Private: Casts value (which is a String) to appropriate instance
-      def type_cast(field, value)
-        return nil if value.nil?
-
-        klass = ::ActiveRecord::ConnectionAdapters::Column
-        case crypt_keeper_type_casts[field]
-          when :string, :text        then value
-          when :integer              then klass.respond_to?(:value_to_integer) ? klass.value_to_integer(value) : (value.to_i rescue value ? 1 : 0)
-          when :float                then value.to_f
-          when :decimal              then klass.value_to_decimal(value)
-          when :datetime, :timestamp then klass.string_to_time(value)
-          when :time                 then klass.string_to_dummy_time(value)
-          when :date                 then klass.respond_to?(:value_to_date) ? klass.value_to_date(value) : klass.string_to_date(value)
-          when :binary               then klass.binary_to_string(value)
-          when :boolean              then klass.value_to_boolean(value)
-          else value
-        end
       end
     end
   end

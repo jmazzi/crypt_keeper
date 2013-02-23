@@ -12,6 +12,77 @@ module CryptKeeper
         subject.instance_variable_set(:@encryptor, nil)
       end
 
+      context "Type casting" do
+        before do
+          subject.crypt_keeper :storage, encryptor: :fake_encryptor, type_casts: {
+            string_attribute: :string,
+            text_attribute: :text,
+            integer_attribute: :integer,
+            float_attribute: :float,
+            decimal_attribute: :decimal,
+            datetime_attribute: :datetime,
+            timestamp_attribute: :timestamp,
+            time_attribute: :time,
+            date_attribute: :date,
+            binary_attribute: :binary,
+            boolean_attribute: :boolean
+          }
+        end
+        it "should return given value when typecasting an attribute without type cast" do
+          subject.type_cast(:foo, "value").should == "value"
+        end
+
+        it "should return given string when casting to string" do
+          subject.type_cast(:string_attribute, "value").should == "value"
+        end
+
+        it "should return given string when casting to text" do
+          subject.type_cast(:text_attribute, "value").should == "value"
+        end
+
+        it "should allow casting integer value to Fixnum" do
+          subject.type_cast(:integer_attribute, "123.45").should == 123
+        end
+
+        it "should allow casting float value to Float" do
+          subject.type_cast(:float_attribute, "123.45").should == 123.45
+        end
+
+        it "should allow casting decimal value to BigDecimal" do
+          subject.type_cast(:decimal_attribute, "123.45").should == BigDecimal.new("123.45")
+        end
+
+        it "should allow casting datetime value to Time" do
+          subject.type_cast(:datetime_attribute, "2000-01-01 12:00:00").should be_kind_of(Time)
+        end
+
+        it "should allow casting timestamp value to Time" do
+          subject.type_cast(:timestamp_attribute, "2000-01-01 12:00:00").should be_kind_of(Time)
+        end
+
+        it "should allow casting time attribute to dummy time" do
+          subject.type_cast(:time_attribute, "12:04:53").should == Time.local(2000, 1, 1, 12, 4, 53)
+        end
+
+        it "should allow casting date attribute to Date" do
+          subject.type_cast(:date_attribute, "2000-01-01").should == Date.new(2000, 1, 1)
+        end
+
+        it "should cast boolean attribute from boolean" do
+          subject.type_cast(:boolean_attribute, nil).should be_nil
+          subject.type_cast(:boolean_attribute, true).should be_true
+          subject.type_cast(:boolean_attribute, false).should be_false
+        end
+
+        it "should cast booleans from string" do
+          subject.type_cast(:boolean_attribute, "").should be_nil
+          subject.type_cast(:boolean_attribute, "0").should be_false
+          subject.type_cast(:boolean_attribute, "1").should be_true
+          subject.type_cast(:boolean_attribute, "f").should be_false
+          subject.type_cast(:boolean_attribute, "t").should be_true
+        end
+      end
+
       context "Fields" do
         it "enables encryption for the given fields" do
           subject.crypt_keeper :storage, :secret, encryptor: :fake_encryptor
@@ -63,9 +134,9 @@ module CryptKeeper
       end
     end
 
-    context "Readers" do
-      let(:plain_text) { 'plain_text' }
-      let(:cipher_text) { 'tooltxet_nialp' }
+    context "Encryption" do
+      let(:plain_text) { '123456789' }
+      let(:cipher_text) { 'tool987654321' }
 
       before do
         SensitiveData.crypt_keeper :storage, passphrase: 'tool', encryptor: :encryptor, type_casts: {storage: :integer}
@@ -73,25 +144,16 @@ module CryptKeeper
 
       subject { SensitiveData.new }
 
-      it "should perform type cast on type casted attributes" do
-        subject.storage = "123"
-        subject.storage.should == 123
-      end
-    end
-
-    context "Encryption" do
-      let(:plain_text) { 'plain_text' }
-      let(:cipher_text) { 'tooltxet_nialp' }
-
-      before do
-        SensitiveData.crypt_keeper :storage, passphrase: 'tool', encryptor: :encryptor
-      end
-
-      subject { SensitiveData.new }
-
       describe "#encrypt" do
         it "should encrypt the data" do
           subject.storage = plain_text
+          subject.stub :decrypt_callback
+          subject.save!
+          subject.storage.should == cipher_text
+        end
+
+        it "should encrypt the data that is not string" do
+          subject.storage = 123456789
           subject.stub :decrypt_callback
           subject.save!
           subject.storage.should == cipher_text
@@ -106,11 +168,11 @@ module CryptKeeper
       end
 
       describe "#decrypt" do
-        it "should decrypt the data" do
+        it "should decrypt and type cast the data" do
           subject.storage = cipher_text
           subject.stub :encrypt_callback
           subject.save!
-          subject.storage.should == plain_text
+          subject.storage.should == 123456789
         end
 
         it "should not decrypt nil" do
@@ -122,10 +184,10 @@ module CryptKeeper
       end
 
       describe "Encrypt & Decrypt" do
-        it "should encrypt and decrypt the data" do
+        it "should encrypt and decrypt the data performing type cast" do
           subject.storage = plain_text
           subject.save!
-          subject.storage.should == plain_text
+          subject.storage.should == 123456789
         end
       end
 
