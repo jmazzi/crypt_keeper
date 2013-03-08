@@ -13,80 +13,65 @@ module CryptKeeper
       end
 
       context "Type casting" do
-        before do
-          subject.crypt_keeper :storage, encryptor: :fake_encryptor, type_casts: {
-            string_attribute: :string,
-            text_attribute: :text,
-            integer_attribute: :integer,
-            float_attribute: :float,
-            decimal_attribute: :decimal,
-            datetime_attribute: :datetime,
-            timestamp_attribute: :timestamp,
-            time_attribute: :time,
-            date_attribute: :date,
-            binary_attribute: :binary,
-            boolean_attribute: :boolean
-          }
-        end
         it "should return given value when typecasting an attribute without type cast" do
-          subject.type_cast(:foo, "value").should == "value"
+          subject.type_cast("value", :foo).should == "value"
         end
 
         it "should return given string when casting to string" do
-          subject.type_cast(:string_attribute, "value").should == "value"
+          subject.type_cast("value", :string).should == "value"
         end
 
         it "should return given string when casting to text" do
-          subject.type_cast(:text_attribute, "value").should == "value"
+          subject.type_cast("value", :text).should == "value"
         end
 
         it "should allow casting integer value to Fixnum" do
-          subject.type_cast(:integer_attribute, "123.45").should == 123
+          subject.type_cast("123.45", :integer).should == 123
         end
 
         it "should allow casting float value to Float" do
-          subject.type_cast(:float_attribute, "123.45").should == 123.45
+          subject.type_cast("123.45", :float).should == 123.45
         end
 
         it "should allow casting decimal value to BigDecimal" do
-          subject.type_cast(:decimal_attribute, "123.45").should == BigDecimal.new("123.45")
+          subject.type_cast("123.45", :decimal).should == BigDecimal.new("123.45")
         end
 
         it "should allow casting datetime value to Time" do
-          subject.type_cast(:datetime_attribute, "2000-01-01 12:00:00").should be_kind_of(Time)
+          subject.type_cast("2000-01-01 12:00:00", :datetime).should be_kind_of(Time)
         end
 
         it "should allow casting timestamp value to Time" do
-          subject.type_cast(:timestamp_attribute, "2000-01-01 12:00:00").should be_kind_of(Time)
+          subject.type_cast("2000-01-01 12:00:00", :timestamp).should be_kind_of(Time)
         end
 
         it "should allow casting time attribute to dummy time" do
-          subject.type_cast(:time_attribute, "12:04:53").should == Time.local(2000, 1, 1, 12, 4, 53)
+          subject.type_cast("12:04:53", :time).should == Time.local(2000, 1, 1, 12, 4, 53)
         end
 
         it "should allow casting date attribute to Date" do
-          subject.type_cast(:date_attribute, "2000-01-01").should == Date.new(2000, 1, 1)
+          subject.type_cast("2000-01-01", :date).should == Date.new(2000, 1, 1)
         end
 
         it "should cast boolean attribute from boolean" do
-          subject.type_cast(:boolean_attribute, nil).should be_nil
-          subject.type_cast(:boolean_attribute, true).should be_true
-          subject.type_cast(:boolean_attribute, false).should be_false
+          subject.type_cast(nil, :boolean).should be_nil
+          subject.type_cast(true, :boolean).should be_true
+          subject.type_cast(false, :boolean).should be_false
         end
 
         it "should cast booleans from string" do
-          subject.type_cast(:boolean_attribute, "").should be_nil
-          subject.type_cast(:boolean_attribute, "0").should be_false
-          subject.type_cast(:boolean_attribute, "1").should be_true
-          subject.type_cast(:boolean_attribute, "f").should be_false
-          subject.type_cast(:boolean_attribute, "t").should be_true
+          subject.type_cast("", :boolean).should be_nil
+          subject.type_cast("0", :boolean).should be_false
+          subject.type_cast("1", :boolean).should be_true
+          subject.type_cast("f", :boolean).should be_false
+          subject.type_cast("t", :boolean).should be_true
         end
       end
 
       context "Fields" do
         it "enables encryption for the given fields" do
           subject.crypt_keeper :storage, :secret, encryptor: :fake_encryptor
-          subject.crypt_keeper_fields.should == [:storage, :secret]
+          subject.crypt_keeper_fields.should == {storage: :text, secret: :text}
         end
 
         it "raises an exception for missing field" do
@@ -119,16 +104,24 @@ module CryptKeeper
           expect { subject.create! storage: 'asdf' }.to raise_error(ArgumentError, msg)
         end
 
-        it "should defaults type casts hash to empty hash" do
+        it "should defaults type casts of fields to :text" do
           subject.crypt_keeper :storage, :secret, encryptor: "FakeEncryptor"
-          subject.crypt_keeper_type_casts.should == {}
+          subject.crypt_keeper_fields.should == {storage: :text, secret: :text}
         end
 
         it "should set type casts if provided" do
-          subject.crypt_keeper :storage, :secret, encryptor: "FakeEncryptor", type_casts: {storage: :date, secret: :integer}
-          subject.crypt_keeper_type_casts.should == {
+          subject.crypt_keeper :secret, encryptor: "FakeEncryptor", fields: {storage: :date}
+          subject.crypt_keeper_fields.should == {
             storage: :date,
-            secret: :integer
+            secret: :text
+          }
+        end
+        
+        it "should set type cast from fields hash" do
+          subject.crypt_keeper :secret, encryptor: "FakeEncryptor", fields: {storage: :date, secret: :integer}
+          subject.crypt_keeper_fields.should == {
+            storage: :date,
+            secret:  :integer
           }
         end
       end
@@ -139,7 +132,7 @@ module CryptKeeper
       let(:cipher_text) { 'tool987654321' }
 
       before do
-        SensitiveData.crypt_keeper :storage, passphrase: 'tool', encryptor: :encryptor, type_casts: {storage: :integer}
+        SensitiveData.crypt_keeper :storage, passphrase: 'tool', encryptor: :encryptor, fields: {storage: :integer}
       end
 
       subject { SensitiveData.new }

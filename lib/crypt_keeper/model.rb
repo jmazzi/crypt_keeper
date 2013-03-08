@@ -19,7 +19,7 @@ module CryptKeeper
 
     # Private: Encrypt each crypt_keeper_fields
     def encrypt_callback
-      crypt_keeper_fields.each do |field|
+      crypt_keeper_fields.each do |field, type|
         if !self[field].nil?
           self[field] = self.class.encrypt read_attribute(field)
         end
@@ -28,16 +28,16 @@ module CryptKeeper
 
     # Private: Decrypt each crypt_keeper_fields
     def decrypt_callback
-      crypt_keeper_fields.each do |field|
+      crypt_keeper_fields.each do |field, type|
         if !self[field].nil?
-          self[field] = self.class.type_cast(field, self.class.decrypt(read_attribute(field)))
+          self[field] = self.class.type_cast(self.class.decrypt(read_attribute(field)), type)
         end
       end
     end
 
     # Private: Run each crypt_keeper_fields through ensure_valid_field!
     def enforce_column_types_callback
-      crypt_keeper_fields.each do |field|
+      crypt_keeper_fields.each do |field, type|
         ensure_valid_field! field
       end
     end
@@ -45,27 +45,37 @@ module CryptKeeper
     module ClassMethods
       # Public: Setup fields for encryption
       #
-      #   args - An array of fields to encrypt. The last argument should be
-      #   a hash of options. Note, an :encryptor is required. This should be
-      #   a class that takes a hash for initialize and provides an encrypt
-      #   and decrypt method.
+      #   args - An array of fields to encrypt and options hash. The last
+      #   argument should be a hash of options. Note, an :encryptor is
+      #   required. This should be a class that takes a hash for initialize
+      #   and provides an encrypt and decrypt method.
+      #   You can also pass fields to encrypt as :fields key in options hash,
+      #   with fields as keys and types as values. Values would be type casted
+      #   to given types in decrypt callback. The default type (used when
+      #   passing field names as array) is :text.
+      #   Available types: :string, :text, :integer, :float, :decimal, :datetime,
+      #   :timestamp, :time, :date, :binary, :boolean
       #
-      # Example
+      # Examples
       #
       #   class MyModel < ActiveRecord::Base
       #     crypt_keeper :field, :other_field, :encryptor => :aes, :key => 'super_good_password'
       #   end
       #
+      #  class MyModel < ActiveRecord::Base
+      #    crypt_keeper :fields => {:field => :integer, :date_field => :datetime}, :encryptor => :aes, :key => 'super_good_password'
+      #  end
+      #
+      #
       def crypt_keeper(*args)
         class_attribute :crypt_keeper_options
         class_attribute :crypt_keeper_fields
         class_attribute :crypt_keeper_encryptor
-        class_attribute :crypt_keeper_type_casts
 
         self.crypt_keeper_options    = args.extract_options!
         self.crypt_keeper_encryptor  = crypt_keeper_options.delete(:encryptor)
-        self.crypt_keeper_type_casts = crypt_keeper_options.delete(:type_casts) || {}
-        self.crypt_keeper_fields     = args
+        self.crypt_keeper_fields     = crypt_keeper_options.delete(:fields) || {}
+        args.each{ |arg| self.crypt_keeper_fields[arg] ||= :text }
 
         ensure_valid_encryptor!
         define_crypt_keeper_callbacks
@@ -73,7 +83,7 @@ module CryptKeeper
 
       # Public: Encrypts a string with the encryptor
       def encrypt(value)
-        encryptor.encrypt value
+        encryptor.encrypt value.to_s
       end
 
       # Public: Decrypts a string with the encryptor
@@ -82,11 +92,11 @@ module CryptKeeper
       end
 
       # Public: Casts value (which is a String) to appropriate instance
-      def type_cast(field, value)
+      def type_cast(value, type)
         return nil if value.nil?
 
         klass = ::ActiveRecord::ConnectionAdapters::Column
-        case crypt_keeper_type_casts[field]
+        case type
           when :string, :text        then value
           when :integer              then klass.respond_to?(:value_to_integer) ? klass.value_to_integer(value) : (value.to_i rescue value ? 1 : 0)
           when :float                then value.to_f
