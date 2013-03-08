@@ -18,7 +18,7 @@ module CryptKeeper
       end
 
       def encrypt(data)
-        @passphrase + data.reverse
+        @passphrase + data.to_s.reverse
       end
 
       def decrypt(data)

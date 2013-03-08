@@ -47,6 +47,36 @@ expected behavior, and has its use cases. An example would be migrating from
 one type of encryption to another. Using `update_column` would allow you to
 update the content without going through the current encryptor.
 
+## Type casting
+
+You can pass `type_casts` hash in options to enable type casting for encrypted attributes. Available types are:
+
+* `string`
+* `text`
+* `integer`
+* `float`
+* `decimal`
+* `datetime`
+* `timestamp`
+* `time`
+* `date`
+* `binary`
+* `boolean`
+
+Type casting is done when calling attribute reader, e.g.:
+
+```ruby
+class MyModel < ActiveRecord::Base
+  crypt_keeper :field, :other_field, :encryptor => :aes, :key => 'super_good_password', :type_casts => {
+    :field => :date
+  }
+end
+
+model = MyModel.new(field: '2012-01-01')
+model.save! #=> Your data is now encrypted
+model.field #=> #<Date: 2012-01-01>
+``` 
+
 ## Creating your own encryptor
 
 Creating your own encryptor is easy. All you have to do is create a class
