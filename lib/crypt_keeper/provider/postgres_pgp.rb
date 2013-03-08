@@ -37,7 +37,7 @@ module CryptKeeper
       # alias - column alias
       # Returns SQL string with decrypt function applied to column name and aliased to column alias
       def column_for_select(column, column_alias)
-        escape_sql(["pgp_sym_decrypt(#{column}::bytea, ?) AS \"#{column_alias}\"", key])
+        escape_sql(["pgp_sym_decrypt(#{column}::bytea, ?) AS #{ActiveRecord::Base.connection.quote_column_name(column_alias)}", key])
       end
     end
   end
