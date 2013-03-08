@@ -44,8 +44,32 @@ module CryptKeeper
 
         it "raises an error on missing encryptor" do
           msg = "You must specify an encryptor"
-          subject.crypt_keeper :storage, :secret
-          expect { subject.create! storage: 'asdf' }.to raise_error(ArgumentError, msg)
+          expect { subject.crypt_keeper :storage, :secret }.to raise_error(ArgumentError, msg)
+        end
+
+        it "should set columns for select" do
+          subject.crypt_keeper :storage, :secret, encryptor: "FakeEncryptor"
+          subject.crypt_keeper_columns_for_select.should == [
+            "sensitive_data.id",
+            "sensitive_data.name",
+            "sensitive_data.storage",
+            "sensitive_data.secret"
+          ]
+        end
+      end
+    end
+
+    context "Scopes" do
+      before do
+        SensitiveData.crypt_keeper :storage, passphrase: 'tool', encryptor: :encryptor, type_casts: {storage: :integer}
+      end
+
+      describe "#decrypted" do
+        let(:record) { SensitiveData.create! storage: "123" }
+
+        it "should select all columns with decrypted values" do
+          data = SensitiveData.decrypted.find(record)
+          data.attributes.keys.should == ["id", "name", "storage", "secret"]
         end
       end
     end
@@ -117,6 +141,80 @@ module CryptKeeper
           SensitiveData.send :encryptor
           SensitiveData.crypt_keeper_options.should include(passphrase: 'tool')
         end
+      end
+    end
+  end
+
+  describe Model, "with AES provider" do
+    use_mysql(true)
+
+    let(:record) { SensitiveData.create! storage: "100" }
+
+    before do
+      SensitiveData.instance_variable_set(:@encryptor_klass, nil)
+      SensitiveData.instance_variable_set(:@encryptor, nil)
+      SensitiveData.crypt_keeper :storage, encryptor: :aes, key: 'secret'
+    end
+
+    describe "#decrypted" do
+      it "should select all columns" do
+        SensitiveData.decrypted.select_values.should == ["sensitive_data.id", "sensitive_data.name", "sensitive_data.storage", "sensitive_data.secret"]
+      end
+
+      it "should return decrypted values for retrieved records" do
+        data = SensitiveData.decrypted.find(record)
+        data.storage.should == "100"
+      end
+    end
+  end
+
+  describe Model, "with MySQL AES provider" do
+    use_mysql(true)
+
+    let(:record) { SensitiveData.create! storage: "100" }
+
+    before do
+      SensitiveData.instance_variable_set(:@encryptor_klass, nil)
+      SensitiveData.instance_variable_set(:@encryptor, nil)
+      SensitiveData.crypt_keeper :storage, encryptor: :mysql_aes, key: 'secret'
+    end
+
+    describe "#decrypted" do
+      it "should select all columns" do
+        SensitiveData.decrypted.select_values.should == ["sensitive_data.id", "sensitive_data.name", "sensitive_data.storage", "sensitive_data.secret"]
+      end
+
+      it "should return decrypted values for retrieved records" do
+        data = SensitiveData.decrypted.find(record)
+        data.storage.should == "100"
+      end
+    end
+  end
+
+  describe Model, "with Postgres PGP provider" do
+    use_postgres(true)
+
+    let(:record) { SensitiveData.create! storage: "100" }
+
+    before do
+      SensitiveData.instance_variable_set(:@encryptor_klass, nil)
+      SensitiveData.instance_variable_set(:@encryptor, nil)
+      SensitiveData.crypt_keeper :storage, encryptor: :postgres_pgp, key: 'secret'
+    end
+
+    describe "#decrypted" do
+      it "should select all columns" do
+        SensitiveData.decrypted.select_values.should == ["sensitive_data.id", "sensitive_data.name", "pgp_sym_decrypt(sensitive_data.storage::bytea, 'secret') AS \"sensitive_data.storage\"", "sensitive_data.secret"]
+      end
+
+      it "should return modified attributes" do
+        data = SensitiveData.decrypted.find(record)
+        data.attributes.keys.should == ["id", "name", "sensitive_data.storage", "secret"]
+      end
+
+      it "should return decrypted values for retrieved records" do
+        data = SensitiveData.decrypted.find(record)
+        data.storage.should == "100"
       end
     end
   end
