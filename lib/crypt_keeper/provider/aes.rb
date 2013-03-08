@@ -13,6 +13,9 @@ module CryptKeeper
       # Public: An instance of  OpenSSL::Cipher::Cipher
       attr_accessor :aes
 
+      # Public: Whether blank string is accepted as data for encryption
+      attr_accessor :strict_mode
+
       # Public: Initializes the class
       #
       #   options - A hash of options. :key is required
@@ -24,6 +27,10 @@ module CryptKeeper
           raise ArgumentError, "Missing :key"
         end
 
+        @strict_mode = options.fetch(:strict_mode) do
+          @strict_mode = true
+        end
+
         @key = Digest::SHA256.digest(key)
       end
 
@@ -31,20 +38,28 @@ module CryptKeeper
       #
       # Returns a string
       def encrypt(value)
-        aes.encrypt
-        aes.key = key
-        Base64::encode64("#{aes.random_iv}#{SEPARATOR}#{aes.update(value.to_s) + aes.final}")
+        if value == '' && !strict_mode
+          value
+        else
+          aes.encrypt
+          aes.key = key
+          Base64::encode64("#{aes.random_iv}#{SEPARATOR}#{aes.update(value.to_s) + aes.final}")
+        end
       end
 
       # Public: Decrypt a string
       #
       # Returns a string
       def decrypt(value)
-        iv, value = Base64::decode64(value.to_s).split(SEPARATOR)
-        aes.decrypt
-        aes.key = key
-        aes.iv  = iv
-        aes.update(value) + aes.final
+        if value == '' && !strict_mode
+          value
+        else
+          iv, value = Base64::decode64(value.to_s).split(SEPARATOR)
+          aes.decrypt
+          aes.key = key
+          aes.iv  = iv
+          aes.update(value) + aes.final
+        end
       end
     end
   end
