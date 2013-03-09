@@ -23,7 +23,7 @@ module CryptKeeper
 
           specify { encrypted.should_not == 'string' }
           specify { encrypted.should_not be_blank }
-          specify { expect { subject.encrypt('') }.to raise_error(ArgumentError, "data must not be empty") }
+          specify { expect { subject.encrypt('') }.not_to raise_error(ArgumentError) }
         end
 
         describe "#decrypt" do
@@ -33,7 +33,12 @@ module CryptKeeper
 
           specify { decrypted.should == 'string' }
 
-          specify { expect { subject.decrypt('') }.to raise_error(TypeError, "can't convert nil into String") }
+          specify { expect { subject.decrypt('') }.not_to raise_error(TypeError) }
+        end
+
+        describe "#encryptable?" do
+          specify { subject.send(:encryptable?, '').should be_false }
+          specify { subject.send(:encryptable?, ' ').should be_true }
         end
       end
 
@@ -43,11 +48,16 @@ module CryptKeeper
         its(:strict_mode) { should be_false }
 
         describe "#encrypt" do
-          specify { expect { subject.encrypt('') }.not_to raise_error(ArgumentError) }
+          specify { expect { subject.encrypt('') }.to raise_error(ArgumentError) }
         end
 
         describe "#decrypt" do
-          specify { expect { subject.decrypt('') }.not_to raise_error(TypeError) }
+          specify { expect { subject.decrypt('') }.to raise_error(TypeError) }
+        end
+
+        describe "#encryptable?" do
+          specify { subject.send(:encryptable?, '').should be_true }
+          specify { subject.send(:encryptable?, ' ').should be_true }
         end
       end
     end

@@ -27,9 +27,7 @@ module CryptKeeper
           raise ArgumentError, "Missing :key"
         end
 
-        @strict_mode = options.fetch(:strict_mode) do
-          @strict_mode = true
-        end
+        @strict_mode = options.fetch(:strict_mode, true)
 
         @key = Digest::SHA256.digest(key)
       end
@@ -38,12 +36,12 @@ module CryptKeeper
       #
       # Returns a string
       def encrypt(value)
-        if value == '' && !strict_mode
-          value
-        else
+        if encryptable?(value)
           aes.encrypt
           aes.key = key
           Base64::encode64("#{aes.random_iv}#{SEPARATOR}#{aes.update(value.to_s) + aes.final}")
+        else
+          value
         end
       end
 
@@ -51,14 +49,27 @@ module CryptKeeper
       #
       # Returns a string
       def decrypt(value)
-        if value == '' && !strict_mode
-          value
-        else
+        if encryptable?(value)
           iv, value = Base64::decode64(value.to_s).split(SEPARATOR)
           aes.decrypt
           aes.key = key
           aes.iv  = iv
           aes.update(value) + aes.final
+        else
+          value
+        end
+      end
+
+      protected
+
+      # Protected: Determine if value can be encrypted
+      #
+      # Returns a boolean
+      def encryptable?(value)
+        if (value == '' && strict_mode)
+          false
+        else
+          true
         end
       end
     end
