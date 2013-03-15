@@ -118,6 +118,32 @@ module CryptKeeper
           SensitiveData.crypt_keeper_options.should include(passphrase: 'tool')
         end
       end
+
+      describe "Dirty records" do
+        before do
+          SensitiveData.crypt_keeper :storage, passphrase: 'tool', encryptor: :postgres_pgp
+        end
+
+        let(:record) do
+          SensitiveData.create storage: 'test'
+        end
+
+        specify { record.should_not be_changed }
+
+        it "UPDATE is not run on unchanged plaintext" do
+          queries = []
+
+          subscriber = ActiveSupport::Notifications.subscribe('sql.active_record')  do |name, started, finished, id, payload|
+            queries << payload[:sql]
+          end
+
+          SensitiveData.find(record.id).save
+          ActiveSupport::Notifications.unsubscribe subscriber
+
+          updates = queries.select { |query| query.match(/^UPDATE "sensitive_data"/) }
+          updates.should be_empty, "Received #{updates}"
+        end
+      end
     end
   end
 end

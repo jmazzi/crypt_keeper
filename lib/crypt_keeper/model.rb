@@ -17,11 +17,29 @@ module CryptKeeper
 
     private
 
+    def crypt_keeper_dirty_tracking
+      @crypt_keeper_dirty_tracking ||= HashWithIndifferentAccess.new
+    end
+
+    # Private: Determine if the field's plaintext value changed. It compares
+    # it to the original value that came from the DB before decryption
+    #
+    # Returns boolean
+    def plaintext_changed?(field)
+      original_plaintext = self.class.decrypt(crypt_keeper_dirty_tracking[field])
+
+      new_record? || self[field] != original_plaintext
+    end
+
     # Private: Encrypt each crypt_keeper_fields
     def encrypt_callback
       crypt_keeper_fields.each do |field|
         if !self[field].nil?
-          self[field] = self.class.encrypt read_attribute(field)
+          if plaintext_changed?(field)
+            self[field] = self.class.encrypt read_attribute(field)
+          else
+            self[field] = crypt_keeper_dirty_tracking[field]
+          end
         end
       end
     end
@@ -30,8 +48,12 @@ module CryptKeeper
     def decrypt_callback
       crypt_keeper_fields.each do |field|
         if !self[field].nil?
+          crypt_keeper_dirty_tracking[field] = read_attribute(field)
           self[field] = self.class.decrypt read_attribute(field)
         end
+
+        previous_changes.delete(field.to_s)
+        changed_attributes.delete(field.to_s)
       end
     end
 
@@ -61,9 +83,9 @@ module CryptKeeper
         class_attribute :crypt_keeper_fields
         class_attribute :crypt_keeper_encryptor
 
-        self.crypt_keeper_options   = args.extract_options!
-        self.crypt_keeper_encryptor = crypt_keeper_options.delete(:encryptor)
-        self.crypt_keeper_fields    = args
+        self.crypt_keeper_options        = args.extract_options!
+        self.crypt_keeper_encryptor      = crypt_keeper_options.delete(:encryptor)
+        self.crypt_keeper_fields         = args
 
         ensure_valid_encryptor!
         define_crypt_keeper_callbacks
