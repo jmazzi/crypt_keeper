@@ -22,7 +22,7 @@ module CryptKeeper
       end
 
       def decrypt(data)
-        data.sub(/^#{@passphrase}/, '').reverse
+        data.to_s.sub(/^#{@passphrase}/, '').reverse
       end
     end
   end
