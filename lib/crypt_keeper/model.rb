@@ -17,6 +17,9 @@ module CryptKeeper
 
     private
 
+    # Private: A hash of encrypted attributes with their encrypted values
+    #
+    # Returns a Hash
     def crypt_keeper_dirty_tracking
       @crypt_keeper_dirty_tracking ||= HashWithIndifferentAccess.new
     end
@@ -26,9 +29,7 @@ module CryptKeeper
     #
     # Returns boolean
     def plaintext_changed?(field)
-      original_plaintext = self.class.decrypt(crypt_keeper_dirty_tracking[field])
-
-      new_record? || self[field] != original_plaintext
+      new_record? || self[field] != self.class.decrypt(crypt_keeper_dirty_tracking[field])
     end
 
     # Private: Encrypt each crypt_keeper_fields
@@ -92,9 +93,9 @@ module CryptKeeper
         class_attribute :crypt_keeper_fields
         class_attribute :crypt_keeper_encryptor
 
-        self.crypt_keeper_options        = args.extract_options!
-        self.crypt_keeper_encryptor      = crypt_keeper_options.delete(:encryptor)
-        self.crypt_keeper_fields         = args
+        self.crypt_keeper_options   = args.extract_options!
+        self.crypt_keeper_encryptor = crypt_keeper_options.delete(:encryptor)
+        self.crypt_keeper_fields    = args
 
         ensure_valid_encryptor!
         define_crypt_keeper_callbacks
