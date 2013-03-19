@@ -39,6 +39,7 @@ module CryptKeeper
             self[field] = self.class.encrypt read_attribute(field)
           else
             self[field] = crypt_keeper_dirty_tracking[field]
+            clear_field_changes! field
           end
         end
       end
@@ -52,8 +53,7 @@ module CryptKeeper
           self[field] = self.class.decrypt read_attribute(field)
         end
 
-        previous_changes.delete(field.to_s)
-        changed_attributes.delete(field.to_s)
+        clear_field_changes! field
       end
     end
 
@@ -62,6 +62,15 @@ module CryptKeeper
       crypt_keeper_fields.each do |field|
         ensure_valid_field! field
       end
+    end
+
+    # Private: Removes changes from `#previous_changes` and
+    # `#changed_attributes` so the model isn't considered dirty.
+    #
+    # field - The field to clear
+    def clear_field_changes!(field)
+      previous_changes.delete(field.to_s)
+      changed_attributes.delete(field.to_s)
     end
 
     module ClassMethods
