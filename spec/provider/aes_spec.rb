@@ -23,7 +23,7 @@ module CryptKeeper
 
           specify { encrypted.should_not == 'string' }
           specify { encrypted.should_not be_blank }
-          specify { expect { subject.encrypt('') }.not_to raise_error(ArgumentError) }
+          specify { expect { subject.encrypt('') }.to raise_error(ArgumentError, "empty string not allowed in strict mode") }
         end
 
         describe "#decrypt" do
@@ -33,7 +33,7 @@ module CryptKeeper
 
           specify { decrypted.should == 'string' }
 
-          specify { expect { subject.decrypt('') }.not_to raise_error(TypeError) }
+          specify { expect { subject.decrypt('') }.to raise_error(ArgumentError, "empty string not allowed in strict mode") }
         end
 
         describe "#encryptable?" do
@@ -48,11 +48,11 @@ module CryptKeeper
         its(:strict_mode) { should be_false }
 
         describe "#encrypt" do
-          specify { expect { subject.encrypt('') }.to raise_error(ArgumentError) }
+          specify { expect { subject.encrypt('') }.not_to raise_error(ArgumentError) }
         end
 
         describe "#decrypt" do
-          specify { expect { subject.decrypt('') }.to raise_error(TypeError) }
+          specify { expect { subject.decrypt('') }.not_to raise_error(ArgumentError) }
         end
 
         describe "#encryptable?" do

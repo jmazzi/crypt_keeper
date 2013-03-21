@@ -37,11 +37,12 @@ module CryptKeeper
       # Returns a string
       def encrypt(value)
         if encryptable?(value)
+          return '' if value == ''
           aes.encrypt
           aes.key = key
           Base64::encode64("#{aes.random_iv}#{SEPARATOR}#{aes.update(value.to_s) + aes.final}")
         else
-          value
+          raise ArgumentError, "empty string not allowed in strict mode"
         end
       end
 
@@ -50,13 +51,14 @@ module CryptKeeper
       # Returns a string
       def decrypt(value)
         if encryptable?(value)
+          return '' if value == ''
           iv, value = Base64::decode64(value.to_s).split(SEPARATOR)
           aes.decrypt
           aes.key = key
           aes.iv  = iv
           aes.update(value) + aes.final
         else
-          value
+          raise ArgumentError, "empty string not allowed in strict mode"
         end
       end
 
