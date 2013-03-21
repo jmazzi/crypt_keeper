@@ -13,12 +13,16 @@ module CryptKeeper
       # Public: An instance of  OpenSSL::Cipher::Cipher
       attr_accessor :aes
 
-      # Public: Whether blank string is accepted as data for encryption
+      # Public: When true (default), blank string is not accepted as data for encryption
       attr_accessor :strict_mode
 
       # Public: Initializes the class
       #
-      #   options - A hash of options. :key is required
+      #   options - A hash of options.
+      #     :key is required
+      #     :strict_mode can be true or false; true is the default
+      #       when true, encryting or decrypting an empty string will raise an exception
+      #       when false an empty string will be accepted (but will not be encrypted; will be returned as empty string)
       def initialize(options = {})
         @aes         = ::OpenSSL::Cipher::Cipher.new("AES-256-CBC")
         @aes.padding = 1
