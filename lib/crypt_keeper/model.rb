@@ -17,11 +17,31 @@ module CryptKeeper
 
     private
 
+    # Private: A hash of encrypted attributes with their encrypted values
+    #
+    # Returns a Hash
+    def crypt_keeper_dirty_tracking
+      @crypt_keeper_dirty_tracking ||= HashWithIndifferentAccess.new
+    end
+
+    # Private: Determine if the field's plaintext value changed. It compares
+    # it to the original value that came from the DB before decryption
+    #
+    # Returns boolean
+    def plaintext_changed?(field)
+      new_record? || self[field] != self.class.decrypt(crypt_keeper_dirty_tracking[field])
+    end
+
     # Private: Encrypt each crypt_keeper_fields
     def encrypt_callback
       crypt_keeper_fields.each do |field|
         if !self[field].nil?
-          self[field] = self.class.encrypt read_attribute(field)
+          if plaintext_changed?(field)
+            self[field] = self.class.encrypt read_attribute(field)
+          else
+            self[field] = crypt_keeper_dirty_tracking[field]
+            clear_field_changes! field
+          end
         end
       end
     end
@@ -30,8 +50,11 @@ module CryptKeeper
     def decrypt_callback
       crypt_keeper_fields.each do |field|
         if !self[field].nil?
+          crypt_keeper_dirty_tracking[field] = read_attribute(field)
           self[field] = self.class.decrypt read_attribute(field)
         end
+
+        clear_field_changes! field
       end
     end
 
@@ -40,6 +63,15 @@ module CryptKeeper
       crypt_keeper_fields.each do |field|
         ensure_valid_field! field
       end
+    end
+
+    # Private: Removes changes from `#previous_changes` and
+    # `#changed_attributes` so the model isn't considered dirty.
+    #
+    # field - The field to clear
+    def clear_field_changes!(field)
+      previous_changes.delete(field.to_s)
+      changed_attributes.delete(field.to_s)
     end
 
     module ClassMethods

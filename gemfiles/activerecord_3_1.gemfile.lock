@@ -1,5 +1,5 @@
 PATH
-  remote: /Users/justin/work/Personal/crypt_keeper
+  remote: /Users/justin/work/jmazzi/crypt_keeper
   specs:
     crypt_keeper (0.8.0)
       activerecord (>= 3.0)
