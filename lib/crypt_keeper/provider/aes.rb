@@ -29,8 +29,11 @@ module CryptKeeper
 
       # Public: Encrypt a string
       #
-      # Returns a string
+      # Note: nil and empty strings are not encryptable with AES.
+      # When they are encountered, the orignal value is returned.
+      # Otherwise, returns the encrypted string
       def encrypt(value)
+        return value if value == '' || value.nil?
         aes.encrypt
         aes.key = key
         Base64::encode64("#{aes.random_iv}#{SEPARATOR}#{aes.update(value.to_s) + aes.final}")
@@ -38,8 +41,11 @@ module CryptKeeper
 
       # Public: Decrypt a string
       #
-      # Returns a string
+      # Note: nil and empty strings are not encryptable with AES (and thus cannot be decrypted).
+      # When they are encountered, the orignal value is returned.
+      # Otherwise, returns the decrypted string
       def decrypt(value)
+        return value if value == '' || value.nil?
         iv, value = Base64::decode64(value.to_s).split(SEPARATOR)
         aes.decrypt
         aes.key = key

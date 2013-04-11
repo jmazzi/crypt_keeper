@@ -21,6 +21,22 @@ module CryptKeeper
 
         specify { encrypted.should_not == 'string' }
         specify { encrypted.should_not be_blank }
+
+        context "an empty string" do
+          let(:encrypted) do
+            subject.encrypt ''
+          end
+
+          specify { encrypted.should == '' }
+        end
+
+        context "a nil" do
+          let(:encrypted) do
+            subject.encrypt nil
+          end
+
+          specify { encrypted.should be_nil }
+        end
       end
 
       describe "#decrypt" do
@@ -29,6 +45,22 @@ module CryptKeeper
         end
 
         specify { decrypted.should == 'string' }
+
+        context "an empty string" do
+          let(:decrypted) do
+            subject.decrypt ''
+          end
+
+          specify { decrypted.should == '' }
+        end
+
+        context "a nil" do
+          let(:decrypted) do
+            subject.decrypt nil
+          end
+
+          specify { decrypted.should be_nil }
+        end
       end
     end
   end
