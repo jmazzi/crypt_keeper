@@ -24,6 +24,7 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'guard-rspec', '~> 2.3.0'
   gem.add_development_dependency 'rake',        '~> 10.0.3'
   gem.add_development_dependency 'rb-fsevent',  '~> 0.9.1'
+  gem.add_development_dependency 'coveralls'
 
   if RUBY_PLATFORM == 'java'
     gem.add_development_dependency 'jruby-openssl', '~> 0.7.7'

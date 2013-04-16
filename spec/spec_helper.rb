@@ -1,3 +1,5 @@
+require 'coveralls'
+Coveralls.wear!
 require 'crypt_keeper'
 
 SPEC_ROOT = Pathname.new File.expand_path File.dirname __FILE__
