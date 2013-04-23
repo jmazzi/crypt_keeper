@@ -102,8 +102,10 @@ There are two included encryptors.
 
 ## Requirements
 
-CryptKeeper has been tested against ActiveRecord 3.0, 3.1, and 3.2 using ruby
-1.9.2, 1.9.3 and jruby in 1.9 mode.
+CryptKeeper has been tested against ActiveRecord 3.0, 3.1, 3.2 using ruby
+1.9.3 and jruby in 1.9 mode.
+
+ActiveRecord 4.0 is supported on the master branch.
 
 ## Installation
 

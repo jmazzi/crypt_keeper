@@ -19,9 +19,9 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency 'activesupport',          '>= 3.0'
   gem.add_runtime_dependency 'appraisal',              '~> 0.5.1'
 
-  gem.add_development_dependency 'rspec',       '~> 2.12.0'
-  gem.add_development_dependency 'guard',       '~> 1.6.0'
-  gem.add_development_dependency 'guard-rspec', '~> 2.3.0'
+  gem.add_development_dependency 'rspec',       '~> 2.13.0'
+  gem.add_development_dependency 'guard',       '~> 1.8.0'
+  gem.add_development_dependency 'guard-rspec', '~> 2.5.4'
   gem.add_development_dependency 'rake',        '~> 10.0.3'
   gem.add_development_dependency 'rb-fsevent',  '~> 0.9.1'
   gem.add_development_dependency 'coveralls'
@@ -33,7 +33,7 @@ Gem::Specification.new do |gem|
     gem.add_development_dependency 'activerecord-jdbcmysql-adapter'
   else
     gem.add_development_dependency 'sqlite3'
-    gem.add_development_dependency 'pg', '~> 0.14.0'
+    gem.add_development_dependency 'pg', '~> 0.15.1'
     gem.add_development_dependency 'mysql2', '~> 0.3.11'
   end
 end
