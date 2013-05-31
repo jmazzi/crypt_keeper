@@ -34,6 +34,25 @@ module CryptKeeper
       describe "#decrypt" do
         specify { subject.decrypt(cipher_text).should == plain_text }
       end
+
+      describe "Custom pgcrypto options" do
+        let(:pgcrypto_options) { 'compress-level=0' }
+
+        subject { PostgresPgp.new key: 'candy', pgcrypto_options: pgcrypto_options }
+
+        it "reads and writes" do
+          queries = logged_queries do
+            encrypted = subject.encrypt(plain_text)
+            subject.decrypt(encrypted).should == plain_text
+          end
+
+          queries.should_not be_empty
+
+          queries.select { |query| query.include?("pgp_sym_encrypt") }.each do |q|
+            q.should include(pgcrypto_options)
+          end
+        end
+      end
     end
   end
 end

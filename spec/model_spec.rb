@@ -131,14 +131,9 @@ module CryptKeeper
         specify { record.should_not be_changed }
 
         it "unchanged plaintext does not trigger a save" do
-          queries = []
-
-          subscriber = ActiveSupport::Notifications.subscribe('sql.active_record')  do |name, started, finished, id, payload|
-            queries << payload[:sql]
+          queries = logged_queries do
+            SensitiveData.find(record.id).save
           end
-
-          SensitiveData.find(record.id).save
-          ActiveSupport::Notifications.unsubscribe subscriber
 
           updates = queries.select { |query| query.match(/^UPDATE /) }
 

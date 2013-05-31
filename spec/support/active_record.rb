@@ -42,7 +42,25 @@ module CryptKeeper
   end
 end
 
+module LoggedQueries
+  # Logs the queries run inside the block, and return them.
+  def logged_queries(&block)
+    queries = []
+
+    subscriber = ActiveSupport::Notifications
+      .subscribe('sql.active_record') do |name, started, finished, id, payload|
+      queries << payload[:sql]
+    end
+
+    block.call
+
+    queries
+
+    ensure ActiveSupport::Notifications.unsubscribe(subscriber)
+  end
+end
 
 RSpec.configure do |config|
   config.extend CryptKeeper::ConnectionHelpers
+  config.include LoggedQueries
 end
