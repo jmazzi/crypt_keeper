@@ -20,23 +20,31 @@ module CryptKeeper
       # Public: Encrypts a string
       #
       # Returns an encrypted string
-      def encrypt(value)
-        escape_and_execute_sql(["SELECT pgp_sym_encrypt(?, ?)", value.to_s, key])['pgp_sym_encrypt']
+      def encrypt(values)
+        pgp_sym("pgp_sym_encrypt", Array(values).map { |v| v.to_s })
       end
 
       # Public: Decrypts a string
       #
       # Returns a plaintext string
       def decrypt(values)
-        values = Array(values)
+        pgp_sym("pgp_sym_decrypt", Array(values))
+      end
 
-        select = values.size.times.map do |i|
-          "CASE ? WHEN NULL THEN NULL ELSE pgp_sym_decrypt(?, ?) END AS decrypt_#{i}"
-        end.join(", ")
+      private
 
-        args = values.map{ |value| [value, value, key] }.flatten
+      def pgp_sym(action, values)
+        if values.empty?
+          []
+        else
+          select = values.size.times.map do |i|
+            "CASE ? WHEN NULL THEN NULL ELSE #{action}(?, ?) END AS value_#{i}"
+          end.join(", ")
 
-        escape_and_execute_sql(["SELECT #{select}", *args]).values
+          args = values.map{ |value| [value, value, key] }.flatten
+
+          escape_and_execute_sql(["SELECT #{select}", *args]).values
+        end
       end
     end
   end

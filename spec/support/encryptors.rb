@@ -18,7 +18,7 @@ module CryptKeeper
       end
 
       def encrypt(data)
-        @passphrase + data.reverse
+        Array(data).map { |d| @passphrase + d.reverse }
       end
 
       def decrypt(data)

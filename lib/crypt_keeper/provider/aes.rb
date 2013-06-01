@@ -32,11 +32,8 @@ module CryptKeeper
       # Note: nil and empty strings are not encryptable with AES.
       # When they are encountered, the orignal value is returned.
       # Otherwise, returns the encrypted string
-      def encrypt(value)
-        return value if value == '' || value.nil?
-        aes.encrypt
-        aes.key = key
-        Base64::encode64("#{aes.random_iv}#{SEPARATOR}#{aes.update(value.to_s) + aes.final}")
+      def encrypt(values)
+        Array(values).map { |value| encrypt_value(value) }
       end
 
       # Public: Decrypt a string
@@ -49,6 +46,13 @@ module CryptKeeper
       end
 
       private
+
+      def encrypt_value(value)
+        return value if value == '' || value.nil?
+        aes.encrypt
+        aes.key = key
+        Base64::encode64("#{aes.random_iv}#{SEPARATOR}#{aes.update(value.to_s) + aes.final}")
+      end
 
       def decrypt_value(value)
         return value if value == '' || value.nil?

@@ -22,20 +22,12 @@ module CryptKeeper
         specify { encrypted.should_not == 'string' }
         specify { encrypted.should_not be_blank }
 
-        context "an empty string" do
+        context "blank strings" do
           let(:encrypted) do
-            subject.encrypt ''
+            subject.encrypt ['', nil]
           end
 
-          specify { encrypted.should == '' }
-        end
-
-        context "a nil" do
-          let(:encrypted) do
-            subject.encrypt nil
-          end
-
-          specify { encrypted.should be_nil }
+          specify { encrypted.should == ['', nil] }
         end
       end
 
