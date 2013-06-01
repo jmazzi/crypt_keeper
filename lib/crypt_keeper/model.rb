@@ -24,34 +24,51 @@ module CryptKeeper
       @crypt_keeper_dirty_tracking ||= HashWithIndifferentAccess.new
     end
 
-    # Private: Determine if the field's plaintext value changed. It compares
-    # it to the original value that came from the DB before decryption
-    #
-    # Returns boolean
-    def plaintext_changed?(field)
-      new_record? || self[field] != self.class.decrypt(crypt_keeper_dirty_tracking[field])
-    end
-
     # Private: Encrypt each crypt_keeper_fields
     def encrypt_callback
-      crypt_keeper_fields.each do |field|
-        if !self[field].nil?
-          if plaintext_changed?(field)
-            self[field] = self.class.encrypt read_attribute(field)
-          else
-            self[field] = crypt_keeper_dirty_tracking[field]
-            clear_field_changes! field
+      fields = crypt_keeper_fields.select { |field| !self[field].nil? }
+
+      changed_fields = if new_record?
+        fields
+      else
+        original_decrypted_values = self.class.decrypt(
+          fields.map { |field| crypt_keeper_dirty_tracking[field] })
+
+        [].tap do |changed_fields|
+          fields.each_with_index do |field, i|
+            changed_fields << field if self[field] != original_decrypted_values[i]
           end
+        end
+      end
+
+      # sets the new encrypted values
+      if changed_fields.any?
+        new_encrypted_values = self.class.encrypt(
+          changed_fields.map { |field| read_attribute(field) })
+
+        changed_fields.each_with_index do |field, i|
+          self[field] = new_encrypted_values[i]
+        end
+      end
+
+      # sets back the original encrypted value for the ones that didn't change
+      if (non_changed_fields = (fields - changed_fields)).any?
+        non_changed_fields.each do |field|
+          self[field] = crypt_keeper_dirty_tracking[field]
+          clear_field_changes! field
         end
       end
     end
 
     # Private: Decrypt each crypt_keeper_fields
     def decrypt_callback
-      crypt_keeper_fields.each do |field|
+      decrypted_values = self.class.decrypt(
+        crypt_keeper_fields.map { |field| read_attribute(field) })
+
+      crypt_keeper_fields.each_with_index do |field, i|
         if !self[field].nil?
           crypt_keeper_dirty_tracking[field] = read_attribute(field)
-          self[field] = self.class.decrypt read_attribute(field)
+          self[field] = decrypted_values[i]
         end
 
         clear_field_changes! field
@@ -101,14 +118,14 @@ module CryptKeeper
         define_crypt_keeper_callbacks
       end
 
-      # Public: Encrypts a string with the encryptor
-      def encrypt(value)
-        encryptor.encrypt value
+      # Public: Encrypts a string or a list of strings with the encryptor.
+      def encrypt(values)
+        encryptor.encrypt values
       end
 
-      # Public: Decrypts a string with the encryptor
-      def decrypt(value)
-        encryptor.decrypt value
+      # Public: Decrypts a string or a list of strings with the encryptor.
+      def decrypt(values)
+        encryptor.decrypt values
       end
 
       private
@@ -138,8 +155,8 @@ module CryptKeeper
       def define_crypt_keeper_callbacks
         after_save :decrypt_callback
         after_find :decrypt_callback
-        before_save :encrypt_callback
         before_save :enforce_column_types_callback
+        before_save :encrypt_callback
       end
     end
   end

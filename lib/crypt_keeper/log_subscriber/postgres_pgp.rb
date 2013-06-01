@@ -12,10 +12,13 @@ module CryptKeeper
 
       # Public: Prevents sensitive data from being logged
       def sql_with_postgres_pgp(event)
-        filter = /(pgp_sym_(encrypt|decrypt))\(((.|\n)*?)\)/i
+        filter      = /(pgp_sym_(encrypt|decrypt))\(((.|\n)*?)\)/i
+        case_filter = /CASE\s\'.*\'\sWHEN/i
 
         event.payload[:sql] = event.payload[:sql].gsub(filter) do |_|
           "#{$1}([FILTERED])"
+        end.gsub(case_filter) do |_|
+          "CASE [FILTERED] WHEN"
         end
 
         sql_without_postgres_pgp(event)

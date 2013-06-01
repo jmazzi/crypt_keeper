@@ -12,11 +12,11 @@ module CryptKeeper::LogSubscriber
     subject { ::ActiveRecord::LogSubscriber.new }
 
     let(:input_query) do
-      "SELECT pgp_sym_encrypt('encrypt_value', 'encrypt_key'), pgp_sym_decrypt('decrypt_value', 'decrypt_key') FROM DUAL;"
+      "SELECT CASE 'encrypt_value' WHEN pgp_sym_encrypt('encrypt_value', 'encrypt_key') END, pgp_sym_decrypt('decrypt_value', 'decrypt_key') FROM DUAL;"
     end
 
     let(:output_query) do
-      "SELECT pgp_sym_encrypt([FILTERED]), pgp_sym_decrypt([FILTERED]) FROM DUAL;"
+      "SELECT CASE [FILTERED] WHEN pgp_sym_encrypt([FILTERED]) END, pgp_sym_decrypt([FILTERED]) FROM DUAL;"
     end
 
     it "filters pgp functions" do
@@ -24,7 +24,7 @@ module CryptKeeper::LogSubscriber
         event.payload[:sql].should == output_query
       end
 
-      subject.sql(ActiveSupport::Notifications::Event.new(:sql, 1, 1, 1, { sql: output_query }))
+      subject.sql(ActiveSupport::Notifications::Event.new(:sql, 1, 1, 1, { sql: input_query }))
     end
   end
 end

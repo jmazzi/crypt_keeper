@@ -18,11 +18,11 @@ module CryptKeeper
       end
 
       def encrypt(data)
-        @passphrase + data.reverse
+        Array(data).map { |d| @passphrase + d.reverse }
       end
 
       def decrypt(data)
-        data.to_s.sub(/^#{@passphrase}/, '').reverse
+        Array(data).map { |d| d.to_s.sub(/^#{@passphrase}/, '').reverse }
       end
     end
   end

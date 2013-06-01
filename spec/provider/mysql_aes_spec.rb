@@ -23,12 +23,15 @@ module CryptKeeper
       end
 
       describe "#encrypt" do
-        specify { subject.encrypt(plain_text).should_not == plain_text }
-        specify { subject.encrypt(plain_text).should_not be_blank }
+        let(:encrypted) { subject.encrypt([plain_text, plain_text]) }
+
+        specify { encrypted.should_not == [plain_text, plain_text] }
+        specify { encrypted.all? { |v| v.present? }.should be_true }
       end
 
       describe "#decrypt" do
-        specify { subject.decrypt(cipher_text).should == plain_text }
+        specify { subject.decrypt([cipher_text, nil]).should == [plain_text, nil] }
+        specify { subject.decrypt([]).should == [] }
       end
     end
   end
