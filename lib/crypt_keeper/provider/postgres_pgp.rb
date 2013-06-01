@@ -27,8 +27,16 @@ module CryptKeeper
       # Public: Decrypts a string
       #
       # Returns a plaintext string
-      def decrypt(value)
-        escape_and_execute_sql(["SELECT pgp_sym_decrypt(?, ?)", value, key])['pgp_sym_decrypt']
+      def decrypt(values)
+        values = Array(values)
+
+        select = values.size.times.map do |i|
+          "CASE ? WHEN NULL THEN NULL ELSE pgp_sym_decrypt(?, ?) END AS decrypt_#{i}"
+        end.join(", ")
+
+        args = values.map{ |value| [value, value, key] }.flatten
+
+        escape_and_execute_sql(["SELECT #{select}", *args]).values
       end
     end
   end

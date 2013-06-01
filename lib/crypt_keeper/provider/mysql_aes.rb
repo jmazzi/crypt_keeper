@@ -29,9 +29,22 @@ module CryptKeeper
       # Public: Decrypts a string
       #
       # Returns a plaintext string
-      def decrypt(value)
-        escape_and_execute_sql(
-          ["SELECT AES_DECRYPT(?, ?)", Base64.decode64(value), key]).first
+      def decrypt(values)
+        values = Array(values)
+
+        select = values.size.times.map do |i|
+          "CASE ? WHEN NULL THEN NULL ELSE AES_DECRYPT(?, ?) END AS decrypt_#{i}"
+        end.join(", ")
+
+        args = values.map{ |value| [decoded(value), decoded(value), key] }.flatten
+
+        escape_and_execute_sql(["SELECT #{select}", *args])
+      end
+
+      private
+
+      def decoded(value)
+        Base64.decode64(value) if value
       end
     end
   end

@@ -40,27 +40,11 @@ module CryptKeeper
       end
 
       describe "#decrypt" do
-        let(:decrypted) do
-          subject.decrypt "MC41MDk5MjI2NjgxMDI1MDI2OmNyeXB0X2tlZXBlcjpPI/8dCqWXDMVj7Jqs\nuwf/\n"
+        let(:cipher_text) do
+          "MC41MDk5MjI2NjgxMDI1MDI2OmNyeXB0X2tlZXBlcjpPI/8dCqWXDMVj7Jqs\nuwf/\n"
         end
 
-        specify { decrypted.should == 'string' }
-
-        context "an empty string" do
-          let(:decrypted) do
-            subject.decrypt ''
-          end
-
-          specify { decrypted.should == '' }
-        end
-
-        context "a nil" do
-          let(:decrypted) do
-            subject.decrypt nil
-          end
-
-          specify { decrypted.should be_nil }
-        end
+        specify { subject.decrypt([cipher_text, '', nil]).should == ['string', '', nil] }
       end
     end
   end

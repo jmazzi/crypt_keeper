@@ -32,7 +32,7 @@ module CryptKeeper
       end
 
       describe "#decrypt" do
-        specify { subject.decrypt(cipher_text).should == plain_text }
+        specify { subject.decrypt([cipher_text, nil]).should == [plain_text, nil] }
       end
     end
   end

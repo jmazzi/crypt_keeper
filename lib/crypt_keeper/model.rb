@@ -29,7 +29,8 @@ module CryptKeeper
     #
     # Returns boolean
     def plaintext_changed?(field)
-      new_record? || self[field] != self.class.decrypt(crypt_keeper_dirty_tracking[field])
+      new_record? ||
+        self[field] != self.class.decrypt(crypt_keeper_dirty_tracking[field]).first
     end
 
     # Private: Encrypt each crypt_keeper_fields
@@ -48,10 +49,13 @@ module CryptKeeper
 
     # Private: Decrypt each crypt_keeper_fields
     def decrypt_callback
-      crypt_keeper_fields.each do |field|
+      decrypted_values = self.class.decrypt(
+        crypt_keeper_fields.map { |field| read_attribute(field) })
+
+      crypt_keeper_fields.each_with_index do |field, i|
         if !self[field].nil?
           crypt_keeper_dirty_tracking[field] = read_attribute(field)
-          self[field] = self.class.decrypt read_attribute(field)
+          self[field] = decrypted_values[i]
         end
 
         clear_field_changes! field
@@ -101,14 +105,14 @@ module CryptKeeper
         define_crypt_keeper_callbacks
       end
 
-      # Public: Encrypts a string with the encryptor
-      def encrypt(value)
-        encryptor.encrypt value
+      # Public: Encrypts a string or a list of strings with the encryptor.
+      def encrypt(values)
+        encryptor.encrypt values
       end
 
-      # Public: Decrypts a string with the encryptor
-      def decrypt(value)
-        encryptor.decrypt value
+      # Public: Decrypts a string or a list of strings with the encryptor.
+      def decrypt(values)
+        encryptor.decrypt values
       end
 
       private
