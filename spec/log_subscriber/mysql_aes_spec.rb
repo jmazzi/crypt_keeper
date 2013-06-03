@@ -12,7 +12,7 @@ module CryptKeeper::LogSubscriber
     subject { ::ActiveRecord::LogSubscriber.new }
 
     let(:input_query) do
-      "SELECT AES_ENCRYPT('encrypt_value', 'encrypt_key'), AES_ENCRYPT('decrypt_value', 'decrypt_key') FROM DUAL;"
+      "SELECT AES_ENCRYPT('encrypt_value', 'encrypt_key'), AES_DECRYPT('decrypt_value', 'decrypt_key') FROM DUAL;"
     end
 
     let(:output_query) do
@@ -24,7 +24,7 @@ module CryptKeeper::LogSubscriber
         event.payload[:sql].should == output_query
       end
 
-      subject.sql(ActiveSupport::Notifications::Event.new(:sql, 1, 1, 1, { sql: output_query }))
+      subject.sql(ActiveSupport::Notifications::Event.new(:sql, 1, 1, 1, { sql: input_query }))
     end
   end
 end
