@@ -99,6 +99,7 @@ There are two included encryptors.
     `CREATE EXTENSION IF NOT EXISTS pgcrypto`
   * ActiveRecord logs are [automatically](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/log_subscriber/postgres_pgp.rb)
     filtered for you to protect senitive data from being logged.
+  * Custom options can be set through the `:pgcrypto_options`. E.g. `crypt_keeper :field, encryptor: :postgres_pgp, pgcrypto_options: 'compress-level=9'
 
 ## Requirements
 

@@ -5,6 +5,7 @@ module CryptKeeper
     class PostgresPgp
       include CryptKeeper::Helper::SQL
       attr_accessor :key
+      attr_accessor :pgcrypto_options
 
       # Public: Initializes the encryptor
       #
@@ -15,13 +16,15 @@ module CryptKeeper
         @key = options.fetch(:key) do
           raise ArgumentError, "Missing :key"
         end
+
+        @pgcrypto_options = options.fetch(:pgcrypto_options, '')
       end
 
       # Public: Encrypts a string
       #
       # Returns an encrypted string
       def encrypt(value)
-        escape_and_execute_sql(["SELECT pgp_sym_encrypt(?, ?)", value.to_s, key])['pgp_sym_encrypt']
+        escape_and_execute_sql(["SELECT pgp_sym_encrypt(?, ?, ?)", value.to_s, key, pgcrypto_options])['pgp_sym_encrypt']
       end
 
       # Public: Decrypts a string
