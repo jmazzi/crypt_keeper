@@ -32,114 +32,41 @@ module CryptKeeper
       end
 
       context "Options" do
-        it "stores options in crypt_keeper_options" do
-          subject.crypt_keeper :storage, :secret, key1: 1, key2: 2, encryptor: :fake_encryptor
-          subject.crypt_keeper_options.should == { key1: 1, key2: 2  }
-        end
-
         it "accepts the class name as a string" do
           subject.crypt_keeper :storage, :secret, key1: 1, key2: 2, encryptor: "FakeEncryptor"
           subject.send(:encryptor_klass).should == CryptKeeper::Provider::FakeEncryptor
         end
 
         it "raises an error on missing encryptor" do
-          msg = "You must specify an encryptor"
-          subject.crypt_keeper :storage, :secret
-          expect { subject.create! storage: 'asdf' }.to raise_error(ArgumentError, msg)
+          expect { subject.crypt_keeper :storage, :secret }.
+            to raise_error(RuntimeError, /You must specify a valid encryptor/)
         end
       end
     end
 
-    context "Encryption" do
+    context "Encryption and Decryption" do
       let(:plain_text) { 'plain_text' }
       let(:cipher_text) { 'tooltxet_nialp' }
+      let(:encryptor) { CryptKeeper::Provider::Encryptor }
 
       before do
         SensitiveData.crypt_keeper :storage, passphrase: 'tool', encryptor: :encryptor
       end
 
-      subject { SensitiveData.new }
-
-      describe "#encrypt" do
-        it "should encrypt the data" do
-          subject.storage = plain_text
-          subject.stub :decrypt_callback
-          subject.save!
-          subject.storage.should == cipher_text
-        end
-
-        it "should not encrypt nil" do
-          subject.storage = nil
-          subject.stub :decrypt_callback
-          subject.save!
-          subject.storage.should be_nil
-        end
+      it "encrypts the data" do
+        CryptKeeper::Provider::Encryptor.any_instance.should_receive(:dump).with('testing')
+        SensitiveData.create!(storage: 'testing')
       end
 
-      describe "#decrypt" do
-        it "should decrypt the data" do
-          subject.storage = cipher_text
-          subject.stub :encrypt_callback
-          subject.save!
-          subject.storage.should == plain_text
-        end
-
-        it "should not decrypt nil" do
-          subject.storage = nil
-          subject.stub :encrypt_callback
-          subject.save!
-          subject.storage.should be_nil
-        end
+      it "decrypts the data" do
+        record = SensitiveData.create!(storage: 'testing')
+        CryptKeeper::Provider::Encryptor.any_instance.should_receive(:load).at_least(1).times.with('toolgnitset')
+        SensitiveData.find(record).storage
       end
 
-      describe "Encrypt & Decrypt" do
-        it "should encrypt and decrypt the data" do
-          subject.storage = plain_text
-          subject.save!
-          subject.storage.should == plain_text
-        end
-      end
-
-      describe "#encryptor" do
-        let(:encryptor) do
-          Class.new do
-            def initialize(options = {})
-              options.delete :passphrase
-            end
-          end
-        end
-
-        before do
-          SensitiveData.crypt_keeper :storage, passphrase: 'tool', encryptor: encryptor
-        end
-
-        it "should dup the options" do
-          SensitiveData.send :encryptor
-          SensitiveData.crypt_keeper_options.should include(passphrase: 'tool')
-        end
-      end
-
-      describe "Dirty records" do
-        before do
-          SensitiveData.crypt_keeper :storage, passphrase: 'tool', encryptor: :postgres_pgp
-        end
-
-        let(:record) do
-          SensitiveData.create storage: 'test'
-        end
-
-        specify { record.should_not be_changed }
-
-        it "unchanged plaintext does not trigger a save" do
-          queries = logged_queries do
-            SensitiveData.find(record.id).save
-          end
-
-          updates = queries.select { |query| query.match(/^UPDATE /) }
-
-          queries.should_not be_empty
-          updates.should be_empty, "Received #{updates}"
-        end
+      it "returns the plaintext on decrypt" do
+        record = SensitiveData.create!(storage: 'testing')
+        SensitiveData.find(record).storage.should == 'testing'
       end
     end
   end
