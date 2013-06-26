@@ -17,7 +17,6 @@ Gem::Specification.new do |gem|
 
   gem.add_runtime_dependency 'activerecord',           '>= 3.0'
   gem.add_runtime_dependency 'activesupport',          '>= 3.0'
-  gem.add_runtime_dependency 'appraisal',              '~> 0.5.1'
 
   gem.add_development_dependency 'rspec',       '~> 2.13.0'
   gem.add_development_dependency 'guard',       '~> 1.8.0'
@@ -25,6 +24,7 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'rake',        '~> 10.0.3'
   gem.add_development_dependency 'rb-fsevent',  '~> 0.9.1'
   gem.add_development_dependency 'coveralls'
+  gem.add_development_dependency 'appraisal',   '~> 0.5.2'
 
   if RUBY_PLATFORM == 'java'
     gem.add_development_dependency 'jruby-openssl', '~> 0.7.7'
