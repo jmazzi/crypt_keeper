@@ -1,10 +1,9 @@
 PATH
   remote: /Users/justin/work/jmazzi/crypt_keeper
   specs:
-    crypt_keeper (0.10.0.pre)
+    crypt_keeper (0.13.1)
       activerecord (>= 3.0)
       activesupport (>= 3.0)
-      appraisal (~> 0.5.1)
 
 GEM
   remote: https://rubygems.org/
@@ -109,6 +108,7 @@ PLATFORMS
 DEPENDENCIES
   activerecord (~> 4.0.0.beta1)
   activesupport (~> 4.0.0.beta1)
+  appraisal (~> 0.5.2)
   coveralls
   crypt_keeper!
   guard (~> 1.8.0)
