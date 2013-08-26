@@ -17,61 +17,11 @@ module CryptKeeper
 
     private
 
-    # Private: A hash of encrypted attributes with their encrypted values
-    #
-    # Returns a Hash
-    def crypt_keeper_dirty_tracking
-      @crypt_keeper_dirty_tracking ||= HashWithIndifferentAccess.new
-    end
-
-    # Private: Determine if the field's plaintext value changed. It compares
-    # it to the original value that came from the DB before decryption
-    #
-    # Returns boolean
-    def plaintext_changed?(field)
-      new_record? || self[field] != self.class.decrypt(crypt_keeper_dirty_tracking[field])
-    end
-
-    # Private: Encrypt each crypt_keeper_fields
-    def encrypt_callback
-      crypt_keeper_fields.each do |field|
-        if !self[field].nil?
-          if plaintext_changed?(field)
-            self[field] = self.class.encrypt read_attribute(field)
-          else
-            self[field] = crypt_keeper_dirty_tracking[field]
-            clear_field_changes! field
-          end
-        end
-      end
-    end
-
-    # Private: Decrypt each crypt_keeper_fields
-    def decrypt_callback
-      crypt_keeper_fields.each do |field|
-        if !self[field].nil?
-          crypt_keeper_dirty_tracking[field] = read_attribute(field)
-          self[field] = self.class.decrypt read_attribute(field)
-        end
-
-        clear_field_changes! field
-      end
-    end
-
     # Private: Run each crypt_keeper_fields through ensure_valid_field!
     def enforce_column_types_callback
       crypt_keeper_fields.each do |field|
         ensure_valid_field! field
       end
-    end
-
-    # Private: Removes changes from `#previous_changes` and
-    # `#changed_attributes` so the model isn't considered dirty.
-    #
-    # field - The field to clear
-    def clear_field_changes!(field)
-      previous_changes.delete(field.to_s)
-      changed_attributes.delete(field.to_s)
     end
 
     module ClassMethods
@@ -89,38 +39,24 @@ module CryptKeeper
       #   end
       #
       def crypt_keeper(*args)
-        class_attribute :crypt_keeper_options
         class_attribute :crypt_keeper_fields
         class_attribute :crypt_keeper_encryptor
+        class_attribute :crypt_keeper_options
 
         self.crypt_keeper_options   = args.extract_options!
         self.crypt_keeper_encryptor = crypt_keeper_options.delete(:encryptor)
         self.crypt_keeper_fields    = args
 
         ensure_valid_encryptor!
-        define_crypt_keeper_callbacks
-      end
 
-      # Public: Encrypts a string with the encryptor
-      def encrypt(value)
-        encryptor.encrypt value
-      end
+        before_save :enforce_column_types_callback
 
-      # Public: Decrypts a string with the encryptor
-      def decrypt(value)
-        encryptor.decrypt value
+        crypt_keeper_fields.each do |field|
+          serialize field, encryptor_klass.new(crypt_keeper_options)
+        end
       end
 
       private
-
-      # Private: An instance of the encryptor class
-      def encryptor
-        @encryptor ||= if crypt_keeper_encryptor.blank?
-                         raise ArgumentError.new('You must specify an encryptor')
-                       else
-                         encryptor_klass.new(crypt_keeper_options.dup)
-                       end
-      end
 
       # Private: The encryptor class
       def encryptor_klass
@@ -129,17 +65,15 @@ module CryptKeeper
 
       # Private: Ensure that the encryptor responds to new
       def ensure_valid_encryptor!
-        unless defined? encryptor_klass
+        unless defined?(encryptor_klass) && valid_encryptor?
           raise "You must specify a valid encryptor `crypt_keeper :encryptor => :aes`"
         end
       end
 
-      # Private: Define callbacks for encryption
-      def define_crypt_keeper_callbacks
-        after_save :decrypt_callback
-        after_find :decrypt_callback
-        before_save :encrypt_callback
-        before_save :enforce_column_types_callback
+      # Private: Checks if the encryptor response to dump and load
+      def valid_encryptor?
+        encryptor_klass.instance_methods.include?(:dump) &&
+          encryptor_klass.instance_methods.include?(:load)
       end
     end
   end

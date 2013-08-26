@@ -4,6 +4,8 @@ module CryptKeeper
   module Provider
     class PostgresPgp
       include CryptKeeper::Helper::SQL
+      include CryptKeeper::Helper::Serializer
+
       attr_accessor :key
       attr_accessor :pgcrypto_options
 
