@@ -5,6 +5,9 @@ require 'base64'
 module CryptKeeper
   module Provider
     class Aes
+      include CryptKeeper::Helper::Serializer
+
+      # A value to split the iv and cipher text with
       SEPARATOR = ":crypt_keeper:"
 
       # Public: The encryption key

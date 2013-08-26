@@ -9,5 +9,15 @@ module CryptKeeper
         ::ActiveRecord::Base.connection.execute(query).first
       end
     end
+
+    module Serializer
+      def dump(value)
+        encrypt(value)
+      end
+
+      def load(value)
+        decrypt(value)
+      end
+    end
   end
 end

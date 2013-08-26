@@ -4,6 +4,7 @@ module CryptKeeper
   module Provider
     class MysqlAes
       include CryptKeeper::Helper::SQL
+      include CryptKeeper::Helper::Serializer
 
       attr_accessor :key
 

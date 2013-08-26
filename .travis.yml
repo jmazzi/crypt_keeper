@@ -5,6 +5,8 @@ gemfile:
   - gemfiles/activerecord_3_1.gemfile
   - gemfiles/activerecord_3_2.gemfile
   - gemfiles/activerecord_4_0.gemfile
+before_install:
+  - bundle install
 before_script:
   - cp spec/default.database.yml spec/database.yml
   - psql -c 'CREATE DATABASE crypt_keeper_providers;' -U postgres
@@ -18,9 +20,4 @@ notifications:
     on_failure: always
 rvm:
   - 1.9.3
-  - jruby
-matrix:
-  allow_failures:
-    - rvm: jruby
-env:
- - JRUBY_OPTS=--1.9
+  - 2.0.0

@@ -2,7 +2,17 @@
 module CryptKeeper
   module Provider
     class FakeEncryptor
+      include CryptKeeper::Helper::Serializer
+
       def initialize(*args)
+      end
+
+      def encrypt(value)
+        value
+      end
+
+      def decrypt(value)
+        value
       end
     end
   end
@@ -13,6 +23,8 @@ end
 module CryptKeeper
   module Provider
     class Encryptor
+      include CryptKeeper::Helper::Serializer
+
       def initialize(options = {})
         @passphrase = options[:passphrase]
       end
