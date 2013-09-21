@@ -40,19 +40,20 @@ module CryptKeeper
       #
       def crypt_keeper(*args)
         class_attribute :crypt_keeper_fields
-        class_attribute :crypt_keeper_encryptor
+        class_attribute :crypt_keeper_encryptor_klass
+        class_attribute :crypt_keeper_encryptor_instance
         class_attribute :crypt_keeper_options
 
         self.crypt_keeper_options   = args.extract_options!
-        self.crypt_keeper_encryptor = crypt_keeper_options.delete(:encryptor)
+        self.crypt_keeper_encryptor_klass = crypt_keeper_options.delete(:encryptor)
         self.crypt_keeper_fields    = args
-
         ensure_valid_encryptor!
 
         before_save :enforce_column_types_callback
 
+        self.crypt_keeper_encryptor_instance = encryptor_klass.new(crypt_keeper_options)
         crypt_keeper_fields.each do |field|
-          serialize field, encryptor_klass.new(crypt_keeper_options)
+          serialize field, crypt_keeper_encryptor_instance
         end
       end
 
@@ -60,7 +61,7 @@ module CryptKeeper
 
       # Private: The encryptor class
       def encryptor_klass
-        @encryptor_klass ||= "CryptKeeper::Provider::#{crypt_keeper_encryptor.to_s.camelize}".constantize
+        @encryptor_klass ||= "CryptKeeper::Provider::#{crypt_keeper_encryptor_klass.to_s.camelize}".constantize
       end
 
       # Private: Ensure that the encryptor responds to new
