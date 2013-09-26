@@ -68,6 +68,12 @@ module CryptKeeper
         record = SensitiveData.create!(storage: 'testing')
         SensitiveData.find(record).storage.should == 'testing'
       end
+
+      describe "Selecting specific column" do
+        it "should not raise error if encrypted_column is not included" do
+          expect{ SensitiveData.select(:name).to_a}.to_not raise_error(ActiveModel::MissingAttributeError)
+        end
+      end
     end
   end
 end
