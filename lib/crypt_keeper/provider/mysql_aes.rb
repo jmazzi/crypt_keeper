@@ -23,16 +23,24 @@ module CryptKeeper
       #
       # Returns an encrypted string
       def encrypt(value)
-        Base64.encode64 escape_and_execute_sql(
-          ["SELECT AES_ENCRYPT(?, ?)", value, key]).first
+        unless value.nil?
+          Base64.encode64 escape_and_execute_sql(
+            ["SELECT AES_ENCRYPT(?, ?)", value, key]).first
+        end
       end
 
       # Public: Decrypts a string
       #
       # Returns a plaintext string
       def decrypt(value)
-        escape_and_execute_sql(
-          ["SELECT AES_DECRYPT(?, ?)", Base64.decode64(value), key]).first
+        unless value.nil?
+          escape_and_execute_sql(
+            ["SELECT AES_DECRYPT(?, ?)", Base64.decode64(value), key]).first
+        end
+      end
+
+      def search(records, field, criteria)
+        records.where(field.to_sym => encrypt(criteria))
       end
     end
   end

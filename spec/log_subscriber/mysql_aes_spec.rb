@@ -2,7 +2,7 @@ require 'spec_helper'
 
 module CryptKeeper::LogSubscriber
   describe MysqlAes do
-    use_postgres
+    use_mysql
 
     # Fire the ActiveSupport.on_load
     before do

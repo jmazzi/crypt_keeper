@@ -62,6 +62,16 @@ module CryptKeeper
           specify { decrypted.should be_nil }
         end
       end
+
+      describe "#search" do
+        let(:records) do
+          [{ name: 'Bob' }, { name: 'Tim' }]
+        end
+
+        it "finds the matching record" do
+          expect(subject.search(records, :name, 'Bob')).to eql([records.first])
+        end
+      end
     end
   end
 end

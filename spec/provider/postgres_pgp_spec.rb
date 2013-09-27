@@ -35,6 +35,14 @@ module CryptKeeper
         specify { subject.decrypt(cipher_text).should == plain_text }
       end
 
+      describe "#search" do
+        it "finds the matching record" do
+          SensitiveDataPg.create!(storage: 'blah2')
+          match = SensitiveDataPg.create!(storage: 'blah')
+          SensitiveDataPg.search_by_plaintext(:storage, 'blah').first.should == match
+        end
+      end
+
       describe "Custom pgcrypto options" do
         let(:pgcrypto_options) { 'compress-level=0' }
 

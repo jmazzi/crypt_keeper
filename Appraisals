@@ -1,16 +1,11 @@
-appraise "activerecord_3_0" do
-  gem 'activerecord',  '~> 3.0'
-  gem 'activesupport', '~> 3.0'
-end
-
 appraise "activerecord_3_1" do
-  gem 'activerecord',  '~> 3.1'
-  gem 'activesupport', '~> 3.1'
+  gem 'activerecord',  '~> 3.1.10'
+  gem 'activesupport', '~> 3.1.10'
 end
 
 appraise "activerecord_3_2" do
-  gem 'activerecord',  '~> 3.2'
-  gem 'activesupport', '~> 3.2'
+  gem 'activerecord',  '~> 3.2.14'
+  gem 'activesupport', '~> 3.2.14'
 end
 
 appraise "activerecord_4_0" do

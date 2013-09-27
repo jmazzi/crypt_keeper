@@ -30,6 +30,22 @@ module CryptKeeper
       describe "#decrypt" do
         specify { subject.decrypt(cipher_text).should == plain_text }
       end
+
+      describe "#search" do
+        it "finds the matching record" do
+          SensitiveDataMysql.create!(storage: 'blah2')
+          match = SensitiveDataMysql.create!(storage: 'blah')
+          SensitiveDataMysql.search_by_plaintext(:storage, 'blah').first.should == match
+        end
+
+        it "keeps the scope" do
+          SensitiveDataMysql.create!(storage: 'blah')
+          SensitiveDataMysql.create!(storage: 'blah')
+
+          scope = SensitiveDataMysql.limit(1)
+          expect(scope.search_by_plaintext(:storage, 'blah').count).to eql(1)
+        end
+      end
     end
   end
 end

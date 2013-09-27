@@ -47,6 +47,48 @@ expected behavior, and has its use cases. An example would be migrating from
 one type of encryption to another. Using `update_column` would allow you to
 update the content without going through the current encryptor.
 
+## Available Encryptors
+
+There are three included encryptors.
+
+* [AES](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/aes.rb)
+  * Encryption is peformed using AES-256 via OpenSSL.
+
+
+* [MySQL AES](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/mysql_aes.rb)
+  * Encryption is peformed MySQL's native AES functions.
+  * ActiveRecord logs are [automatically](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/log_subscriber/mysql_aes.rb)
+    filtered for you to protect senitive data from being logged.
+
+
+* [PostgreSQL PGP](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/postgres_pgp.rb).
+  * Encryption is performed using PostgresSQL's native [PGP functions](http://www.postgresql.org/docs/9.1/static/pgcrypto.html).
+  * It requires the `pgcrypto` PostgresSQL extension:
+    `CREATE EXTENSION IF NOT EXISTS pgcrypto`
+  * ActiveRecord logs are [automatically](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/log_subscriber/postgres_pgp.rb)
+    filtered for you to protect senitive data from being logged.
+  * Custom options can be set through the `:pgcrypto_options`. E.g. `crypt_keeper :field, encryptor: :postgres_pgp, pgcrypto_options: 'compress-level=9'
+
+## Searching
+Searching ciphertext is a complex problem that varies depending on the encryption algorithm you choose. All of the bundled providers include search support, but they have some caveats. 
+
+* AES
+  * The Ruby implementation of AES uses a random initialization vector. The same plaintext encrypted multiple times will have different output each time for the ciphertext. Since this is the case, it is not possible to search leveraging the database. Database rows will need to be filtered in memory. It is suggested that you use a scope or ActiveRecord batches to narrow the results before seaching them.
+
+* Mysql AES
+ * Surprisingly, MySQL's implementation of AES does not use a random initialization vector. The column containing the ciphertext can be indexed and searched quickly. 
+
+* PostgresSQL PGP
+ * PGP also uses a random initialization vector which means it generates unique output each time you encrypt plaintext. Although the database can be searched by performing row level description and comparing the plaintext, it will not be able to use an index. A scope or batch is suggested when searching.
+
+## How the search interface is used
+
+```ruby
+Model.search_by_plaintext(:field, 'searchstring')
+# With a scope
+Model.where(something: 'blah').search_by_plaintext(:field, 'searchstring')
+```
+
 ## Creating your own encryptor
 
 Creating your own encryptor is easy. All you have to do is create a class
@@ -79,32 +121,10 @@ class MyModel < ActiveRecord::Base
 end
 ```
 
-## Available Encryptors
-
-There are two included encryptors.
-
-* [AES](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/aes.rb)
-  * Encryption is peformed using AES-256 via OpenSSL.
-
-
-* [MySQL AES](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/mysql_aes.rb)
-  * Encryption is peformed MySQL's native AES functions.
-  * ActiveRecord logs are [automatically](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/log_subscriber/mysql_aes.rb)
-    filtered for you to protect senitive data from being logged.
-
-
-* [PostgreSQL PGP](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/postgres_pgp.rb).
-  * Encryption is performed using PostgresSQL's native [PGP functions](http://www.postgresql.org/docs/9.1/static/pgcrypto.html).
-  * It requires the `pgcrypto` PostgresSQL extension:
-    `CREATE EXTENSION IF NOT EXISTS pgcrypto`
-  * ActiveRecord logs are [automatically](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/log_subscriber/postgres_pgp.rb)
-    filtered for you to protect senitive data from being logged.
-  * Custom options can be set through the `:pgcrypto_options`. E.g. `crypt_keeper :field, encryptor: :postgres_pgp, pgcrypto_options: 'compress-level=9'
-
 ## Requirements
 
-CryptKeeper has been tested against ActiveRecord 3.0, 3.1, 3.2 using ruby
-1.9.3 and jruby in 1.9 mode.
+CryptKeeper has been tested against ActiveRecord 3.1, 3.2, 4.0 using ruby
+1.9.3 and 2.0.0
 
 ActiveRecord 4.0 is supported starting with v0.11.0.
 

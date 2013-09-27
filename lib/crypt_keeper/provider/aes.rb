@@ -55,6 +55,15 @@ module CryptKeeper
         aes.iv  = iv
         aes.update(value) + aes.final
       end
+
+      # Public: Search for a record
+      #
+      # record   - An ActiveRecord collection
+      # field    - The field to search
+      # criteria - A string to search with
+      def search(records, field, criteria)
+        records.select { |record| record[field] == criteria }
+      end
     end
   end
 end

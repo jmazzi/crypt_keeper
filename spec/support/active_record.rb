@@ -5,31 +5,28 @@ require 'logger'
 ::ActiveRecord::Migration.verbose = false
 
 module CryptKeeper
-  class SensitiveData < ActiveRecord::Base; end
+  class SensitiveDataMysql < ActiveRecord::Base
+    self.table_name = 'sensitive_data'
+    crypt_keeper :storage, key: 'tool', encryptor: :mysql_aes
+  end
+
+  class SensitiveDataPg < ActiveRecord::Base
+    self.table_name = 'sensitive_data'
+    crypt_keeper :storage, key: 'tool', encryptor: :postgres_pgp
+  end
+
+  class SensitiveData < ActiveRecord::Base
+  end
 
   module ConnectionHelpers
-    def use_postgres
-      before :all do
-        ::ActiveRecord::Base.clear_active_connections!
-        config = YAML.load_file SPEC_ROOT.join('database.yml')
-        ::ActiveRecord::Base.establish_connection(config['postgres'])
+    class CreateConnection
+      def initialize(driver)
+        @driver = driver
+        @config = YAML.load_file SPEC_ROOT.join('database.yml')
+        connect!
       end
-    end
 
-    def use_mysql
-      before :all do
-        ::ActiveRecord::Base.clear_active_connections!
-        config = YAML.load_file SPEC_ROOT.join('database.yml')
-        ::ActiveRecord::Base.establish_connection(config['mysql'])
-      end
-    end
-
-    def use_sqlite
-      before :all do
-        ::ActiveRecord::Base.clear_active_connections!
-        ::ActiveRecord::Base.establish_connection(:adapter => 'sqlite3',
-          :database => ':memory:')
-
+      def define_schema!
         ::ActiveRecord::Schema.define do
           create_table :sensitive_data, :force => true do |t|
             t.column :name, :string
@@ -37,6 +34,29 @@ module CryptKeeper
             t.column :secret, :text
           end
         end
+      end
+
+      private
+      def connect!
+        ::ActiveRecord::Base.establish_connection(@config[@driver])
+      end
+    end
+
+    def use_postgres
+      before :each do
+        CreateConnection.new('postgres').define_schema!
+      end
+    end
+
+    def use_mysql
+      before :each do
+        CreateConnection.new('mysql').define_schema!
+      end
+    end
+
+    def use_sqlite
+      before :all do
+        CreateConnection.new('sqlite').define_schema!
       end
     end
   end
