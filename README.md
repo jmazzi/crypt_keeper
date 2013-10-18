@@ -79,7 +79,7 @@ Searching ciphertext is a complex problem that varies depending on the encryptio
  * Surprisingly, MySQL's implementation of AES does not use a random initialization vector. The column containing the ciphertext can be indexed and searched quickly. 
 
 * PostgresSQL PGP
- * PGP also uses a random initialization vector which means it generates unique output each time you encrypt plaintext. Although the database can be searched by performing row level description and comparing the plaintext, it will not be able to use an index. A scope or batch is suggested when searching.
+ * PGP also uses a random initialization vector which means it generates unique output each time you encrypt plaintext. Although the database can be searched by performing row level decryption and comparing the plaintext, it will not be able to use an index. A scope or batch is suggested when searching.
 
 ## How the search interface is used
 
