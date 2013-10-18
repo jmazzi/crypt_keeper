@@ -58,7 +58,7 @@ There are three included encryptors.
 * [MySQL AES](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/mysql_aes.rb)
   * Encryption is peformed MySQL's native AES functions.
   * ActiveRecord logs are [automatically](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/log_subscriber/mysql_aes.rb)
-    filtered for you to protect senitive data from being logged.
+    filtered for you to protect sensitive data from being logged.
 
 
 * [PostgreSQL PGP](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/postgres_pgp.rb).
