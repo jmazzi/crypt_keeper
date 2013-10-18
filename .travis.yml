@@ -1,7 +1,6 @@
 branches: master
 language: ruby
 gemfile:
-  - gemfiles/activerecord_3_0.gemfile
   - gemfiles/activerecord_3_1.gemfile
   - gemfiles/activerecord_3_2.gemfile
   - gemfiles/activerecord_4_0.gemfile

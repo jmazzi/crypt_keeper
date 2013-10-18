@@ -56,6 +56,15 @@ module CryptKeeper
         end
       end
 
+      def search_by_plaintext(field, criteria)
+        if crypt_keeper_fields.include?(field.to_sym)
+          encryptor = encryptor_klass.new(crypt_keeper_options)
+          encryptor.search(scoping_strategy, field.to_s, criteria)
+        else
+          raise "#{field} is not a crypt_keeper field"
+        end
+      end
+
       private
 
       # Private: The encryptor class
@@ -74,6 +83,14 @@ module CryptKeeper
       def valid_encryptor?
         encryptor_klass.instance_methods.include?(:dump) &&
           encryptor_klass.instance_methods.include?(:load)
+      end
+
+      def scoping_strategy
+        if ::ActiveRecord.respond_to?(:version) && ::ActiveRecord.version.segments[0] == 4
+          all
+        else
+          scoped
+        end
       end
     end
   end

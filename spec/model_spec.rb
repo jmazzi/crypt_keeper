@@ -4,14 +4,13 @@ module CryptKeeper
   describe Model do
     use_sqlite
 
+    before do
+      SensitiveData.instance_variable_set('@encryptor_klass', nil)
+    end
+
     subject { SensitiveData }
 
     describe "#crypt_keeper" do
-      after(:each) do
-        subject.instance_variable_set(:@encryptor_klass, nil)
-        subject.instance_variable_set(:@encryptor, nil)
-      end
-
       context "Fields" do
         it "enables encryption for the given fields" do
           subject.crypt_keeper :storage, :secret, encryptor: :fake_encryptor
@@ -47,7 +46,6 @@ module CryptKeeper
     context "Encryption and Decryption" do
       let(:plain_text) { 'plain_text' }
       let(:cipher_text) { 'tooltxet_nialp' }
-      let(:encryptor) { CryptKeeper::Provider::Encryptor }
 
       before do
         SensitiveData.crypt_keeper :storage, passphrase: 'tool', encryptor: :encryptor
@@ -67,6 +65,20 @@ module CryptKeeper
       it "returns the plaintext on decrypt" do
         record = SensitiveData.create!(storage: 'testing')
         SensitiveData.find(record).storage.should == 'testing'
+      end
+    end
+
+    context "Search" do
+      before do
+        SensitiveData.crypt_keeper :storage, passphrase: 'tool', encryptor: :search_encryptor
+      end
+
+      it "searches if supported" do
+        expect { SensitiveData.search_by_plaintext(:storage, 'test1') }.to_not raise_error
+      end
+
+      it "complains about bad columns" do
+        expect { SensitiveData.search_by_plaintext(:what, 'test1') }.to raise_error(/what is not a crypt_keeper field/)
       end
     end
   end

@@ -1,6 +1,6 @@
-# A fake class that does no encryption
 module CryptKeeper
   module Provider
+    # A fake class that does no encryption
     class FakeEncryptor
       include CryptKeeper::Helper::Serializer
 
@@ -15,13 +15,29 @@ module CryptKeeper
         value
       end
     end
-  end
-end
 
-# This class embeds the passphrase in the beginning of the string
-# and then reverses the 'plaintext'
-module CryptKeeper
-  module Provider
+    class SearchEncryptor
+      include CryptKeeper::Helper::Serializer
+
+      def initialize(*args)
+      end
+
+      def encrypt(value)
+        value
+      end
+
+      def decrypt(value)
+        value
+      end
+
+      def search(records, field, criteria)
+        records.select { |record| record[field] == criteria }
+      end
+    end
+
+
+    # This class embeds the passphrase in the beginning of the string
+    # and then reverses the 'plaintext'
     class Encryptor
       include CryptKeeper::Helper::Serializer
 

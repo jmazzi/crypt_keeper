@@ -6,6 +6,7 @@ postgres:
   pool: 5
   username: postgres
   password:
+  min_messages: WARNING
 mysql:
   adapter: mysql2
   encoding: utf8
@@ -14,3 +15,8 @@ mysql:
   pool: 5
   username: root
   password:
+sqlite:
+  adapter: sqlite3
+  encoding: utf8
+  reconnect: false
+  database: ':memory:'
