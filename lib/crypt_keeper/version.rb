@@ -1,3 +1,3 @@
 module CryptKeeper
-  VERSION = "0.14.0.pre"
+  VERSION = "0.15.0.pre"
 end
