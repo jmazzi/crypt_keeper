@@ -2,8 +2,6 @@ module CryptKeeper
   module Provider
     # A fake class that does no encryption
     class FakeEncryptor
-      include CryptKeeper::Helper::Serializer
-
       def initialize(*args)
       end
 
@@ -17,8 +15,6 @@ module CryptKeeper
     end
 
     class SearchEncryptor
-      include CryptKeeper::Helper::Serializer
-
       def initialize(*args)
       end
 
@@ -39,8 +35,6 @@ module CryptKeeper
     # This class embeds the passphrase in the beginning of the string
     # and then reverses the 'plaintext'
     class Encryptor
-      include CryptKeeper::Helper::Serializer
-
       def initialize(options = {})
         @passphrase = options[:passphrase]
       end

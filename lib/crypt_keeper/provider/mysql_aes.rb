@@ -4,7 +4,6 @@ module CryptKeeper
   module Provider
     class MysqlAes
       include CryptKeeper::Helper::SQL
-      include CryptKeeper::Helper::Serializer
 
       attr_accessor :key
 
@@ -23,20 +22,16 @@ module CryptKeeper
       #
       # Returns an encrypted string
       def encrypt(value)
-        unless value.nil?
-          Base64.encode64 escape_and_execute_sql(
-            ["SELECT AES_ENCRYPT(?, ?)", value, key]).first
-        end
+        Base64.encode64 escape_and_execute_sql(
+          ["SELECT AES_ENCRYPT(?, ?)", value, key]).first
       end
 
       # Public: Decrypts a string
       #
       # Returns a plaintext string
       def decrypt(value)
-        unless value.nil?
-          escape_and_execute_sql(
-            ["SELECT AES_DECRYPT(?, ?)", Base64.decode64(value), key]).first
-        end
+        escape_and_execute_sql(
+          ["SELECT AES_DECRYPT(?, ?)", Base64.decode64(value), key]).first
       end
 
       def search(records, field, criteria)

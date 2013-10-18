@@ -12,11 +12,19 @@ module CryptKeeper
 
     module Serializer
       def dump(value)
-        encrypt(value)
+        if value.blank?
+          value
+        else
+          encrypt(value)
+        end
       end
 
       def load(value)
-        decrypt(value)
+        if value.blank?
+          value
+        else
+          decrypt(value)
+        end
       end
     end
   end

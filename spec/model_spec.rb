@@ -52,19 +52,29 @@ module CryptKeeper
       end
 
       it "encrypts the data" do
-        CryptKeeper::Provider::Encryptor.any_instance.should_receive(:dump).with('testing')
+        CryptKeeper::Provider::Encryptor.any_instance.should_receive(:encrypt).with('testing')
         SensitiveData.create!(storage: 'testing')
       end
 
       it "decrypts the data" do
         record = SensitiveData.create!(storage: 'testing')
-        CryptKeeper::Provider::Encryptor.any_instance.should_receive(:load).at_least(1).times.with('toolgnitset')
+        CryptKeeper::Provider::Encryptor.any_instance.should_receive(:decrypt).at_least(1).times.with('toolgnitset')
         SensitiveData.find(record).storage
       end
 
       it "returns the plaintext on decrypt" do
         record = SensitiveData.create!(storage: 'testing')
         SensitiveData.find(record).storage.should == 'testing'
+      end
+
+      it "does not encrypt or decrypt nil" do
+        data = SensitiveData.create!(storage: nil)
+        data.storage.should be_nil
+      end
+
+      it "does not encrypt or decrypt empty strings" do
+        data = SensitiveData.create!(storage: "")
+        data.storage.should be_empty
       end
     end
 

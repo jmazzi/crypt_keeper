@@ -52,7 +52,8 @@ module CryptKeeper
         before_save :enforce_column_types_callback
 
         crypt_keeper_fields.each do |field|
-          serialize field, encryptor_klass.new(crypt_keeper_options)
+          serialize field, encryptor_klass.new(crypt_keeper_options).
+            extend(::CryptKeeper::Helper::Serializer)
         end
       end
 
@@ -74,15 +75,9 @@ module CryptKeeper
 
       # Private: Ensure that the encryptor responds to new
       def ensure_valid_encryptor!
-        unless defined?(encryptor_klass) && valid_encryptor?
+        unless defined?(encryptor_klass) && encryptor_klass.respond_to?(:new)
           raise "You must specify a valid encryptor `crypt_keeper :encryptor => :aes`"
         end
-      end
-
-      # Private: Checks if the encryptor response to dump and load
-      def valid_encryptor?
-        encryptor_klass.instance_methods.include?(:dump) &&
-          encryptor_klass.instance_methods.include?(:load)
       end
 
       def scoping_strategy
