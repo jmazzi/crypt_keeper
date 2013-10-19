@@ -3,14 +3,14 @@ require 'spec_helper'
 module CryptKeeper
   module Provider
     describe Aes do
-      subject { Aes.new(key: 'cake') }
+      subject { Aes.new(key: 'cake', salt: 'salt') }
 
       describe "#initialize" do
-        let(:hexed_key) do
-          Digest::SHA256.digest('cake')
+        let(:digested_key) do
+          ::Armor.digest('cake', 'salt')
         end
 
-        its(:key) { should == hexed_key }
+        its(:key) { should == digested_key }
         specify { expect { Aes.new }.to raise_error(ArgumentError, "Missing :key") }
       end
 
@@ -25,7 +25,7 @@ module CryptKeeper
 
       describe "#decrypt" do
         let(:decrypted) do
-          subject.decrypt "MC41MDk5MjI2NjgxMDI1MDI2OmNyeXB0X2tlZXBlcjpPI/8dCqWXDMVj7Jqs\nuwf/\n"
+          subject.decrypt "V02ebRU2wLk25AizasROVg==$kE+IpRaUNdBfYqR+WjMqvA=="
         end
 
         specify { decrypted.should == 'string' }

@@ -1,13 +1,14 @@
 require 'active_record'
 require 'logger'
 
-::ActiveRecord::Base.logger = Logger.new SPEC_ROOT.join('debug.log').to_s
+::ActiveRecord::Base.logger = Logger.new(AR_LOG)
 ::ActiveRecord::Migration.verbose = false
 
 module CryptKeeper
   class SensitiveDataMysql < ActiveRecord::Base
     self.table_name = 'sensitive_data'
-    crypt_keeper :storage, key: 'tool', encryptor: :mysql_aes
+    crypt_keeper :storage, encryptor: :mysql_aes, key: ENCRYPTION_PASSWORD,
+      salt: 'salt'
   end
 
   class SensitiveDataPg < ActiveRecord::Base

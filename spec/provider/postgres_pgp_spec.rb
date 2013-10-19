@@ -5,15 +5,16 @@ module CryptKeeper
     describe PostgresPgp do
       use_postgres
 
-      let(:cipher_text) { '\\xc30d0407030283b15f71b6a7d0296cd23501bd2c8fe3c7a56005ff4619527c4291509a78c77a6758cddd2a14acbde589fa10b3e0686865182d3beadaf237b9f928e7ba1810b8' }
+      let(:cipher_text) { '\xc30d04070302f1a092093988b26873d235017203ce086a53fce1925dc39b4e972e534f192d10b94af3dcf8589abc1f828456f5d3e20b225d56006ffd1e312e3b8a492a6010e9' }
       let(:plain_text)  { 'test' }
 
-      let(:integer_cipher_text) { '\xc30d040703028c65c58c0e9d015360d2320125112fc38f094e57cce1c0313f3eea4a7fc3e95c048bc319e25003ab6f29ceabe3609089d12094508c1eb79a2d70f95233' }
+      let(:integer_cipher_text) { '\xc30d04070302c8d266353bcf2fc07dd23201153f9d9c32fbb3c36b9b0db137bf8b6c609172210d89ded63f11dff23d1ddbf5111c0266549dde26175c4425e06bb4bd6f' }
+
       let(:integer_plain_text) { 1 }
 
-      subject { PostgresPgp.new key: 'candy' }
+      subject { PostgresPgp.new key: ENCRYPTION_PASSWORD }
 
-      its(:key) { should == 'candy' }
+      its(:key) { should == ENCRYPTION_PASSWORD }
 
       describe "#initialize" do
         specify { expect { PostgresPgp.new }.to raise_error(ArgumentError, "Missing :key") }
@@ -33,6 +34,7 @@ module CryptKeeper
 
       describe "#decrypt" do
         specify { subject.decrypt(cipher_text).should == plain_text }
+        specify { subject.decrypt(integer_cipher_text).should == integer_plain_text.to_s }
       end
 
       describe "#search" do

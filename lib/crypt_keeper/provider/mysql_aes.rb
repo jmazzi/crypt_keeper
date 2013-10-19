@@ -4,18 +4,16 @@ module CryptKeeper
   module Provider
     class MysqlAes
       include CryptKeeper::Helper::SQL
+      include CryptKeeper::Helper::DigestPassphrase
 
       attr_accessor :key
 
       # Public: Initializes the encryptor
       #
-      #  options - A hash, :key is required
+      #  options - A hash, :key and :salt are required
       def initialize(options = {})
         ActiveSupport.run_load_hooks(:crypt_keeper_mysql_aes_log, self)
-
-        @key = options.fetch(:key) do
-          raise ArgumentError, "Missing :key"
-        end
+        @key = digest_passphrase(options[:key], options[:salt])
       end
 
       # Public: Encrypts a string

@@ -11,15 +11,16 @@ module CryptKeeper
       # into a spec :). This is a Base64 encoded string of 'test' AES encrypted
       # by AES_ENCRYPT()
       let(:cipher_text) do
-        "nbKOoWn8kvAw9k/C2Mex6Q==\n"
+        "fBN8i7bx/DGAA4NJ4EWi0A=="
       end
 
-      subject { MysqlAes.new key: 'candy' }
+      subject { MysqlAes.new key: ENCRYPTION_PASSWORD, salt: 'salt' }
 
-      its(:key) { should == 'candy' }
+      its(:key) { should == "825e8c5e8ca394818b307b22b8cb7d3df2735e9c1e5838b476e7719135a4f499f2133022c1a0e8597c9ac1507b0f0c44328a40049f9704fab3598c5dec120724" }
 
       describe "#initialize" do
         specify { expect { MysqlAes.new }.to raise_error(ArgumentError, "Missing :key") }
+        specify { expect { MysqlAes.new(key: 'blah') }.to raise_error(ArgumentError, "Missing :salt") }
       end
 
       describe "#encrypt" do

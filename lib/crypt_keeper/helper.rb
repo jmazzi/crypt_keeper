@@ -10,6 +10,14 @@ module CryptKeeper
       end
     end
 
+    module DigestPassphrase
+      def digest_passphrase(key, salt)
+        raise ArgumentError.new("Missing :key") if key.blank?
+        raise ArgumentError.new("Missing :salt") if salt.blank?
+        ::Armor.digest(key, salt)
+      end
+    end
+
     module Serializer
       def dump(value)
         if value.blank?
