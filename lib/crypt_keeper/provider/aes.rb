@@ -5,14 +5,9 @@ module CryptKeeper
   module Provider
     class Aes
       include CryptKeeper::Helper::DigestPassphrase
-      # A value to split the iv and cipher text with
-      SEPARATOR = ":crypt_keeper:"
 
       # Public: The encryption key
       attr_accessor :key
-
-      # Public: An instance of  OpenSSL::Cipher::Cipher
-      attr_accessor :aes
 
       # Public: Initializes the class
       #
