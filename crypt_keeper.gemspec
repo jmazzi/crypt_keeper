@@ -18,6 +18,8 @@ Gem::Specification.new do |gem|
 
   gem.add_runtime_dependency 'activerecord',  '>= 3.1', '< 4.1'
   gem.add_runtime_dependency 'activesupport', '>= 3.1', '< 4.1'
+  gem.add_runtime_dependency 'aes',           '~> 0.5.0'
+  gem.add_runtime_dependency 'armor',         '~> 0.0.2'
 
   gem.add_development_dependency 'rspec',       '~> 2.13.0'
   gem.add_development_dependency 'guard',       '~> 1.8.0'

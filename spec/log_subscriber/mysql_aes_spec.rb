@@ -6,7 +6,7 @@ module CryptKeeper::LogSubscriber
 
     # Fire the ActiveSupport.on_load
     before do
-      CryptKeeper::Provider::MysqlAes.new key: 'secret'
+      CryptKeeper::Provider::MysqlAes.new key: ENCRYPTION_PASSWORD, salt: 'salt'
     end
 
     subject { ::ActiveRecord::LogSubscriber.new }
@@ -16,7 +16,7 @@ module CryptKeeper::LogSubscriber
     end
 
     let(:output_query) do
-      "SELECT AES_ENCRYPT([FILTERED]), AES_DECRYPT([FILTERED]) FROM DUAL;"
+      "SELECT AES_ENCRYPT([FILTERED]) FROM DUAL;"
     end
 
     it "filters mysql aes functions" do
@@ -25,6 +25,14 @@ module CryptKeeper::LogSubscriber
       end
 
       subject.sql(ActiveSupport::Notifications::Event.new(:sql, 1, 1, 1, { sql: input_query }))
+    end
+
+    it "filters with lowercase" do
+      subject.should_receive(:sql_without_mysql_aes) do |event|
+        event.payload[:sql].should == output_query.downcase.gsub(/filtered/, 'FILTERED')
+      end
+
+      subject.sql(ActiveSupport::Notifications::Event.new(:sql, 1, 1, 1, { sql: input_query.downcase }))
     end
   end
 end

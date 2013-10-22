@@ -27,7 +27,7 @@ simple that *just works*.
 
 ```ruby
 class MyModel < ActiveRecord::Base
-  crypt_keeper :field, :other_field, :encryptor => :aes, :key => 'super_good_password'
+  crypt_keeper :field, :other_field, :encryptor => :aes, :key => 'super_good_password', salt: 'salt'
 end
 
 model = MyModel.new(field: 'sometext')
@@ -53,12 +53,15 @@ There are three included encryptors.
 
 * [AES](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/aes.rb)
   * Encryption is peformed using AES-256 via OpenSSL.
+  * Passphrases are derived using [PBKDF2](http://en.wikipedia.org/wiki/PBKDF2)
 
 
 * [MySQL AES](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/mysql_aes.rb)
   * Encryption is peformed MySQL's native AES functions.
   * ActiveRecord logs are [automatically](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/log_subscriber/mysql_aes.rb)
     filtered for you to protect sensitive data from being logged.
+  * Passphrases are derived using [PBKDF2](http://en.wikipedia.org/wiki/PBKDF2)
+
 
 
 * [PostgreSQL PGP](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/postgres_pgp.rb).
@@ -68,6 +71,7 @@ There are three included encryptors.
   * ActiveRecord logs are [automatically](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/log_subscriber/postgres_pgp.rb)
     filtered for you to protect senitive data from being logged.
   * Custom options can be set through the `:pgcrypto_options`. E.g. `crypt_keeper :field, encryptor: :postgres_pgp, pgcrypto_options: 'compress-level=9'
+  * Passphrases are hashed by PostgresSQL itself using a [String2Key (S2K)](http://www.postgresql.org/docs/9.2/static/pgcrypto.html) algorithm. This is rather similar to crypt() algorithms — purposefully slow and with random salt — but it produces a full-length binary key.
 
 ## Searching
 Searching ciphertext is a complex problem that varies depending on the encryption algorithm you choose. All of the bundled providers include search support, but they have some caveats. 
