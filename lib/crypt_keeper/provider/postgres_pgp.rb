@@ -3,6 +3,7 @@ require 'forwardable'
 
 module CryptKeeper
   module Provider
+    # Symmetric pgp encryption
     class PostgresPgpSym
       include CryptKeeper::Helper::SQL
 
@@ -31,6 +32,7 @@ module CryptKeeper
     end
 
     class PostgresPgpPublic
+      # public key pgp encryption
       include CryptKeeper::Helper::SQL
 
       def initialize(key, options)
