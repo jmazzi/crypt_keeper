@@ -38,7 +38,7 @@ module CryptKeeper
       def initialize(key, options)
         @key         = key
         @public_key  = options.fetch(:public_key)
-        @private_key = options.fetch(:private_key)
+        @private_key = options[:private_key]
       end
 
       # Public: Encrypts a string

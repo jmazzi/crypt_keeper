@@ -86,6 +86,13 @@ module CryptKeeper
         subject { PostgresPgp.new key: ENCRYPTION_PASSWORD, public_key: public_key, private_key: private_key }
 
         describe "#encrypt" do
+          context "Missing private key" do
+            it "does not decrypt" do
+              pgp = PostgresPgp.new key: ENCRYPTION_PASSWORD, public_key: public_key
+              pgp.decrypt(cipher_text).should be_nil
+            end
+          end
+
           context "Strings" do
             specify { subject.encrypt(plain_text).should_not == plain_text }
             specify { subject.encrypt(plain_text).should_not be_empty }
