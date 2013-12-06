@@ -1,4 +1,5 @@
 require 'crypt_keeper/log_subscriber/postgres_pgp'
+require 'forwardable'
 
 module CryptKeeper
   module Provider
@@ -22,6 +23,10 @@ module CryptKeeper
       # Returns a plaintext string
       def decrypt(value)
         escape_and_execute_sql(["SELECT pgp_sym_decrypt(?, ?)", value, @key])['pgp_sym_decrypt']
+      end
+
+      def search(records, field, criteria)
+        records.where("(pgp_sym_decrypt(cast(#{field} AS bytea), ?) = ?)", @key, criteria)
       end
     end
 
@@ -50,7 +55,11 @@ module CryptKeeper
     end
 
     class PostgresPgp
-      attr_accessor :key
+      extend Forwardable
+
+      def_delegators :@encryption_class, :encrypt, :decrypt, :search
+
+      attr_reader :key
 
       # Public: Initializes the encryptor
       #
@@ -62,25 +71,8 @@ module CryptKeeper
           raise ArgumentError, "Missing :key"
         end
 
-        @options = options
-      end
-
-      # Public: Encrypts a string
-      #
-      # Returns an encrypted string
-      def encrypt(value)
-        decrypt_class.new(key, @options).encrypt(value)
-      end
-
-      # Public: Decrypts a string
-      #
-      # Returns a plaintext string
-      def decrypt(value)
-        decrypt_class.new(key, @options).decrypt(value)
-      end
-
-      def search(records, field, criteria)
-        records.where("(pgp_sym_decrypt(cast(#{field} AS bytea), ?) = ?)", key, criteria)
+        @options          = options
+        @encryption_class = decrypt_class.new(@key, @options)
       end
 
       def decrypt_class
