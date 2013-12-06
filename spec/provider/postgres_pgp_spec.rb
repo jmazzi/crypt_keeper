@@ -101,7 +101,6 @@ module CryptKeeper
           specify { subject.decrypt(cipher_text).should == plain_text }
           specify { subject.decrypt(integer_cipher_text).should == integer_plain_text.to_s }
         end
-
       end
     end
   end
