@@ -5,12 +5,26 @@ module CryptKeeper
     describe PostgresPgp do
       use_postgres
 
+      def self.read_key(file)
+        IO.read(File.join(SPEC_ROOT, 'fixtures', file))
+      end
+
       let(:cipher_text) { '\xc30d04070302f1a092093988b26873d235017203ce086a53fce1925dc39b4e972e534f192d10b94af3dcf8589abc1f828456f5d3e20b225d56006ffd1e312e3b8a492a6010e9' }
       let(:plain_text)  { 'test' }
 
       let(:integer_cipher_text) { '\xc30d04070302c8d266353bcf2fc07dd23201153f9d9c32fbb3c36b9b0db137bf8b6c609172210d89ded63f11dff23d1ddbf5111c0266549dde26175c4425e06bb4bd6f' }
 
       let(:integer_plain_text) { 1 }
+
+      let(:public_key) do
+        IO.read(File.join(SPEC_ROOT, 'fixtures', 'public.asc'))
+      end
+
+      let(:private_key) do
+        IO.read(File.join(SPEC_ROOT, 'fixtures', 'private.asc'))
+      end
+
+      let(:private_key_passphrase) { 'crypt_keeper' }
 
       subject { PostgresPgp.new key: ENCRYPTION_PASSWORD }
 
@@ -61,6 +75,14 @@ module CryptKeeper
           queries.select { |query| query.include?("pgp_sym_encrypt") }.each do |q|
             q.should include(pgcrypto_options)
           end
+        end
+      end
+
+      context "Public key encryption" do
+        it "does things" do
+          pgp = PostgresPgp.new key: ENCRYPTION_PASSWORD, public_key: public_key, private_key: private_key
+          encrypted = pgp.encrypt('asdf')
+          decrypted = pgp.decrypt(encrypted)
         end
       end
     end

@@ -6,15 +6,15 @@ module CryptKeeper
       include CryptKeeper::Helper::SQL
 
       def initialize(key, options)
-        @key     = key
-        @options = options
+        @key              = key
+        @pgcrypto_options = options.delete(:pgcrypto_options) || ''
       end
 
       # Public: Encrypts a string
       #
       # Returns an encrypted string
       def encrypt(value)
-        escape_and_execute_sql(["SELECT pgp_sym_encrypt(?, ?, ?)", value.to_s, @key, @options])['pgp_sym_encrypt']
+        escape_and_execute_sql(["SELECT pgp_sym_encrypt(?, ?, ?)", value.to_s, @key, @pgcrypto_options])['pgp_sym_encrypt']
       end
 
       # Public: Decrypts a string
@@ -23,6 +23,38 @@ module CryptKeeper
       def decrypt(value)
         escape_and_execute_sql(["SELECT pgp_sym_decrypt(?, ?)", value, @key])['pgp_sym_decrypt']
       end
+    end
+
+    class PostgresPgpPublic
+      include CryptKeeper::Helper::SQL
+
+      def initialize(key, options)
+        @key         = key
+        @public_key  = options.fetch(:public_key)
+        @private_key = options.fetch(:private_key)
+      end
+
+      # Public: Encrypts a string
+      #
+      # Returns an encrypted string
+      def encrypt(value)
+        escape_and_execute_sql(["SELECT pgp_pub_encrypt(?, dearmor(?))", value.to_s, @public_key])['pgp_pub_encrypt']
+      end
+
+      # Public: Decrypts a string
+      #
+      # Returns a plaintext string
+      def decrypt(value)
+        escape_and_execute_sql(["SELECT pgp_pub_decrypt(?, dearmor(?), ?)", value, @private_key, @key])['pgp_pub_decrypt']
+      end
+
+      # def private_key
+      #   escape_and_execute_sql(["SELECT dearmor(?)", @private_key])['dearmor']
+      # end
+
+      # def public_key
+      #   escape_and_execute_sql(["SELECT dearmor(?)", @public_key])['dearmor']
+      # end
     end
 
     class PostgresPgp
@@ -38,22 +70,21 @@ module CryptKeeper
           raise ArgumentError, "Missing :key"
         end
 
-        @pgcrypto_options = options.delete(:pgcrypto_options) || ''
-        @options          = options
+        @options = options
       end
 
       # Public: Encrypts a string
       #
       # Returns an encrypted string
       def encrypt(value)
-        decrypt_class.new(key, @pgcrypto_options).encrypt(value)
+        decrypt_class.new(key, @options).encrypt(value)
       end
 
       # Public: Decrypts a string
       #
       # Returns a plaintext string
       def decrypt(value)
-        decrypt_class.new(key, @pgcrypto_options).decrypt(value)
+        decrypt_class.new(key, @options).decrypt(value)
       end
 
       def search(records, field, criteria)
@@ -61,7 +92,7 @@ module CryptKeeper
       end
 
       def decrypt_class
-        @options[:public] ? PostgresPgpPublic : PostgresPgpSym
+        @options[:public_key] ? PostgresPgpPublic : PostgresPgpSym
       end
     end
   end
