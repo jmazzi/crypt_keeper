@@ -47,14 +47,6 @@ module CryptKeeper
       def decrypt(value)
         escape_and_execute_sql(["SELECT pgp_pub_decrypt(?, dearmor(?), ?)", value, @private_key, @key])['pgp_pub_decrypt']
       end
-
-      # def private_key
-      #   escape_and_execute_sql(["SELECT dearmor(?)", @private_key])['dearmor']
-      # end
-
-      # def public_key
-      #   escape_and_execute_sql(["SELECT dearmor(?)", @public_key])['dearmor']
-      # end
     end
 
     class PostgresPgp
