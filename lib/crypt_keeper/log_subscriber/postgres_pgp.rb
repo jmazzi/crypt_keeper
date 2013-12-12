@@ -12,7 +12,7 @@ module CryptKeeper
 
       # Public: Prevents sensitive data from being logged
       def sql_with_postgres_pgp(event)
-        filter = /(\(*)pgp_sym_(?<operation>decrypt|encrypt)(\(+.*\)+)/i
+        filter = /(\(*)pgp_(sym|pub)_(?<operation>decrypt|encrypt)(\(+.*\)+)/im
 
         event.payload[:sql] = event.payload[:sql].gsub(filter) do |_|
           "#{$~[:operation]}([FILTERED])"
@@ -24,6 +24,6 @@ module CryptKeeper
   end
 end
 
-ActiveSupport.on_load :crypt_keeper_posgres_pgp_log do
+ActiveSupport.on_load :crypt_keeper_postgres_pgp_log do
   ActiveRecord::LogSubscriber.send :include, CryptKeeper::LogSubscriber::PostgresPgp
 end

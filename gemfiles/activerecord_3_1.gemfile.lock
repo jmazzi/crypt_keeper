@@ -1,7 +1,7 @@
 PATH
   remote: /Users/justin/work/jmazzi/crypt_keeper
   specs:
-    crypt_keeper (0.15.0.pre)
+    crypt_keeper (0.16.0.pre)
       activerecord (>= 3.1, < 4.1)
       activesupport (>= 3.1, < 4.1)
       aes (~> 0.5.0)
