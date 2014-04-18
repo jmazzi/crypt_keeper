@@ -12,9 +12,10 @@ module CryptKeeper
 
       # Public: Prevents sensitive data from being logged
       def sql_with_mysql_aes(event)
-        filter = /(aes_(encrypt|decrypt))\(.*\)/i
+        # Also filter from_base64 in case user-constructed queries include that
+        filter = /(aes_(encrypt|decrypt))\((from_base64\(.*\))?.*\)/i
 
-        event.payload[:sql] = event.payload[:sql].gsub(filter) do |_|
+        event.payload[:sql] = event.payload[:sql].encode('UTF-8', 'UTF-8', :invalid => :replace).gsub(filter) do |_|
           "#{$1}([FILTERED])"
         end
 
