@@ -51,17 +51,23 @@ update the content without going through the current encryptor.
 
 There are three included encryptors.
 
-* [AES](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/aes.rb)
+* [AES](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/aes_new.rb)
   * Encryption is peformed using AES-256 via OpenSSL.
   * Passphrases are derived using [PBKDF2](http://en.wikipedia.org/wiki/PBKDF2)
 
+* [AES Legacy](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/aes.rb) *DEPRECATED*
+  * Encryption is peformed using AES-256 via OpenSSL.
 
-* [MySQL AES](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/mysql_aes.rb)
+* [MySQL AES](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/mysql_aes_new.rb)
   * Encryption is peformed MySQL's native AES functions.
   * ActiveRecord logs are [automatically](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/log_subscriber/mysql_aes.rb)
     filtered for you to protect sensitive data from being logged.
   * Passphrases are derived using [PBKDF2](http://en.wikipedia.org/wiki/PBKDF2)
 
+* [MySQL AES](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/mysql_aes.rb) *DEPRECATED*
+  * Encryption is peformed MySQL's native AES functions.
+  * ActiveRecord logs are [automatically](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/log_subscriber/mysql_aes.rb)
+    filtered for you to protect senitive data from being logged.
 
 * [PostgreSQL PGP](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/postgres_pgp.rb).
   * Encryption is performed using PostgresSQL's native [PGP functions](http://www.postgresql.org/docs/9.1/static/pgcrypto.html).
@@ -82,13 +88,13 @@ There are three included encryptors.
   * Passphrases are hashed by PostgresSQL itself using a [String2Key (S2K)](http://www.postgresql.org/docs/9.2/static/pgcrypto.html) algorithm. This is rather similar to crypt() algorithms — purposefully slow and with random salt — but it produces a full-length binary key.
 
 ## Searching
-Searching ciphertext is a complex problem that varies depending on the encryption algorithm you choose. All of the bundled providers include search support, but they have some caveats. 
+Searching ciphertext is a complex problem that varies depending on the encryption algorithm you choose. All of the bundled providers include search support, but they have some caveats.
 
 * AES
   * The Ruby implementation of AES uses a random initialization vector. The same plaintext encrypted multiple times will have different output each time for the ciphertext. Since this is the case, it is not possible to search leveraging the database. Database rows will need to be filtered in memory. It is suggested that you use a scope or ActiveRecord batches to narrow the results before seaching them.
 
 * Mysql AES
- * Surprisingly, MySQL's implementation of AES does not use a random initialization vector. The column containing the ciphertext can be indexed and searched quickly. 
+ * Surprisingly, MySQL's implementation of AES does not use a random initialization vector. The column containing the ciphertext can be indexed and searched quickly.
 
 * PostgresSQL PGP
  * PGP also uses a random initialization vector which means it generates unique output each time you encrypt plaintext. Although the database can be searched by performing row level decryption and comparing the plaintext, it will not be able to use an index. A scope or batch is suggested when searching.
@@ -135,10 +141,11 @@ end
 
 ## Requirements
 
-CryptKeeper has been tested against ActiveRecord 3.1, 3.2, 4.0 using ruby
-1.9.3 and 2.0.0
+CryptKeeper has been tested against ActiveRecord 3.1, 3.2, 4.0, 4.1 using ruby
+1.9.3, 2.0.0 and 2.1.1
 
 ActiveRecord 4.0 is supported starting with v0.11.0.
+ActiveRecord 4.1 is supported starting with v0.16.0. (unreleased, use master branch)
 
 ## Installation
 

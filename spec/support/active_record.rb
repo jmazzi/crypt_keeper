@@ -7,7 +7,7 @@ require 'logger'
 module CryptKeeper
   class SensitiveDataMysql < ActiveRecord::Base
     self.table_name = 'sensitive_data'
-    crypt_keeper :storage, encryptor: :mysql_aes, key: ENCRYPTION_PASSWORD,
+    crypt_keeper :storage, encryptor: :mysql_aes_new, key: ENCRYPTION_PASSWORD,
       salt: 'salt'
   end
 

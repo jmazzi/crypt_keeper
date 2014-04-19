@@ -4,6 +4,7 @@ gemfile:
   - gemfiles/activerecord_3_1.gemfile
   - gemfiles/activerecord_3_2.gemfile
   - gemfiles/activerecord_4_0.gemfile
+  - gemfiles/activerecord_4_1.gemfile
 before_install:
   - bundle install
 before_script:
@@ -20,5 +21,6 @@ notifications:
 rvm:
   - 1.9.3
   - 2.0.0
+  - 2.1.1
 addons:
   postgresql: 9.3

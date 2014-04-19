@@ -1,4 +1,5 @@
 ENV['ARMOR_ITER'] ||= "10"
+ENV['CRYPT_KEEPER_IGNORE_LEGACY_DEPRECATION'] = "true"
 require 'coveralls'
 Coveralls.wear!
 require 'crypt_keeper'
