@@ -40,6 +40,10 @@ OptionParser.new do |opts|
   opts.on("--old-encryptor [old encryptor]", "The old encryptor") do |v|
     options[:old_encryptor] = v
   end
+
+  opts.on("--query-log [file]", "ActiveRecord query log") do |v|
+    options[:query_log] = v
+  end
 end.parse!
 
 def get_required_arg(arg, options)
@@ -53,6 +57,10 @@ table_name      = get_required_arg(:table_name, options)
 columns         = get_required_arg(:columns, options).split(',')
 encryptor       = get_required_arg(:old_encryptor, options)
 env             = ENV.fetch('RAILS_ENV', 'development')
+
+if options[:query_log].present?
+  ActiveRecord::Base.logger = Logger.new(options[:query_log])
+end
 
 if encryptor == "aes"
   old_encryptor = CryptKeeper::Provider::Aes.new(key: old_key)
