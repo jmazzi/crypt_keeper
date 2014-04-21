@@ -1,0 +1,89 @@
+#!/usr/bin/env ruby
+$:.unshift(File.join(File.dirname(__FILE__), "/../lib"))
+require 'crypt_keeper'
+require 'yaml'
+require 'active_support/core_ext'
+require 'active_record/log_subscriber'
+require 'optparse'
+
+if !File.exists?('config/database.yml')
+  puts "Please run this from the root of the rails project"
+  exit 1
+else
+  config = YAML::load_file('./config/database.yml')
+end
+
+options = {}
+OptionParser.new do |opts|
+  opts.banner = "Usage: crypt_keeper [options]"
+
+  opts.on("--old-key [key]", "The old encryption key") do |v|
+    options[:old_key] = v
+  end
+
+  opts.on("--new-key [key]", "The new encryption key") do |v|
+    options[:new_key] = v
+  end
+
+  opts.on("--salt [salt]", "The salt for the new encryption") do |v|
+    options[:salt] = v
+  end
+
+  opts.on("--table-name [table_name]", "The name of the table") do |v|
+    options[:table_name] = v
+  end
+
+  opts.on("--columns [field1,field2]", "A comma separated list of column names which are encrypted") do |v|
+    options[:columns] = v
+  end
+
+  opts.on("--old-encryptor [old encryptor]", "The old encryptor") do |v|
+    options[:old_encryptor] = v
+  end
+end.parse!
+
+def get_required_arg(arg, options)
+  options.fetch(arg) { raise ArgumentError, "--#{arg.to_s.sub('_', '-')} is a required option"}
+end
+
+old_key         = get_required_arg(:old_key, options)
+new_key         = get_required_arg(:new_key, options)
+salt            = get_required_arg(:salt, options)
+table_name      = get_required_arg(:table_name, options)
+columns         = get_required_arg(:columns, options).split(',')
+encryptor       = get_required_arg(:old_encryptor, options)
+env             = ENV.fetch('RAILS_ENV', 'development')
+
+if encryptor == "aes"
+  old_encryptor = CryptKeeper::Provider::Aes.new(key: old_key)
+  new_encryptor = CryptKeeper::Provider::AesNew.new(key: new_key, salt: salt)
+elsif encryptor == "mysql_aes"
+  old_encryptor = CryptKeeper::Provider::MysqlAes.new(key: old_key)
+  new_encryptor = CryptKeeper::Provider::MysqlAesNew.new(key: new_key, salt: salt)
+else
+  puts "#{encryptor} is not a known encryptor that can be migrated"
+  exit 1
+end
+
+class MigrateData < ActiveRecord::Base
+  def self.reencrypt_all(encrypted_fields, old_encryptor, new_encryptor)
+    ActiveRecord::Base.transaction do
+      find_each do |record|
+        encrypted_fields.each do |f|
+          plaintext  = old_encryptor.decrypt(record[f])
+          ciphertext = new_encryptor.encrypt(plaintext)
+
+          record.update_attributes! f => ciphertext
+          yield record if block_given?
+        end
+      end
+    end
+  end
+end
+
+ActiveRecord::Base.establish_connection(config.fetch(env))
+MigrateData.table_name = table_name
+
+MigrateData.reencrypt_all(columns, old_encryptor, new_encryptor) do |r|
+  puts "#{r.id} is now re-encrypted"
+end

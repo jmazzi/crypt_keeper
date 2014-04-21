@@ -2,21 +2,18 @@ require 'crypt_keeper/log_subscriber/mysql_aes'
 
 module CryptKeeper
   module Provider
-    class MysqlAes
+    class MysqlAesNew
       include CryptKeeper::Helper::SQL
+      include CryptKeeper::Helper::DigestPassphrase
 
       attr_accessor :key
 
       # Public: Initializes the encryptor
       #
-      #  options - A hash, :key is required
+      #  options - A hash, :key and :salt are required
       def initialize(options = {})
-        legacy
         ActiveSupport.run_load_hooks(:crypt_keeper_mysql_aes_log, self)
-
-        @key = options.fetch(:key) do
-          raise ArgumentError, "Missing :key"
-        end
+        @key = digest_passphrase(options[:key], options[:salt])
       end
 
       # Public: Encrypts a string
@@ -35,12 +32,11 @@ module CryptKeeper
           ["SELECT AES_DECRYPT(?, ?)", Base64.decode64(value), key]).first
       end
 
-      private
-
-      def legacy
-        unless ENV['CRYPT_KEEPER_IGNORE_LEGACY_DEPRECATION']
-          warn "[DEPRECATION] MySqlAes Legacy is now deprecated. Please see http://git.io/nXXOlg"
-        end
+      # Public: Searches the table
+      #
+      # Returns an Enumerable
+      def search(records, field, criteria)
+        records.where(field.to_sym => encrypt(criteria))
       end
     end
   end
