@@ -69,13 +69,15 @@ class MigrateData < ActiveRecord::Base
   def self.reencrypt_all(encrypted_fields, old_encryptor, new_encryptor)
     ActiveRecord::Base.transaction do
       find_each do |record|
+        new_hash = {}
         encrypted_fields.each do |f|
-          plaintext  = old_encryptor.decrypt(record[f])
-          ciphertext = new_encryptor.encrypt(plaintext)
-
-          record.update_attributes! f => ciphertext
-          yield record if block_given?
+          plaintext   = old_encryptor.decrypt(record[f])
+          ciphertext  = new_encryptor.encrypt(plaintext)
+          new_hash[f] = ciphertext
         end
+
+        record.update_attributes! new_hash
+        yield record if block_given?
       end
     end
   end
