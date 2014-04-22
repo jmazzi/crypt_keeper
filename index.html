@@ -32,7 +32,8 @@
 
 <p><img src="http://i.imgur.com/qf0aD.jpg" alt="CryptKeeper"></p>
 
-<h1>CryptKeeper</h1>
+<h1>
+<a name="cryptkeeper" class="anchor" href="#cryptkeeper"><span class="octicon octicon-link"></span></a>CryptKeeper</h1>
 
 <p>Provides transparent encryption for ActiveRecord. It is encryption agnostic.
 You can guard your data with any encryption algorithm you want. All you need
@@ -48,16 +49,18 @@ hash.</p>
 
 <p>You can see an AES example <a href="https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/aes.rb">here</a>.</p>
 
-<h2>Why?</h2>
+<h2>
+<a name="why" class="anchor" href="#why"><span class="octicon octicon-link"></span></a>Why?</h2>
 
 <p>The options available were either too complicated under the hood or had weird
 edge cases that made the library hard to use. I wanted to write something
 simple that <em>just works</em>.</p>
 
-<h2>Usage</h2>
+<h2>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
 
-<div class="highlight"><pre><span class="k">class</span> <span class="nc">MyModel</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
-  <span class="n">crypt_keeper</span> <span class="ss">:field</span><span class="p">,</span> <span class="ss">:other_field</span><span class="p">,</span> <span class="ss">:encryptor</span> <span class="o">=&gt;</span> <span class="ss">:aes</span><span class="p">,</span> <span class="ss">:key</span> <span class="o">=&gt;</span> <span class="s1">'super_good_password'</span>
+<div class="highlight highlight-ruby"><pre><span class="k">class</span> <span class="nc">MyModel</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="n">crypt_keeper</span> <span class="ss">:field</span><span class="p">,</span> <span class="ss">:other_field</span><span class="p">,</span> <span class="ss">:encryptor</span> <span class="o">=&gt;</span> <span class="ss">:aes_new</span><span class="p">,</span> <span class="ss">:key</span> <span class="o">=&gt;</span> <span class="s1">'super_good_password'</span>
 <span class="k">end</span>
 
 <span class="n">model</span> <span class="o">=</span> <span class="no">MyModel</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">field</span><span class="p">:</span> <span class="s1">'sometext'</span><span class="p">)</span>
@@ -77,12 +80,13 @@ expected behavior, and has its use cases. An example would be migrating from
 one type of encryption to another. Using <code>update_column</code> would allow you to
 update the content without going through the current encryptor.</p>
 
-<h2>Creating your own encryptor</h2>
+<h2>
+<a name="creating-your-own-encryptor" class="anchor" href="#creating-your-own-encryptor"><span class="octicon octicon-link"></span></a>Creating your own encryptor</h2>
 
 <p>Creating your own encryptor is easy. All you have to do is create a class
 under the <code>CryptKeeper::Provider</code> namespace, like this:</p>
 
-<div class="highlight"><pre><span class="k">module</span> <span class="nn">CryptKeeper</span>
+<div class="highlight highlight-ruby"><pre><span class="k">module</span> <span class="nn">CryptKeeper</span>
   <span class="k">module</span> <span class="nn">Provider</span>
     <span class="k">class</span> <span class="nc">MyEncryptor</span>
       <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">options</span> <span class="o">=</span> <span class="p">{})</span>
@@ -102,12 +106,13 @@ under the <code>CryptKeeper::Provider</code> namespace, like this:</p>
 <p>Just require your code and setup your model to use it. Just pass the class name
 as a string or an underscored symbol</p>
 
-<div class="highlight"><pre><span class="k">class</span> <span class="nc">MyModel</span> <span class="o">&lt;</span> <span class="ss">ActiveRecord</span><span class="p">:</span><span class="ss">:Base</span>
+<div class="highlight highlight-ruby"><pre><span class="k">class</span> <span class="nc">MyModel</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
   <span class="n">crypt_keeper</span> <span class="ss">:field</span><span class="p">,</span> <span class="ss">:other_field</span><span class="p">,</span> <span class="ss">:encryptor</span> <span class="o">=&gt;</span> <span class="ss">:my_encryptor</span><span class="p">,</span> <span class="ss">:key</span> <span class="o">=&gt;</span> <span class="s1">'super_good_password'</span>
 <span class="k">end</span>
 </pre></div>
 
-<h2>Available Encryptors</h2>
+<h2>
+<a name="available-encryptors" class="anchor" href="#available-encryptors"><span class="octicon octicon-link"></span></a>Available Encryptors</h2>
 
 <p>There are two included encryptors.</p>
 
@@ -140,14 +145,16 @@ filtered for you to protect senitive data from being logged.</li>
 filtered for you to protect senitive data from being logged.</li>
 </ul>
 </li>
-</ul><h2>Requirements</h2>
+</ul><h2>
+<a name="requirements" class="anchor" href="#requirements"><span class="octicon octicon-link"></span></a>Requirements</h2>
 
 <p>CryptKeeper has been tested against ActiveRecord 3.0, 3.1, 3.2 using ruby
 1.9.3 and jruby in 1.9 mode.</p>
 
 <p>ActiveRecord 4.0 is supported starting with v0.11.0.</p>
 
-<h2>Installation</h2>
+<h2>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
 
 <p>Add this line to your application's Gemfile:</p>
 
@@ -164,7 +171,8 @@ filtered for you to protect senitive data from being logged.</li>
 <pre><code>$ gem install crypt_keeper
 </code></pre>
 
-<h2>Contributing</h2>
+<h2>
+<a name="contributing" class="anchor" href="#contributing"><span class="octicon octicon-link"></span></a>Contributing</h2>
 
 <ol>
 <li>Fork it</li>
@@ -187,7 +195,7 @@ filtered for you to protect senitive data from being logged.</li>
 
           <p class="repo-owner"><a href="https://github.com/jmazzi/crypt_keeper"></a> is maintained by <a href="https://github.com/jmazzi">jmazzi</a>.</p>
 
-          <p>This page was generated by <a href="pages.github.com">GitHub Pages</a> using the Architect theme by <a href="http://twitter.com/jasonlong">Jason Long</a>.</p>
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
         </aside>
       </div>
     </div>
