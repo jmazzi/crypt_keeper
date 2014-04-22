@@ -27,7 +27,7 @@ simple that *just works*.
 
 ```ruby
 class MyModel < ActiveRecord::Base
-  crypt_keeper :field, :other_field, :encryptor => :aes, :key => 'super_good_password', salt: 'salt'
+  crypt_keeper :field, :other_field, :encryptor => :aes_new, :key => 'super_good_password', salt: 'salt'
 end
 
 model = MyModel.new(field: 'sometext')
