@@ -150,7 +150,7 @@ CryptKeeper has been tested against ActiveRecord 3.1, 3.2, 4.0, 4.1 using ruby
 1.9.3, 2.0.0 and 2.1.1
 
 ActiveRecord 4.0 is supported starting with v0.11.0.
-ActiveRecord 4.1 is supported starting with v0.16.0. (unreleased, use master branch)
+ActiveRecord 4.1 is supported starting with v0.16.0.
 
 ## Installation
 
