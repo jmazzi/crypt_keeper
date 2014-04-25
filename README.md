@@ -1,4 +1,4 @@
-[![Build Status](https://secure.travis-ci.org/jmazzi/crypt_keeper.png?branch=master)](http://travis-ci.org/jmazzi/crypt_keeper)
+[![Build Status](https://secure.travis-ci.org/jmazzi/crypt_keeper.png?branch=master)](http://travis-ci.org/jmazzi/crypt_keeper) [![Gem Version](https://badge.fury.io/rb/crypt_keeper.svg)](http://badge.fury.io/rb/crypt_keeper)
 
 ![CryptKeeper](http://i.imgur.com/qf0aD.jpg)
 
