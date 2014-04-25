@@ -27,7 +27,7 @@ simple that *just works*.
 
 ```ruby
 class MyModel < ActiveRecord::Base
-  crypt_keeper :field, :other_field, :encryptor => :aes, :key => 'super_good_password', salt: 'salt'
+  crypt_keeper :field, :other_field, :encryptor => :aes_new, :key => 'super_good_password', salt: 'salt'
 end
 
 model = MyModel.new(field: 'sometext')
@@ -50,8 +50,6 @@ update the content without going through the current encryptor.
 ## Supported Available Encryptors
 
 There are four supported encryptors: `aes_new`, `mysql_aes_new`, `postgresql_pgp`, `postgres_pgp_public_key`.
-
-The Legacy encryptors will be removed in a future version and should no longer be used.
 
 * [AES New](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/aes_new.rb)
   * Encryption is peformed using AES-256 via OpenSSL.
