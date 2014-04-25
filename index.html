@@ -60,7 +60,7 @@ simple that <em>just works</em>.</p>
 <a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
 
 <div class="highlight highlight-ruby"><pre><span class="k">class</span> <span class="nc">MyModel</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
-  <span class="n">crypt_keeper</span> <span class="ss">:field</span><span class="p">,</span> <span class="ss">:other_field</span><span class="p">,</span> <span class="ss">:encryptor</span> <span class="o">=&gt;</span> <span class="ss">:aes_new</span><span class="p">,</span> <span class="ss">:key</span> <span class="o">=&gt;</span> <span class="s1">'super_good_password'</span>
+  <span class="n">crypt_keeper</span> <span class="ss">:field</span><span class="p">,</span> <span class="ss">:other_field</span><span class="p">,</span> <span class="ss">:encryptor</span> <span class="o">=&gt;</span> <span class="ss">:aes_new</span><span class="p">,</span> <span class="ss">:key</span> <span class="o">=&gt;</span> <span class="s1">'super_good_password'</span><span class="p">,</span> <span class="ss">salt</span><span class="p">:</span> <span class="s1">'salt'</span>
 <span class="k">end</span>
 
 <span class="n">model</span> <span class="o">=</span> <span class="no">MyModel</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">field</span><span class="p">:</span> <span class="s1">'sometext'</span><span class="p">)</span>
@@ -79,6 +79,119 @@ which <em>skips</em> all validations, callbacks.</p>
 expected behavior, and has its use cases. An example would be migrating from
 one type of encryption to another. Using <code>update_column</code> would allow you to
 update the content without going through the current encryptor.</p>
+
+<h2>
+<a name="supported-available-encryptors" class="anchor" href="#supported-available-encryptors"><span class="octicon octicon-link"></span></a>Supported Available Encryptors</h2>
+
+<p>There are four supported encryptors: <code>aes_new</code>, <code>mysql_aes_new</code>, <code>postgresql_pgp</code>, <code>postgres_pgp_public_key</code>.</p>
+
+<ul>
+<li>
+<p><a href="https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/aes_new.rb">AES New</a></p>
+
+<ul>
+<li>Encryption is peformed using AES-256 via OpenSSL.</li>
+<li>Passphrases are derived using <a href="http://en.wikipedia.org/wiki/PBKDF2">PBKDF2</a>
+</li>
+</ul>
+</li>
+<li>
+<p><a href="https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/mysql_aes_new.rb">MySQL AES New</a></p>
+
+<ul>
+<li>Encryption is peformed MySQL's native AES functions.</li>
+<li>ActiveRecord logs are <a href="https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/log_subscriber/mysql_aes.rb">automatically</a>
+filtered for you to protect sensitive data from being logged.</li>
+<li>Passphrases are derived using <a href="http://en.wikipedia.org/wiki/PBKDF2">PBKDF2</a>
+</li>
+</ul>
+</li>
+<li>
+<p><a href="https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/postgres_pgp.rb">PostgreSQL PGP</a>.</p>
+
+<ul>
+<li>Encryption is performed using PostgresSQL's native <a href="http://www.postgresql.org/docs/9.1/static/pgcrypto.html">PGP functions</a>.</li>
+<li>It requires the <code>pgcrypto</code> PostgresSQL extension:
+<code>CREATE EXTENSION IF NOT EXISTS pgcrypto</code>
+</li>
+<li>ActiveRecord logs are <a href="https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/log_subscriber/postgres_pgp.rb">automatically</a>
+filtered for you to protect senitive data from being logged.</li>
+<li>Custom options can be set through the <code>:pgcrypto_options</code>. E.g. `crypt_keeper :field, encryptor: :postgres_pgp, pgcrypto_options: 'compress-level=9'</li>
+<li>Passphrases are hashed by PostgresSQL itself using a <a href="http://www.postgresql.org/docs/9.2/static/pgcrypto.html">String2Key (S2K)</a> algorithm. This is rather similar to crypt() algorithms — purposefully slow and with random salt — but it produces a full-length binary key.</li>
+</ul>
+</li>
+<li>
+<p><a href="https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/postgres_pgp_public_key.rb">PostgreSQL PGP Public Key</a>.</p>
+
+<ul>
+<li>Encryption is performed using PostgresSQL's native <a href="http://www.postgresql.org/docs/9.1/static/pgcrypto.html">PGP functions</a>.</li>
+<li>It requires the <code>pgcrypto</code> PostgresSQL extension:
+<code>CREATE EXTENSION IF NOT EXISTS pgcrypto</code>
+</li>
+<li>ActiveRecord logs are <a href="https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/log_subscriber/postgres_pgp.rb">automatically</a>
+filtered for you to protect senitive data from being logged.</li>
+<li>Accepts a public and private_key. The private key is optional. If the private key is not present the ciphertext value is returned instead of the plaintext. This allows you to keep the private key off certain servers. Encryption is possible with only a public key. Any server that needs access to the plaintext will need the private key.</li>
+<li>Passphrases are hashed by PostgresSQL itself using a <a href="http://www.postgresql.org/docs/9.2/static/pgcrypto.html">String2Key (S2K)</a> algorithm. This is rather similar to crypt() algorithms — purposefully slow and with random salt — but it produces a full-length binary key.</li>
+</ul>
+</li>
+</ul><h2>
+<a name="deprecated-encryptors" class="anchor" href="#deprecated-encryptors"><span class="octicon octicon-link"></span></a>Deprecated Encryptors</h2>
+
+<p>These encryptors are now deprecated and should be migrated from as soon as possible using the included <code>bin/crypt_keeper</code> script.</p>
+
+<ul>
+<li>
+<p><a href="https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/aes.rb">AES Legacy</a> <em>DEPRECATED</em></p>
+
+<ul>
+<li>Encryption is peformed using AES-256 via OpenSSL.</li>
+<li><a href="https://github.com/jmazzi/crypt_keeper/wiki/AES-Legacy-Migration-Instructions">How to migrate to AES New</a></li>
+</ul>
+</li>
+<li>
+<p><a href="https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/mysql_aes.rb">MySQL AES Legacy</a> <em>DEPRECATED</em></p>
+
+<ul>
+<li>Encryption is peformed MySQL's native AES functions.</li>
+<li>ActiveRecord logs are <a href="https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/log_subscriber/mysql_aes.rb">automatically</a>
+filtered for you to protect senitive data from being logged.</li>
+<li><a href="https://github.com/jmazzi/crypt_keeper/wiki/MysqlAes-Legacy-Migration-Instructions">How to migrate to MySQL AES New</a></li>
+</ul>
+</li>
+</ul><h2>
+<a name="searching" class="anchor" href="#searching"><span class="octicon octicon-link"></span></a>Searching</h2>
+
+<p>Searching ciphertext is a complex problem that varies depending on the encryption algorithm you choose. All of the bundled providers include search support, but they have some caveats.</p>
+
+<ul>
+<li>
+<p>AES</p>
+
+<ul>
+<li>The Ruby implementation of AES uses a random initialization vector. The same plaintext encrypted multiple times will have different output each time for the ciphertext. Since this is the case, it is not possible to search leveraging the database. Database rows will need to be filtered in memory. It is suggested that you use a scope or ActiveRecord batches to narrow the results before seaching them.</li>
+</ul>
+</li>
+<li>
+<p>Mysql AES</p>
+
+<ul>
+<li>Surprisingly, MySQL's implementation of AES does not use a random initialization vector. The column containing the ciphertext can be indexed and searched quickly.</li>
+</ul>
+</li>
+<li>
+<p>PostgresSQL PGP</p>
+
+<ul>
+<li>PGP also uses a random initialization vector which means it generates unique output each time you encrypt plaintext. Although the database can be searched by performing row level decryption and comparing the plaintext, it will not be able to use an index. A scope or batch is suggested when searching.</li>
+</ul>
+</li>
+</ul><h2>
+<a name="how-the-search-interface-is-used" class="anchor" href="#how-the-search-interface-is-used"><span class="octicon octicon-link"></span></a>How the search interface is used</h2>
+
+<div class="highlight highlight-ruby"><pre><span class="no">Model</span><span class="o">.</span><span class="n">search_by_plaintext</span><span class="p">(</span><span class="ss">:field</span><span class="p">,</span> <span class="s1">'searchstring'</span><span class="p">)</span>
+<span class="c1"># With a scope</span>
+<span class="no">Model</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="ss">something</span><span class="p">:</span> <span class="s1">'blah'</span><span class="p">)</span><span class="o">.</span><span class="n">search_by_plaintext</span><span class="p">(</span><span class="ss">:field</span><span class="p">,</span> <span class="s1">'searchstring'</span><span class="p">)</span>
+</pre></div>
 
 <h2>
 <a name="creating-your-own-encryptor" class="anchor" href="#creating-your-own-encryptor"><span class="octicon octicon-link"></span></a>Creating your own encryptor</h2>
@@ -112,46 +225,13 @@ as a string or an underscored symbol</p>
 </pre></div>
 
 <h2>
-<a name="available-encryptors" class="anchor" href="#available-encryptors"><span class="octicon octicon-link"></span></a>Available Encryptors</h2>
-
-<p>There are two included encryptors.</p>
-
-<ul>
-<li>
-<p><a href="https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/aes.rb">AES</a></p>
-
-<ul>
-<li>Encryption is peformed using AES-256 via OpenSSL.</li>
-</ul>
-</li>
-<li>
-<p><a href="https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/mysql_aes.rb">MySQL AES</a></p>
-
-<ul>
-<li>Encryption is peformed MySQL's native AES functions.</li>
-<li>ActiveRecord logs are <a href="https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/log_subscriber/mysql_aes.rb">automatically</a>
-filtered for you to protect senitive data from being logged.</li>
-</ul>
-</li>
-<li>
-<p><a href="https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/postgres_pgp.rb">PostgreSQL PGP</a>.</p>
-
-<ul>
-<li>Encryption is performed using PostgresSQL's native <a href="http://www.postgresql.org/docs/9.1/static/pgcrypto.html">PGP functions</a>.</li>
-<li>It requires the <code>pgcrypto</code> PostgresSQL extension:
-<code>CREATE EXTENSION IF NOT EXISTS pgcrypto</code>
-</li>
-<li>ActiveRecord logs are <a href="https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/log_subscriber/postgres_pgp.rb">automatically</a>
-filtered for you to protect senitive data from being logged.</li>
-</ul>
-</li>
-</ul><h2>
 <a name="requirements" class="anchor" href="#requirements"><span class="octicon octicon-link"></span></a>Requirements</h2>
 
-<p>CryptKeeper has been tested against ActiveRecord 3.0, 3.1, 3.2 using ruby
-1.9.3 and jruby in 1.9 mode.</p>
+<p>CryptKeeper has been tested against ActiveRecord 3.1, 3.2, 4.0, 4.1 using ruby
+1.9.3, 2.0.0 and 2.1.1</p>
 
-<p>ActiveRecord 4.0 is supported starting with v0.11.0.</p>
+<p>ActiveRecord 4.0 is supported starting with v0.11.0.
+ActiveRecord 4.1 is supported starting with v0.16.0. (unreleased, use master branch)</p>
 
 <h2>
 <a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
