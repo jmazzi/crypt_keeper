@@ -47,27 +47,21 @@ expected behavior, and has its use cases. An example would be migrating from
 one type of encryption to another. Using `update_column` would allow you to
 update the content without going through the current encryptor.
 
-## Available Encryptors
+## Supported Available Encryptors
 
-There are three included encryptors.
+There are four supported encryptors: `aes_new`, `mysql_aes_new`, `postgresql_pgp`, `postgres_pgp_public_key`.
 
-* [AES](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/aes_new.rb)
+The Legacy encryptors will be removed in a future version and should no longer be used.
+
+* [AES New](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/aes_new.rb)
   * Encryption is peformed using AES-256 via OpenSSL.
   * Passphrases are derived using [PBKDF2](http://en.wikipedia.org/wiki/PBKDF2)
 
-* [AES Legacy](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/aes.rb) *DEPRECATED*
-  * Encryption is peformed using AES-256 via OpenSSL.
-
-* [MySQL AES](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/mysql_aes_new.rb)
+* [MySQL AES New](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/mysql_aes_new.rb)
   * Encryption is peformed MySQL's native AES functions.
   * ActiveRecord logs are [automatically](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/log_subscriber/mysql_aes.rb)
     filtered for you to protect sensitive data from being logged.
   * Passphrases are derived using [PBKDF2](http://en.wikipedia.org/wiki/PBKDF2)
-
-* [MySQL AES](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/mysql_aes.rb) *DEPRECATED*
-  * Encryption is peformed MySQL's native AES functions.
-  * ActiveRecord logs are [automatically](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/log_subscriber/mysql_aes.rb)
-    filtered for you to protect senitive data from being logged.
 
 * [PostgreSQL PGP](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/postgres_pgp.rb).
   * Encryption is performed using PostgresSQL's native [PGP functions](http://www.postgresql.org/docs/9.1/static/pgcrypto.html).
@@ -86,6 +80,19 @@ There are three included encryptors.
     filtered for you to protect senitive data from being logged.
   * Accepts a public and private_key. The private key is optional. If the private key is not present the ciphertext value is returned instead of the plaintext. This allows you to keep the private key off certain servers. Encryption is possible with only a public key. Any server that needs access to the plaintext will need the private key.
   * Passphrases are hashed by PostgresSQL itself using a [String2Key (S2K)](http://www.postgresql.org/docs/9.2/static/pgcrypto.html) algorithm. This is rather similar to crypt() algorithms — purposefully slow and with random salt — but it produces a full-length binary key.
+
+## Deprecated Encryptors
+These encryptors are now deprecated and should be migrated from as soon as possible using the included `bin/crypt_keeper` script.
+
+* [AES Legacy](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/aes.rb) *DEPRECATED*
+  * Encryption is peformed using AES-256 via OpenSSL.
+  * [How to migrate to AES New](https://github.com/jmazzi/crypt_keeper/wiki/AES-Legacy-Migration-Instructions)
+
+* [MySQL AES Legacy](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/mysql_aes.rb) *DEPRECATED*
+  * Encryption is peformed MySQL's native AES functions.
+  * ActiveRecord logs are [automatically](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/log_subscriber/mysql_aes.rb)
+    filtered for you to protect senitive data from being logged.
+  * [How to migrate to MySQL AES New](https://github.com/jmazzi/crypt_keeper/wiki/MysqlAes-Legacy-Migration-Instructions)
 
 ## Searching
 Searching ciphertext is a complex problem that varies depending on the encryption algorithm you choose. All of the bundled providers include search support, but they have some caveats.
