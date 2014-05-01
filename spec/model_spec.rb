@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require 'spec_helper'
 
 module CryptKeeper
@@ -89,6 +91,25 @@ module CryptKeeper
 
       it "complains about bad columns" do
         expect { SensitiveData.search_by_plaintext(:what, 'test1') }.to raise_error(/what is not a crypt_keeper field/)
+      end
+    end
+
+    context "Encodings" do
+      before do
+        SensitiveData.crypt_keeper :storage, key: 'tool', salt: 'salt', encryptor: :aes_new, encoding: 'utf-8'
+      end
+
+      it "forces the encoding on decrypt" do
+        record = SensitiveData.create!(storage: 'Tromsø')
+        record.reload
+        expect(record.storage).to eql('Tromsø')
+      end
+
+      it "converts from other encodings" do
+        plaintext = "\xC2\xA92011 AACR".force_encoding('ASCII-8BIT')
+        record = SensitiveData.create!(storage: plaintext)
+        record.reload
+        expect(record.storage.encoding.name).to eql('UTF-8')
       end
     end
   end
