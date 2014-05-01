@@ -47,6 +47,21 @@ expected behavior, and has its use cases. An example would be migrating from
 one type of encryption to another. Using `update_column` would allow you to
 update the content without going through the current encryptor.
 
+## Encodings
+
+You can force an encoding on the plaintext before encryption and after decryption by using the `encoding` option. This is useful when dealing with multibyte strings:
+
+```ruby
+class MyModel < ActiveRecord::Base
+  crypt_keeper :field, :other_field, :encryptor => :aes_new, :key => 'super_good_password', salt: 'salt', :encoding => 'UTF-8'
+end
+
+model = MyModel.new(field: 'Tromsø')
+model.save! #=> Your data is now encrypted
+model.field #=> 'Tromsø'
+model.field.encoding #=> #<Encoding:UTF-8>
+```
+
 ## Supported Available Encryptors
 
 There are four supported encryptors: `aes_new`, `mysql_aes_new`, `postgresql_pgp`, `postgres_pgp_public_key`.
