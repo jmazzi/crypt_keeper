@@ -80,6 +80,15 @@ module CryptKeeper
         end
       end
 
+      def search_by_part(field, criteria)
+        if crypt_keeper_fields.include?(field.to_sym)
+          encryptor = encryptor_klass.new(crypt_keeper_options)
+          encryptor.partial_search(scoping_strategy, field.to_s, criteria)
+        else
+          raise "#{field} is not a crypt_keeper field"
+        end
+      end
+
       private
 
       # Private: The encryptor class
