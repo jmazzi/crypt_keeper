@@ -1,7 +1,7 @@
 PATH
   remote: /Users/justin/work/jmazzi/crypt_keeper
   specs:
-    crypt_keeper (0.16.0.pre)
+    crypt_keeper (0.17.0)
       activerecord (>= 3.1, < 4.2)
       activesupport (>= 3.1, < 4.2)
       aes (~> 0.5.0)
@@ -26,7 +26,7 @@ GEM
       bundler
       rake
     arel (2.2.3)
-    armor (0.0.2)
+    armor (0.0.3)
     builder (3.0.4)
     coderay (1.0.9)
     coveralls (0.7.0)
