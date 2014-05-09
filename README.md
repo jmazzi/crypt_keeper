@@ -62,6 +62,20 @@ model.field #=> 'Tromsø'
 model.field.encoding #=> #<Encoding:UTF-8>
 ```
 
+## Adding encryption to an existing table
+
+If you are working with an existing table you would like to encrypt, you must use the `MyExistingModel.encrypt_table!` class method.
+
+```ruby
+class MyExistingModel < ActiveRecord::Base
+  crypt_keeper :field, :other_field, :encryptor => :aes_new, :key => 'super_good_password', salt: 'salt'
+end
+
+MyExistingModel.encrypt_table!
+```
+
+Running `encrypt_table!` will encrypt all rows in the database using the encryption method specificed by the `crypt_keeper` line in your model.
+
 ## Supported Available Encryptors
 
 There are four supported encryptors: `aes_new`, `mysql_aes_new`, `postgresql_pgp`, `postgres_pgp_public_key`.
