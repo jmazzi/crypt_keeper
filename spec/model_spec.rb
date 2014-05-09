@@ -112,5 +112,20 @@ module CryptKeeper
         expect(record.storage.encoding.name).to eql('UTF-8')
       end
     end
+
+    context "Initial Table Encryption" do
+      before do
+        SensitiveData.crypt_keeper :storage, key: 'tool', salt: 'salt', encryptor: :aes_new, encoding: 'utf-8'
+        SensitiveData.delete_all
+        c = Class.new(ActiveRecord::Base).tap {|c| c.table_name = 'sensitive_data' }
+        5.times { |i|  c.create! storage: "testing#{i}" }
+      end
+
+      it "encrypts the table" do
+        expect { SensitiveData.first(5) }.to raise_error(OpenSSL::Cipher::CipherError)
+        SensitiveData.encrypt_table!
+        expect { SensitiveData.first(5) }.not_to raise_error
+      end
+    end
   end
 end
