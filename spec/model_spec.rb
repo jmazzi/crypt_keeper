@@ -6,11 +6,7 @@ module CryptKeeper
   describe Model do
     use_sqlite
 
-    before do
-      SensitiveData.instance_variable_set('@encryptor_klass', nil)
-    end
-
-    subject { SensitiveData }
+    subject { create_model }
 
     describe "#crypt_keeper" do
       context "Fields" do
@@ -49,82 +45,77 @@ module CryptKeeper
       let(:plain_text) { 'plain_text' }
       let(:cipher_text) { 'tooltxet_nialp' }
 
-      before do
-        SensitiveData.crypt_keeper :storage, passphrase: 'tool', encryptor: :encryptor
-      end
+      subject { create_encrypted_model :storage, passphrase: 'tool', encryptor: :encryptor }
 
       it "encrypts the data" do
         CryptKeeper::Provider::Encryptor.any_instance.should_receive(:encrypt).with('testing')
-        SensitiveData.create!(storage: 'testing')
+        subject.create!(storage: 'testing')
       end
 
       it "decrypts the data" do
-        record = SensitiveData.create!(storage: 'testing')
+        record = subject.create!(storage: 'testing')
         CryptKeeper::Provider::Encryptor.any_instance.should_receive(:decrypt).at_least(1).times.with('toolgnitset')
-        SensitiveData.find(record).storage
+        subject.find(record).storage
       end
 
       it "returns the plaintext on decrypt" do
-        record = SensitiveData.create!(storage: 'testing')
-        SensitiveData.find(record).storage.should == 'testing'
+        record = subject.create!(storage: 'testing')
+        subject.find(record).storage.should == 'testing'
       end
 
       it "does not encrypt or decrypt nil" do
-        data = SensitiveData.create!(storage: nil)
+        data = subject.create!(storage: nil)
         data.storage.should be_nil
       end
 
       it "does not encrypt or decrypt empty strings" do
-        data = SensitiveData.create!(storage: "")
+        data = subject.create!(storage: "")
         data.storage.should be_empty
       end
     end
 
     context "Search" do
-      before do
-        SensitiveData.crypt_keeper :storage, passphrase: 'tool', encryptor: :search_encryptor
-      end
+      subject { create_encrypted_model :storage, passphrase: 'tool', encryptor: :search_encryptor }
 
       it "searches if supported" do
-        expect { SensitiveData.search_by_plaintext(:storage, 'test1') }.to_not raise_error
+        expect { subject.search_by_plaintext(:storage, 'test1') }.to_not raise_error
       end
 
       it "complains about bad columns" do
-        expect { SensitiveData.search_by_plaintext(:what, 'test1') }.to raise_error(/what is not a crypt_keeper field/)
+        expect { subject.search_by_plaintext(:what, 'test1') }.to raise_error(/what is not a crypt_keeper field/)
       end
     end
 
     context "Encodings" do
-      before do
-        SensitiveData.crypt_keeper :storage, key: 'tool', salt: 'salt', encryptor: :aes_new, encoding: 'utf-8'
-      end
+      subject { create_encrypted_model :storage, key: 'tool', salt: 'salt', encryptor: :aes_new, encoding: 'utf-8' }
 
       it "forces the encoding on decrypt" do
-        record = SensitiveData.create!(storage: 'Tromsø')
+        record = subject.create!(storage: 'Tromsø')
         record.reload
         expect(record.storage).to eql('Tromsø')
       end
 
       it "converts from other encodings" do
         plaintext = "\xC2\xA92011 AACR".force_encoding('ASCII-8BIT')
-        record = SensitiveData.create!(storage: plaintext)
+        record = subject.create!(storage: plaintext)
         record.reload
         expect(record.storage.encoding.name).to eql('UTF-8')
       end
     end
 
     context "Initial Table Encryption" do
+      subject { create_encrypted_model :storage, key: 'tool', salt: 'salt', encryptor: :aes_new, encoding: 'utf-8' }
+
       before do
-        SensitiveData.crypt_keeper :storage, key: 'tool', salt: 'salt', encryptor: :aes_new, encoding: 'utf-8'
-        SensitiveData.delete_all
-        c = Class.new(ActiveRecord::Base).tap {|c| c.table_name = 'sensitive_data' }
+        subject.delete_all
+        c = create_model
         5.times { |i|  c.create! storage: "testing#{i}" }
       end
 
       it "encrypts the table" do
-        expect { SensitiveData.first(5) }.to raise_error(OpenSSL::Cipher::CipherError)
-        SensitiveData.encrypt_table!
-        expect { SensitiveData.first(5) }.not_to raise_error
+        expect { subject.first(5) }.to raise_error(OpenSSL::Cipher::CipherError)
+        subject.encrypt_table!
+        expect { subject.first(5) }.not_to raise_error
       end
     end
   end

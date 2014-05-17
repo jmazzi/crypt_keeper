@@ -38,10 +38,12 @@ module CryptKeeper
       end
 
       describe "#search" do
+        subject { postgres_model }
+
         it "finds the matching record" do
-          SensitiveDataPg.create!(storage: 'blah2')
-          match = SensitiveDataPg.create!(storage: 'blah')
-          SensitiveDataPg.search_by_plaintext(:storage, 'blah').first.should == match
+          subject.create!(storage: 'blah2')
+          match = subject.create!(storage: 'blah')
+          subject.search_by_plaintext(:storage, 'blah').first.should == match
         end
       end
 

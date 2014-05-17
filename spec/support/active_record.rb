@@ -5,20 +5,6 @@ require 'logger'
 ::ActiveRecord::Migration.verbose = false
 
 module CryptKeeper
-  class SensitiveDataMysql < ActiveRecord::Base
-    self.table_name = 'sensitive_data'
-    crypt_keeper :storage, encryptor: :mysql_aes_new, key: ENCRYPTION_PASSWORD,
-      salt: 'salt'
-  end
-
-  class SensitiveDataPg < ActiveRecord::Base
-    self.table_name = 'sensitive_data'
-    crypt_keeper :storage, key: 'tool', encryptor: :postgres_pgp
-  end
-
-  class SensitiveData < ActiveRecord::Base
-  end
-
   module ConnectionHelpers
     class CreateConnection
       def initialize(driver)
@@ -61,27 +47,57 @@ module CryptKeeper
       end
     end
   end
-end
 
-module LoggedQueries
-  # Logs the queries run inside the block, and return them.
-  def logged_queries(&block)
-    queries = []
-
-    subscriber = ActiveSupport::Notifications
-      .subscribe('sql.active_record') do |name, started, finished, id, payload|
-      queries << payload[:sql]
+  module AnonymousModels
+    def mysql_model
+      create_encrypted_model :storage, encryptor: :mysql_aes_new, key: ENCRYPTION_PASSWORD, salt: 'salt'
     end
 
-    block.call
+    def postgres_model
+      create_encrypted_model :storage, key: 'tool', encryptor: :postgres_pgp
+    end
 
-    queries
+    def create_encrypted_model(*args)
+      Class.new(ActiveRecord::Base) do
+        def self.table_name
+          "sensitive_data"
+        end
 
-    ensure ActiveSupport::Notifications.unsubscribe(subscriber)
+        crypt_keeper *args
+      end
+    end
+
+    def create_model
+      Class.new(ActiveRecord::Base) do
+        def self.table_name
+          "sensitive_data"
+        end
+      end
+    end
   end
+
+  module LoggedQueries
+    # Logs the queries run inside the block, and return them.
+    def logged_queries(&block)
+      queries = []
+
+      subscriber = ActiveSupport::Notifications
+        .subscribe('sql.active_record') do |name, started, finished, id, payload|
+        queries << payload[:sql]
+      end
+
+      block.call
+
+      queries
+
+      ensure ActiveSupport::Notifications.unsubscribe(subscriber)
+    end
+  end
+
 end
 
 RSpec.configure do |config|
   config.extend CryptKeeper::ConnectionHelpers
-  config.include LoggedQueries
+  config.include CryptKeeper::AnonymousModels
+  config.include CryptKeeper::LoggedQueries
 end
