@@ -104,7 +104,7 @@ module CryptKeeper
     end
 
     context "Initial Table Encryption" do
-      subject { create_encrypted_model :storage, key: 'tool', salt: 'salt', encryptor: :aes_new, encoding: 'utf-8' }
+      subject { create_encrypted_model :storage, key: 'tool', salt: 'salt', encryptor: :aes_new }
 
       before do
         subject.delete_all
@@ -113,9 +113,9 @@ module CryptKeeper
       end
 
       it "encrypts the table" do
-        expect { subject.first(5) }.to raise_error(OpenSSL::Cipher::CipherError)
+        expect { subject.first(5).map(&:storage) }.to raise_error(OpenSSL::Cipher::CipherError)
         subject.encrypt_table!
-        expect { subject.first(5) }.not_to raise_error
+        expect { subject.first(5).map(&:storage) }.not_to raise_error
       end
     end
   end
