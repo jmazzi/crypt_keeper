@@ -58,13 +58,7 @@ module CryptKeeper
     end
 
     def create_encrypted_model(*args)
-      Class.new(ActiveRecord::Base) do
-        def self.table_name
-          "sensitive_data"
-        end
-
-        crypt_keeper *args
-      end
+      create_model.tap { |m| m.crypt_keeper *args }
     end
 
     def create_model
