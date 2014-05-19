@@ -33,17 +33,19 @@ module CryptKeeper
       end
 
       describe "#search" do
+        subject { mysql_model }
+
         it "finds the matching record" do
-          SensitiveDataMysql.create!(storage: 'blah2')
-          match = SensitiveDataMysql.create!(storage: 'blah')
-          SensitiveDataMysql.search_by_plaintext(:storage, 'blah').first.should == match
+          subject.create!(storage: 'blah2')
+          match = subject.create!(storage: 'blah')
+          results = subject.search_by_plaintext(:storage, 'blah').first.should == match
         end
 
         it "keeps the scope" do
-          SensitiveDataMysql.create!(storage: 'blah')
-          SensitiveDataMysql.create!(storage: 'blah')
+          subject.create!(storage: 'blah')
+          subject.create!(storage: 'blah')
 
-          scope = SensitiveDataMysql.limit(1)
+          scope = subject.limit(1)
           expect(scope.search_by_plaintext(:storage, 'blah').count).to eql(1)
         end
       end
