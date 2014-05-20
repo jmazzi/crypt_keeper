@@ -28,7 +28,7 @@
     <div id="content-wrapper">
       <div class="inner clearfix">
         <section id="main-content">
-          <p><a href="http://travis-ci.org/jmazzi/crypt_keeper"><img src="https://secure.travis-ci.org/jmazzi/crypt_keeper.png?branch=master" alt="Build Status"></a></p>
+          <p><a href="http://travis-ci.org/jmazzi/crypt_keeper"><img src="https://secure.travis-ci.org/jmazzi/crypt_keeper.png?branch=master" alt="Build Status"></a> <a href="http://badge.fury.io/rb/crypt_keeper"><img src="https://badge.fury.io/rb/crypt_keeper.svg" alt="Gem Version"></a></p>
 
 <p><img src="http://i.imgur.com/qf0aD.jpg" alt="CryptKeeper"></p>
 
@@ -79,6 +79,35 @@ which <em>skips</em> all validations, callbacks.</p>
 expected behavior, and has its use cases. An example would be migrating from
 one type of encryption to another. Using <code>update_column</code> would allow you to
 update the content without going through the current encryptor.</p>
+
+<h2>
+<a name="encodings" class="anchor" href="#encodings"><span class="octicon octicon-link"></span></a>Encodings</h2>
+
+<p>You can force an encoding on the plaintext before encryption and after decryption by using the <code>encoding</code> option. This is useful when dealing with multibyte strings:</p>
+
+<div class="highlight highlight-ruby"><pre><span class="k">class</span> <span class="nc">MyModel</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="n">crypt_keeper</span> <span class="ss">:field</span><span class="p">,</span> <span class="ss">:other_field</span><span class="p">,</span> <span class="ss">:encryptor</span> <span class="o">=&gt;</span> <span class="ss">:aes_new</span><span class="p">,</span> <span class="ss">:key</span> <span class="o">=&gt;</span> <span class="s1">'super_good_password'</span><span class="p">,</span> <span class="ss">salt</span><span class="p">:</span> <span class="s1">'salt'</span><span class="p">,</span> <span class="ss">:encoding</span> <span class="o">=&gt;</span> <span class="s1">'UTF-8'</span>
+<span class="k">end</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="no">MyModel</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">field</span><span class="p">:</span> <span class="s1">'Tromsø'</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">save!</span> <span class="c1">#=&gt; Your data is now encrypted</span>
+<span class="n">model</span><span class="o">.</span><span class="n">field</span> <span class="c1">#=&gt; 'Tromsø'</span>
+<span class="n">model</span><span class="o">.</span><span class="n">field</span><span class="o">.</span><span class="n">encoding</span> <span class="c1">#=&gt; #&lt;Encoding:UTF-8&gt;</span>
+</pre></div>
+
+<h2>
+<a name="adding-encryption-to-an-existing-table" class="anchor" href="#adding-encryption-to-an-existing-table"><span class="octicon octicon-link"></span></a>Adding encryption to an existing table</h2>
+
+<p>If you are working with an existing table you would like to encrypt, you must use the <code>MyExistingModel.encrypt_table!</code> class method.</p>
+
+<div class="highlight highlight-ruby"><pre><span class="k">class</span> <span class="nc">MyExistingModel</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="n">crypt_keeper</span> <span class="ss">:field</span><span class="p">,</span> <span class="ss">:other_field</span><span class="p">,</span> <span class="ss">:encryptor</span> <span class="o">=&gt;</span> <span class="ss">:aes_new</span><span class="p">,</span> <span class="ss">:key</span> <span class="o">=&gt;</span> <span class="s1">'super_good_password'</span><span class="p">,</span> <span class="ss">salt</span><span class="p">:</span> <span class="s1">'salt'</span>
+<span class="k">end</span>
+
+<span class="no">MyExistingModel</span><span class="o">.</span><span class="n">encrypt_table!</span>
+</pre></div>
+
+<p>Running <code>encrypt_table!</code> will encrypt all rows in the database using the encryption method specificed by the <code>crypt_keeper</code> line in your model.</p>
 
 <h2>
 <a name="supported-available-encryptors" class="anchor" href="#supported-available-encryptors"><span class="octicon octicon-link"></span></a>Supported Available Encryptors</h2>
@@ -231,7 +260,7 @@ as a string or an underscored symbol</p>
 1.9.3, 2.0.0 and 2.1.1</p>
 
 <p>ActiveRecord 4.0 is supported starting with v0.11.0.
-ActiveRecord 4.1 is supported starting with v0.16.0. (unreleased, use master branch)</p>
+ActiveRecord 4.1 is supported starting with v0.16.0.</p>
 
 <h2>
 <a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
