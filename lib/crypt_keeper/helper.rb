@@ -23,7 +23,7 @@ module CryptKeeper
         if value.blank?
           value
         else
-          encrypt(value)
+          encrypt(value.to_s)
         end
       end
 
