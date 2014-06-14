@@ -72,6 +72,11 @@ module CryptKeeper
         data = subject.create!(storage: "")
         data.storage.should be_empty
       end
+
+      it "converts numbers to strings" do
+        data = subject.create!(storage: 1)
+        data.reload.storage.should == "1"
+      end
     end
 
     context "Search" do
