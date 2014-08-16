@@ -51,6 +51,11 @@ module CryptKeeper::LogSubscriber
 
         subject.sql(ActiveSupport::Notifications::Event.new(:sql, 1, 1, 1, { sql: input_search_query }))
       end
+
+      it "forces string encodings" do
+        string_encoding_query = "SELECT pgp_sym_encrypt('hi \255', 'test')"
+        subject.sql(ActiveSupport::Notifications::Event.new(:sql, 1, 1, 1, { sql: string_encoding_query }))
+      end
     end
 
     context "Public key encryption" do
