@@ -123,5 +123,14 @@ module CryptKeeper
         expect { subject.first(5).map(&:storage) }.not_to raise_error
       end
     end
+
+    context "Missing Attributes" do
+      subject { create_encrypted_model :storage, key: 'tool', salt: 'salt', encryptor: :aes_new, encoding: 'utf-8' }
+
+      it "doesn't attempt decryption of missing attributes" do
+        subject.create!(storage: 'blah')
+        expect { subject.select(:id).first }.to_not raise_error
+      end
+    end
   end
 end
