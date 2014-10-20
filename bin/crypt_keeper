@@ -74,6 +74,8 @@ else
 end
 
 class MigrateData < ActiveRecord::Base
+  self.inheritance_column = :_disable_sti_
+
   def self.reencrypt_all(encrypted_fields, old_encryptor, new_encryptor)
     ActiveRecord::Base.transaction do
       find_each do |record|
