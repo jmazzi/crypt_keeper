@@ -98,6 +98,11 @@ module CryptKeeper
         end
       end
 
+      def without_encrypted
+        fields = column_names.map(&:to_sym) - crypt_keeper_fields
+        select(fields)
+      end
+
       private
 
       # Private: The encryptor class
