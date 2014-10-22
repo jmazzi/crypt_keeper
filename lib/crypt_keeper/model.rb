@@ -113,8 +113,9 @@ module CryptKeeper
       end
 
       def without_encrypted
+        #puts scoping_strategy.select_values
         fields = column_names.map(&:to_sym) - crypt_keeper_fields
-        WithoutEncrypted.new(select(fields))
+        WithoutEncrypted.new(scoping_strategy.select(fields))
       end
 
       private
