@@ -8,12 +8,9 @@ module CryptKeeper
         @collection = collection
       end
 
-      def count(*args)
-        if args.empty?
-          @collection.count(primary_key)
-        else
-          @collection.count(*args)
-        end
+      def count(column_name, options = {})
+        column = column_name.present? ? column_name : primary_key
+        @collection.count(column_name, options)
       end
 
       def method_missing(method, *args, &block)
