@@ -8,8 +8,7 @@ module CryptKeeper
         @collection = collection
       end
 
-      def count(column_name, options = {})
-        column = column_name.present? ? column_name : primary_key
+      def count(column_name = primary_key, options = {})
         @collection.count(column_name, options)
       end
 
