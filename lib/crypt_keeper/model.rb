@@ -98,6 +98,16 @@ module CryptKeeper
         end
       end
 
+      def without_encrypted
+        fields = column_names.map(&:to_sym) - crypt_keeper_fields
+
+        select(fields).tap do |s|
+          s.define_singleton_method(:count) do |column = primary_key, opts = {}|
+            super(column, opts)
+          end
+        end
+      end
+
       private
 
       # Private: The encryptor class
