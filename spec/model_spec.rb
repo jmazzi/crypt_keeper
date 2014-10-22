@@ -139,9 +139,7 @@ module CryptKeeper
       it "does not perform decryption" do
         subject.create!(storage: 'blah')
         subject.send(:encryptor_klass).any_instance.should_not_receive(:decrypt)
-
-        record = subject.without_encrypted.first
-        expect { record.storage }.to raise_error(ActiveModel::MissingAttributeError)
+        subject.without_encrypted.first
       end
 
       it "responds_to AR methods" do
