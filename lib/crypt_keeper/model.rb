@@ -3,6 +3,24 @@ require 'active_support/core_ext/array/extract_options'
 
 module CryptKeeper
   module Model
+    class WithoutEncrypted
+      def initialize(collection)
+        @collection = collection
+      end
+
+      def count(*args)
+        if args.empty?
+          @collection.count(primary_key)
+        else
+          @collection.count(*args)
+        end
+      end
+
+      def method_missing(method, *args, &block)
+        @collection.send(method, *args, &block)
+      end
+    end
+
     extend ActiveSupport::Concern
 
     # Public: Ensures that each field exist and is of type text. This prevents
@@ -100,7 +118,7 @@ module CryptKeeper
 
       def without_encrypted
         fields = column_names.map(&:to_sym) - crypt_keeper_fields
-        select(fields)
+        WithoutEncrypted.new(select(fields))
       end
 
       private
