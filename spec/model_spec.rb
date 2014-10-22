@@ -132,5 +132,17 @@ module CryptKeeper
         expect { subject.select(:id).first }.to_not raise_error
       end
     end
+
+    context "Without encryption" do
+      subject { create_encrypted_model :storage, key: 'tool', salt: 'salt', encryptor: :aes_new, encoding: 'utf-8' }
+
+      it "does not perform decryption" do
+        subject.create!(storage: 'blah')
+        subject.send(:encryptor_klass).any_instance.should_not_receive(:decrypt)
+
+        record = subject.without_encrypted.first
+        expect { record.storage }.to raise_error(ActiveModel::MissingAttributeError)
+      end
+    end
   end
 end
