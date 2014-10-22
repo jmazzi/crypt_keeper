@@ -15,6 +15,10 @@ module CryptKeeper
       def method_missing(method, *args, &block)
         @collection.send(method, *args, &block)
       end
+
+      def respond_to?(method, include_all = false)
+        @collection.respond_to?(method, include_all)
+      end
     end
 
     extend ActiveSupport::Concern
