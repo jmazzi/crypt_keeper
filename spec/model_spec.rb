@@ -143,6 +143,11 @@ module CryptKeeper
         record = subject.without_encrypted.first
         expect { record.storage }.to raise_error(ActiveModel::MissingAttributeError)
       end
+
+      it "responds_to AR methods" do
+        subject.create!(storage: 'blah')
+        subject.without_encrypted.should respond_to(:to_ary)
+      end
     end
   end
 end

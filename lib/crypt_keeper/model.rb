@@ -16,6 +16,8 @@ module CryptKeeper
         @collection.send(method, *args, &block)
       end
 
+      private
+
       def respond_to?(method, include_all = false)
         @collection.respond_to?(method, include_all)
       end
