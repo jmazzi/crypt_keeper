@@ -132,5 +132,16 @@ module CryptKeeper
         expect { subject.select(:id).first }.to_not raise_error
       end
     end
+
+    context "Marshal" do
+      subject { create_encrypted_model :storage, key: 'tool', salt: 'salt', encryptor: :aes_new, marshal: true }
+
+      it "marshals the object" do
+        value = DateTime.now
+        record = subject.create!(storage: value)
+        record.reload
+        expect(record.storage.class.to_s).to eql('DateTime')
+      end
+    end
   end
 end
