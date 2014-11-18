@@ -18,7 +18,7 @@ module CryptKeeper
     private
 
     # Private: Forces string encodings on each crypt_keeper_fields
-    def force_string_encodings(value)
+    def force_string_encoding(value)
       if self.class.crypt_keeper_encoding && value.respond_to?(:force_encoding)
         value.force_encoding(self.class.crypt_keeper_encoding)
       else
@@ -36,7 +36,7 @@ module CryptKeeper
     def encrypt_fields
       crypt_keeper_fields.each do |field|
         value = read_attribute(field)
-        value = force_string_encodings(value)
+        value = force_string_encoding(value)
 
         if value.present?
           self.send("#{field}=", self.class.encryptor_klass_instance.encrypt(value.to_s))
@@ -79,7 +79,7 @@ module CryptKeeper
             value = read_attribute(field)
 
             if value.present?
-              force_string_encodings self.class.encryptor_klass_instance.decrypt(value).to_s
+              force_string_encoding self.class.encryptor_klass_instance.decrypt(value).to_s
             else
               value
             end
