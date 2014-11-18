@@ -33,6 +33,7 @@ module CryptKeeper
       end
     end
 
+    # Private: Encrypts each crypt_keeper_fields via before_safe
     def encrypt_fields
       crypt_keeper_fields.each do |field|
         value = read_attribute(field)
