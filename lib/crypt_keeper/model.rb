@@ -36,7 +36,7 @@ module CryptKeeper
     # Private: Encrypts each crypt_keeper_fields via before_safe
     def encrypt_fields
       crypt_keeper_fields.each do |field|
-        value = read_attribute(field)
+        value = attributes[field.to_s]
         value = force_string_encoding(value)
 
         if value.present?
@@ -79,7 +79,7 @@ module CryptKeeper
           define_method "#{field}" do
             value = read_attribute(field)
 
-            if value.present?
+            if value.present? && persisted?
               force_string_encoding self.class.encryptor_klass_instance.decrypt(value).to_s
             else
               value

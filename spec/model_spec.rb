@@ -77,6 +77,14 @@ module CryptKeeper
         data = subject.create!(storage: 1)
         data.reload.storage.should == "1"
       end
+
+      it "doesn't attempt a decrypt if the record is not yet persisted" do
+        subject.validates(:secret, presence: true)
+        record = subject.new(storage: 'testing')
+        record.save
+
+        record.storage.should == 'testing'
+      end
     end
 
     context "Search" do
