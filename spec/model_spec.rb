@@ -78,12 +78,19 @@ module CryptKeeper
         data.reload.storage.should == "1"
       end
 
-      it "doesn't attempt a decrypt if the record is not yet persisted" do
-        subject.validates(:secret, presence: true)
-        record = subject.new(storage: 'testing')
-        expect(record.save).to be_false
+      context "Non-persisted record" do
+        it "doesn't attempt a decrypt after a save error" do
+          subject.validates(:secret, presence: true)
+          record = subject.new(storage: 'testing')
+          expect(record.save).to be_false
 
-        record.storage.should == 'testing'
+          record.storage.should == 'testing'
+        end
+
+        it "doesn't attempt a decrypt before saving" do
+          record = subject.new(storage: 'testing')
+          record.storage.should == 'testing'
+        end
       end
     end
 
