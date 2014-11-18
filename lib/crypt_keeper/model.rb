@@ -75,7 +75,7 @@ module CryptKeeper
 
         crypt_keeper_fields.each do |field|
           define_method "#{field}" do
-            if read_attribute(field).present? && self.class.crypt_keeper_fields.include?(field.to_sym)
+            if read_attribute(field).present?
               force_string_encodings self.class.encryptor_klass_instance.decrypt(read_attribute(field)).to_s
             else
               read_attribute(field)
