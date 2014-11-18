@@ -40,8 +40,7 @@ module CryptKeeper
     # Private: Encrypts each crypt_keeper_fields via before_safe
     def encrypt_fields
       crypt_keeper_fields.each do |field|
-        value = attributes[field.to_s]
-        value = force_string_encoding(value)
+        value = force_string_encoding(attributes[field.to_s])
 
         if value.present?
           self.send("#{field}=", self.class.encryptor_klass_instance.encrypt(value.to_s))
