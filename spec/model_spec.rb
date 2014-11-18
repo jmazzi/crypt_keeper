@@ -81,7 +81,7 @@ module CryptKeeper
       it "doesn't attempt a decrypt if the record is not yet persisted" do
         subject.validates(:secret, presence: true)
         record = subject.new(storage: 'testing')
-        record.save
+        expect(record.save).to be_false
 
         record.storage.should == 'testing'
       end
