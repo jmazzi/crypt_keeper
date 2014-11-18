@@ -64,7 +64,7 @@ module CryptKeeper
         crypt_keeper_fields.each do |field|
           define_method "#{field}" do
             if read_attribute(field).present?
-              force_string_encodings self.class.encryptor_klass.new(self.class.crypt_keeper_options).decrypt(read_attribute(field)).to_s
+              force_string_encodings self.class.encryptor_klass_instance.decrypt(read_attribute(field)).to_s
             else
               read_attribute(field)
             end
@@ -74,7 +74,7 @@ module CryptKeeper
             value = force_string_encodings(value)
 
             if value.present?
-              write_attribute(field, self.class.encryptor_klass.new(self.class.crypt_keeper_options).encrypt(value.to_s))
+              write_attribute(field, self.class.encryptor_klass_instance.encrypt(value.to_s))
             else
               write_attribute(field, value)
             end
@@ -110,6 +110,10 @@ module CryptKeeper
       # Private: The encryptor class
       def encryptor_klass
         @encryptor_klass ||= "CryptKeeper::Provider::#{crypt_keeper_encryptor.to_s.camelize}".constantize
+      end
+
+      def encryptor_klass_instance
+        encryptor_klass.new(crypt_keeper_options)
       end
 
       private
