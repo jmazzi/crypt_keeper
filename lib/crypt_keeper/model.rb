@@ -32,6 +32,17 @@ module CryptKeeper
       end
     end
 
+    def encrypt_fields
+      crypt_keeper_fields.each do |field|
+        value = read_attribute(field)
+        value = force_string_encodings(value)
+
+        if value.present?
+          self.send("#{field}=", self.class.encryptor_klass_instance.encrypt(value.to_s))
+        end
+      end
+    end
+
     module ClassMethods
       # Public: Setup fields for encryption
       #
@@ -60,23 +71,14 @@ module CryptKeeper
         ensure_valid_encryptor!
 
         before_save :enforce_column_types_callback
+        before_save :encrypt_fields
 
         crypt_keeper_fields.each do |field|
           define_method "#{field}" do
-            if read_attribute(field).present?
+            if read_attribute(field).present? && self.class.crypt_keeper_fields.include?(field.to_sym)
               force_string_encodings self.class.encryptor_klass_instance.decrypt(read_attribute(field)).to_s
             else
               read_attribute(field)
-            end
-          end
-
-          define_method "#{field}=" do |value|
-            value = force_string_encodings(value)
-
-            if value.present?
-              write_attribute(field, self.class.encryptor_klass_instance.encrypt(value.to_s))
-            else
-              write_attribute(field, value)
             end
           end
         end
