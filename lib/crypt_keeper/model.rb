@@ -17,6 +17,14 @@ module CryptKeeper
 
     private
 
+      def clean_string(value)
+        if self.class.crypt_keeper_encoding && value.respond_to?(:force_encoding)
+          value.force_encoding(self.class.crypt_keeper_encoding)
+        else
+          value
+        end
+      end
+
     # Private: Run each crypt_keeper_fields through ensure_valid_field!
     def enforce_column_types_callback
       crypt_keeper_fields.each do |field|
@@ -63,13 +71,28 @@ module CryptKeeper
         before_save :enforce_column_types_callback
 
         if self.crypt_keeper_encoding
-          after_find :force_encodings_on_fields
-          before_save :force_encodings_on_fields
+          # after_find :force_encodings_on_fields
+          # before_save :force_encodings_on_fields
         end
 
         crypt_keeper_fields.each do |field|
-          serialize field, encryptor_klass.new(crypt_keeper_options).
-            extend(::CryptKeeper::Helper::Serializer)
+          define_method "#{field}" do
+            if read_attribute(field).present?
+              clean_string self.class.encryptor_klass.new(self.class.crypt_keeper_options).decrypt(read_attribute(field)).to_s
+            else
+              read_attribute(field)
+            end
+          end
+
+          define_method "#{field}=" do |value|
+            value = clean_string(value)
+
+            if value.present?
+              write_attribute(field, self.class.encryptor_klass.new(self.class.crypt_keeper_options).encrypt(value.to_s))
+            else
+              write_attribute(field, value)
+            end
+          end
         end
       end
 
@@ -98,12 +121,12 @@ module CryptKeeper
         end
       end
 
-      private
-
       # Private: The encryptor class
       def encryptor_klass
         @encryptor_klass ||= "CryptKeeper::Provider::#{crypt_keeper_encryptor.to_s.camelize}".constantize
       end
+
+      private
 
       # Private: Ensure that the encryptor responds to new
       def ensure_valid_encryptor!
