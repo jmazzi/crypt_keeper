@@ -17,6 +17,7 @@ module CryptKeeper
 
     private
 
+    # Private: Forces string encodings on each crypt_keeper_fields
     def force_string_encodings(value)
       if self.class.crypt_keeper_encoding && value.respond_to?(:force_encoding)
         value.force_encoding(self.class.crypt_keeper_encoding)
