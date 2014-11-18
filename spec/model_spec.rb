@@ -92,6 +92,26 @@ module CryptKeeper
           record.storage.should == 'testing'
         end
       end
+
+      it "encrypts when using #attributes=" do
+        data = subject.create!(storage: 'testing')
+        data.reload
+
+        data.attributes[:storage] = 'testing'
+        data.save!
+
+        data.storage.should == 'testing'
+      end
+
+      it "encrypts when using #[]=" do
+        data = subject.create!(storage: 'testing')
+        data.reload
+
+        data[:storage] = 'testing'
+        data.save!
+
+        data.storage.should == 'testing'
+      end
     end
 
     context "Search" do
