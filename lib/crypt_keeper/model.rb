@@ -109,16 +109,19 @@ module CryptKeeper
         end
       end
 
+      # Public: The instance of the encryptor_klass with options
+      #
+      # Returns an instance encryptor_klass
+      def encryptor_klass_instance
+        @encryptor_klass_instance ||= encryptor_klass.new(crypt_keeper_options)
+      end
+
+      private
+
       # Private: The encryptor class
       def encryptor_klass
         @encryptor_klass ||= "CryptKeeper::Provider::#{crypt_keeper_encryptor.to_s.camelize}".constantize
       end
-
-      def encryptor_klass_instance
-        encryptor_klass.new(crypt_keeper_options)
-      end
-
-      private
 
       # Private: Ensure that the encryptor responds to new
       def ensure_valid_encryptor!
