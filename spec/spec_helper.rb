@@ -8,6 +8,8 @@ SPEC_ROOT           = Pathname.new File.expand_path File.dirname __FILE__
 AR_LOG              = SPEC_ROOT.join('debug.log').to_s
 ENCRYPTION_PASSWORD = "supermadsecretstring"
 
+I18n.enforce_available_locales = false
+
 Dir[SPEC_ROOT.join('support/*.rb')].each{|f| require f }
 
 RSpec.configure do |config|

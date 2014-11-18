@@ -66,6 +66,10 @@ module CryptKeeper
         def self.table_name
           "sensitive_data"
         end
+
+        def self.name
+          "ModelClass"
+        end
       end
     end
   end

@@ -17,6 +17,19 @@ module CryptKeeper
 
     private
 
+    # Private: Forces string encodings on each crypt_keeper_fields
+    #
+    # value - A string
+    #
+    # Returns the original value or an encoded string
+    def force_string_encoding(value)
+      if self.class.crypt_keeper_encoding && value.respond_to?(:force_encoding)
+        value.force_encoding(self.class.crypt_keeper_encoding)
+      else
+        value
+      end
+    end
+
     # Private: Run each crypt_keeper_fields through ensure_valid_field!
     def enforce_column_types_callback
       crypt_keeper_fields.each do |field|
@@ -24,11 +37,13 @@ module CryptKeeper
       end
     end
 
-    # Private: Force string encodings if the option is set
-    def force_encodings_on_fields
+    # Private: Encrypts each crypt_keeper_fields via before_safe
+    def encrypt_fields
       crypt_keeper_fields.each do |field|
-        if attributes.has_key?(field.to_s) && send(field).respond_to?(:force_encoding)
-          send(field).force_encoding(crypt_keeper_encoding)
+        value = force_string_encoding(read_attribute(field).to_s)
+
+        if value.present? && send("#{field}_changed?")
+          self.send("#{field}=", self.class.encryptor_klass_instance.encrypt(value.to_s))
         end
       end
     end
@@ -61,15 +76,18 @@ module CryptKeeper
         ensure_valid_encryptor!
 
         before_save :enforce_column_types_callback
-
-        if self.crypt_keeper_encoding
-          after_find :force_encodings_on_fields
-          before_save :force_encodings_on_fields
-        end
+        before_save :encrypt_fields
 
         crypt_keeper_fields.each do |field|
-          serialize field, encryptor_klass.new(crypt_keeper_options).
-            extend(::CryptKeeper::Helper::Serializer)
+          define_method "#{field}" do
+            value = read_attribute(field)
+
+            if value.present? && persisted?
+              force_string_encoding self.class.encryptor_klass_instance.decrypt(value).to_s
+            else
+              value
+            end
+          end
         end
       end
 
@@ -96,6 +114,13 @@ module CryptKeeper
             r.save!
           end
         end
+      end
+
+      # Public: The instance of the encryptor_klass with options
+      #
+      # Returns an instance encryptor_klass
+      def encryptor_klass_instance
+        @encryptor_klass_instance ||= encryptor_klass.new(crypt_keeper_options)
       end
 
       private

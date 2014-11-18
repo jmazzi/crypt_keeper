@@ -77,6 +77,41 @@ module CryptKeeper
         data = subject.create!(storage: 1)
         data.reload.storage.should == "1"
       end
+
+      context "Non-persisted record" do
+        it "doesn't attempt a decrypt after a save error" do
+          subject.validates(:secret, presence: true)
+          record = subject.new(storage: 'testing')
+          expect(record.save).to be_false
+
+          record.storage.should == 'testing'
+        end
+
+        it "doesn't attempt a decrypt before saving" do
+          record = subject.new(storage: 'testing')
+          record.storage.should == 'testing'
+        end
+      end
+
+      it "encrypts when using #attributes=" do
+        data = subject.create!(storage: 'testing')
+        data.reload
+
+        data.attributes[:storage] = 'testing'
+        data.save!
+
+        data.storage.should == 'testing'
+      end
+
+      it "encrypts when using #[]=" do
+        data = subject.create!(storage: 'testing')
+        data.reload
+
+        data[:storage] = 'testing'
+        data.save!
+
+        data.storage.should == 'testing'
+      end
     end
 
     context "Search" do
