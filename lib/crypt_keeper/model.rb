@@ -8,6 +8,8 @@ module CryptKeeper
     # Public: Ensures that each field exist and is of type text. This prevents
     # encrypted data from being truncated.
     def ensure_valid_field!(field)
+      field = "#{field}_encrypted"
+
       if self.class.columns_hash["#{field}"].nil?
         raise ArgumentError, "Column :#{field} does not exist"
       elsif self.class.columns_hash["#{field}"].type != :text
@@ -21,15 +23,6 @@ module CryptKeeper
     def enforce_column_types_callback
       crypt_keeper_fields.each do |field|
         ensure_valid_field! field
-      end
-    end
-
-    # Private: Force string encodings if the option is set
-    def force_encodings_on_fields
-      crypt_keeper_fields.each do |field|
-        if attributes.has_key?(field.to_s) && send(field).respond_to?(:force_encoding)
-          send(field).force_encoding(crypt_keeper_encoding)
-        end
       end
     end
 
@@ -62,21 +55,89 @@ module CryptKeeper
 
         before_save :enforce_column_types_callback
 
-        if self.crypt_keeper_encoding
-          after_find :force_encodings_on_fields
-          before_save :force_encodings_on_fields
-        end
-
         crypt_keeper_fields.each do |field|
-          serialize field, encryptor_klass.new(crypt_keeper_options).
-            extend(::CryptKeeper::Helper::Serializer)
+
+          # Older ActiveRecord expects strings for arguments
+          field = field.to_s
+
+          # ActiveRecord::Dirty methods
+          define_method "#{field}_changed?" do
+            changed_attributes.include?(field)
+          end
+
+          define_method "#{field}_change" do
+            attribute_change(field)
+          end
+
+          define_method "#{field}_was" do
+            attribute_was(field)
+          end
+
+          define_method "#{field}_will_change!" do
+            attribute_will_change!(field)
+          end
+
+          define_method "reset_#{field}!" do
+            if attribute_changed?(field)
+              send("#{field}=", changed_attributes[field])
+              changed_attributes.delete(field)
+              send("reset_#{field}_encrypted!")
+            end
+          end
+
+          # Public: Gets the plaintext for field_encrypted
+          define_method "#{field}" do
+            self.class.decrypt_value send("#{field}_encrypted")
+          end
+
+          # Public: Sets the ciphertext for field_encrypted
+          define_method "#{field}=" do |value|
+            unless value == self.class.decrypt_value(send("#{field}_encrypted"))
+              send("#{field}_will_change!")
+              self.send("#{field}_encrypted=", self.class.encrypt_value(value))
+            end
+          end
         end
       end
 
+      # Public: Decrypt and encode a string
+      #
+      # value - A string
+      #
+      # Returns the decrypted string if not empty
+      def decrypt_value(value)
+        if value.blank?
+          value
+        else
+          force_encoding_on encryptor_klass_instance.decrypt(value)
+        end
+      end
+
+      # Public: Encrypt and encode a string
+      #
+      # value - A string
+      #
+      # Returns the encrypted string if not empty
+      def encrypt_value(value)
+        value = force_encoding_on(value)
+
+        if value.blank?
+          value
+        else
+          encryptor_klass_instance.encrypt(value.to_s)
+        end
+      end
+
+      # Public: Searches the field for the given criteria
+      #
+      # field - The encrypted field to search
+      # criteria - A string to search for
+      #
+      # Returns an ActiveRecord::Collection
       def search_by_plaintext(field, criteria)
         if crypt_keeper_fields.include?(field.to_sym)
           encryptor = encryptor_klass.new(crypt_keeper_options)
-          encryptor.search(scoping_strategy, field.to_s, criteria)
+          encryptor.search(scoping_strategy, "#{field}_encrypted", criteria)
         else
           raise "#{field} is not a crypt_keeper field"
         end
@@ -90,7 +151,7 @@ module CryptKeeper
         transaction do
           tmp_table.find_each do |r|
             crypt_keeper_fields.each do |field|
-              r.send("#{field}=", enc.encrypt(r[field])) if r[field].present?
+              r.send("#{field}_encrypted=", enc.encrypt(r["#{field}_encrypted"])) if r["#{field}_encrypted"].present?
             end
 
             r.save!
@@ -98,7 +159,28 @@ module CryptKeeper
         end
       end
 
+      # Public: An instance of encryptor_klass initialized with
+      # crypt_keeper_options
+      #
+      # Returns an instance of the encryptor_klass
+      def encryptor_klass_instance
+        @encryptor_klass_instance ||= encryptor_klass.new(crypt_keeper_options)
+      end
+
       private
+
+      # Private: Force string encodings if the option is set
+      #
+      # value - string
+      #
+      # Returns a string
+      def force_encoding_on(value)
+        if crypt_keeper_encoding && value.respond_to?(:force_encoding)
+          value.force_encoding(crypt_keeper_encoding)
+        else
+          value
+        end
+      end
 
       # Private: The encryptor class
       def encryptor_klass
@@ -112,6 +194,9 @@ module CryptKeeper
         end
       end
 
+      # Private: Determines the scoping method
+      #
+      # Returns an ActiveRecord::Relation
       def scoping_strategy
         if ::ActiveRecord.respond_to?(:version) && ::ActiveRecord.version.segments[0] == 4
           all
