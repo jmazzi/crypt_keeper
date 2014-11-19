@@ -1,26 +1,32 @@
-branches: master
 language: ruby
+
+rvm:
+  - 1.9.3
+  - 2.0.0
+  - 2.1.1
+
 gemfile:
   - gemfiles/activerecord_3_1.gemfile
   - gemfiles/activerecord_3_2.gemfile
   - gemfiles/activerecord_4_0.gemfile
   - gemfiles/activerecord_4_1.gemfile
-before_install:
-  - bundle install
+
+addons:
+  postgresql: 9.3
+
+sudo: false
+
 before_script:
   - cp spec/default.database.yml spec/database.yml
   - psql -c 'CREATE DATABASE crypt_keeper_providers;' -U postgres
   - psql crypt_keeper_providers -c 'CREATE EXTENSION IF NOT EXISTS pgcrypto;' -U postgres
   - mysql -e 'CREATE DATABASE crypt_keeper_providers'
+
+branches: master
+
 notifications:
   email:
     recipients:
       jmazzi@gmail.com
     on_success: never
     on_failure: always
-rvm:
-  - 1.9.3
-  - 2.0.0
-  - 2.1.1
-addons:
-  postgresql: 9.3
