@@ -92,7 +92,7 @@ module CryptKeeper
 
           # Public: Sets the ciphertext for field_encrypted
           define_method "#{field}=" do |value|
-            unless value == self.class.decrypt_value(send("#{field}_encrypted"))
+            unless value == send(field)
               send("#{field}_will_change!")
               self.send("#{field}_encrypted=", self.class.encrypt_value(value))
             end
