@@ -16,13 +16,13 @@ module CryptKeeper
         end
 
         it "raises an exception for missing field" do
-          msg = "Column :none does not exist"
+          msg = "Column :none_encrypted does not exist"
           subject.crypt_keeper :none, encryptor: :fake_encryptor
           expect { subject.new.save }.to raise_error(ArgumentError, msg)
         end
 
         it "raises an exception for non text fields" do
-          msg = "Column :name must be of type 'text' to be used for encryption"
+          msg = "Column :name_encrypted must be of type 'text' to be used for encryption"
           subject.crypt_keeper :name, encryptor: :fake_encryptor
           expect { subject.new.save }.to raise_error(ArgumentError, msg)
         end
@@ -77,6 +77,38 @@ module CryptKeeper
         data = subject.create!(storage: 1)
         data.reload.storage.should == "1"
       end
+
+      context "Dirty" do
+        it "is not dirty by default" do
+          data = subject.create!(storage: 'dirty')
+          data.storage_changed?.should be_false
+          data.storage_change.should be_nil
+          data.storage_was.should == "dirty"
+          data.changed.should_not include("storage", "storage_encrypted")
+          data.changes.should_not include("storage", "storage_encrypted")
+          data.previous_changes.should include("storage" => [nil, "dirty"])
+        end
+
+        it "is dirty after a change" do
+          data = subject.create!(storage: 'dirty')
+          data.storage = 'blah'
+
+          data.storage_changed?.should be_true
+          data.storage_change.should == ["dirty", "blah"]
+          data.storage_was.should == "dirty"
+          data.changed.should include("storage", "storage_encrypted")
+          data.changes.should include("storage" => ["dirty", "blah"])
+          data.previous_changes.should include("storage" => [nil, "dirty"])
+        end
+
+        it "resets changed" do
+          data = subject.create!(storage: 'dirty')
+          data.storage = "testing"
+          data.changed.should include("storage", "storage_encrypted")
+          data.reset_storage!
+          data.changed.should_not include("storage", "storage_encrypted")
+        end
+      end
     end
 
     context "Search" do
@@ -114,7 +146,7 @@ module CryptKeeper
       before do
         subject.delete_all
         c = create_model
-        5.times { |i|  c.create! storage: "testing#{i}" }
+        5.times { |i| c.create! storage_encrypted: "testing#{i}" }
       end
 
       it "encrypts the table" do

@@ -16,8 +16,8 @@ module CryptKeeper
       def define_schema!
         ::ActiveRecord::Schema.define do
           create_table :sensitive_data, :force => true do |t|
-            t.column :name, :string
-            t.column :storage, :text
+            t.column :name_encrypted, :string
+            t.column :storage_encrypted, :text
             t.column :secret, :text
           end
         end

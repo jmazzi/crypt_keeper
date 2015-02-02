@@ -17,23 +17,5 @@ module CryptKeeper
         ::Armor.digest(key, salt)
       end
     end
-
-    module Serializer
-      def dump(value)
-        if value.blank?
-          value
-        else
-          encrypt(value.to_s)
-        end
-      end
-
-      def load(value)
-        if value.blank?
-          value
-        else
-          decrypt(value)
-        end
-      end
-    end
   end
 end
