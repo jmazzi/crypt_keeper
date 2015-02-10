@@ -35,5 +35,23 @@ module CryptKeeper
         end
       end
     end
+
+    module MarshalSerializer
+      def dump(value)
+        if value.blank?
+          value
+        else
+          encrypt(Marshal.dump(value))
+        end
+      end
+
+      def load(value)
+        if value.blank?
+          value
+        else
+          Marshal.load(decrypt(value))
+        end
+      end
+    end
   end
 end

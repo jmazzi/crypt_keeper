@@ -52,10 +52,12 @@ module CryptKeeper
         class_attribute :crypt_keeper_encryptor
         class_attribute :crypt_keeper_options
         class_attribute :crypt_keeper_encoding
+        class_attribute :crypt_keeper_marshal
 
         self.crypt_keeper_options   = args.extract_options!
         self.crypt_keeper_encryptor = crypt_keeper_options.delete(:encryptor)
         self.crypt_keeper_encoding  = crypt_keeper_options.delete(:encoding)
+        self.crypt_keeper_marshal   = crypt_keeper_options.delete(:marshal)
         self.crypt_keeper_fields    = args
 
         ensure_valid_encryptor!
@@ -67,9 +69,10 @@ module CryptKeeper
           before_save :force_encodings_on_fields
         end
 
+        serializer = self.crypt_keeper_marshal ? ::CryptKeeper::Helper::MarshalSerializer : ::CryptKeeper::Helper::Serializer
+
         crypt_keeper_fields.each do |field|
-          serialize field, encryptor_klass.new(crypt_keeper_options).
-            extend(::CryptKeeper::Helper::Serializer)
+          serialize field, encryptor_klass.new(crypt_keeper_options).extend(serializer)
         end
       end
 
