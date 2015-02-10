@@ -36,7 +36,7 @@ module CryptKeeper
       #
       # Returns an Enumerable
       def search(records, field, criteria)
-        records.where(field.to_sym => encrypt(criteria))
+        records.where("#{field} = ?", encrypt(criteria))
       end
     end
   end

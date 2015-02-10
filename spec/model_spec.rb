@@ -55,12 +55,12 @@ module CryptKeeper
       it "decrypts the data" do
         record = subject.create!(storage: 'testing')
         CryptKeeper::Provider::Encryptor.any_instance.should_receive(:decrypt).at_least(1).times.with('toolgnitset')
-        subject.find(record).storage
+        subject.find(record.id).storage
       end
 
       it "returns the plaintext on decrypt" do
         record = subject.create!(storage: 'testing')
-        subject.find(record).storage.should == 'testing'
+        subject.find(record.id).storage.should == 'testing'
       end
 
       it "does not encrypt or decrypt nil" do

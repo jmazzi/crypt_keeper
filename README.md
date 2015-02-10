@@ -78,7 +78,7 @@ Running `encrypt_table!` will encrypt all rows in the database using the encrypt
 
 ## Supported Available Encryptors
 
-There are four supported encryptors: `aes_new`, `mysql_aes_new`, `postgresql_pgp`, `postgres_pgp_public_key`.
+There are four supported encryptors: `aes_new`, `mysql_aes_new`, `postgres_pgp`, `postgres_pgp_public_key`.
 
 * [AES New](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/aes_new.rb)
   * Encryption is peformed using AES-256 via OpenSSL.
@@ -175,7 +175,7 @@ end
 
 ## Requirements
 
-CryptKeeper has been tested against ActiveRecord 3.1, 3.2, 4.0, 4.1 using ruby
+CryptKeeper has been tested against ActiveRecord 3.1, 3.2, 4.0, 4.1, 4.2 using ruby
 1.9.3, 2.0.0 and 2.1.1
 
 ActiveRecord 4.0 is supported starting with v0.11.0.
