@@ -124,6 +124,21 @@ module CryptKeeper
       end
     end
 
+    context "Table Decryption (Reverse of Initial Table Encryption)" do
+      subject { create_encrypted_model :storage, key: 'tool', salt: 'salt', encryptor: :aes_new }
+      let!(:storage_entries) { 5.times.map { |i| "testing#{i}" } }
+
+      before do
+        subject.delete_all
+        storage_entries.each { |entry| subject.create! storage: entry}
+      end
+
+      it "decrypts the table" do
+        subject.decrypt_table!
+        expect( create_model.first(5).map(&:storage) ).to eq( storage_entries )
+      end
+    end
+
     context "Missing Attributes" do
       subject { create_encrypted_model :storage, key: 'tool', salt: 'salt', encryptor: :aes_new, encoding: 'utf-8' }
 
