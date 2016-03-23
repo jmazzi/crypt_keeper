@@ -4,7 +4,7 @@ require 'spec_helper'
 
 module CryptKeeper
   describe Model do
-    use_sqlite
+    use_postgres
 
     subject { create_model }
 
@@ -76,6 +76,11 @@ module CryptKeeper
       it "converts numbers to strings" do
         data = subject.create!(storage: 1)
         data.reload.storage.should == "1"
+      end
+
+      it "reports encypted fields as unchanged" do
+        data = subject.create!(storage: 1)
+        data.storage_changed?.should be(false)
       end
     end
 
