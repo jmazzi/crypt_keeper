@@ -37,6 +37,14 @@ module CryptKeeper
         specify { subject.decrypt(integer_cipher_text).should == integer_plain_text.to_s }
       end
 
+      context "changes" do
+        subject { postgres_model }
+        it "reports encypted fields as unchanged" do
+          data = subject.create!(storage: "test")
+          data.storage_changed?.should be(false)
+        end
+      end
+
       describe "#search" do
         subject { postgres_model }
 

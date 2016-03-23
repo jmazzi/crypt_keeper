@@ -77,11 +77,6 @@ module CryptKeeper
         data = subject.create!(storage: 1)
         data.reload.storage.should == "1"
       end
-
-      it "reports encypted fields as unchanged" do
-        data = subject.create!(storage: 1)
-        data.storage_changed?.should be(false)
-      end
     end
 
     context "Search" do
