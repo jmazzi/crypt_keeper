@@ -27,7 +27,7 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'rake',        '~> 10.3.1'
   gem.add_development_dependency 'rb-fsevent',  '~> 0.9.1'
   gem.add_development_dependency 'coveralls'
-  gem.add_development_dependency 'appraisal',   '~> 1.0.0'
+  gem.add_development_dependency 'appraisal',   '~> 2.1.0'
 
   if RUBY_PLATFORM == 'java'
     gem.add_development_dependency 'jruby-openssl', '~> 0.7.7'
