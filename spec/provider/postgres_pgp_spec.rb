@@ -39,6 +39,7 @@ module CryptKeeper
 
       context "changes" do
         subject { postgres_model }
+
         it "reports encypted fields as unchanged" do
           data = subject.create!(storage: "test")
           data.storage_changed?.should be(false)
