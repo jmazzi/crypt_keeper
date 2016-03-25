@@ -1,5 +1,6 @@
 require 'active_support/concern'
 require 'active_support/core_ext/array/extract_options'
+require 'crypt_keeper/encrypted_text'
 
 module CryptKeeper
   module Model
@@ -68,6 +69,8 @@ module CryptKeeper
         end
 
         crypt_keeper_fields.each do |field|
+          attribute field, ::CryptKeeper::EncryptedText.new
+
           serialize field, encryptor_klass.new(crypt_keeper_options).
             extend(::CryptKeeper::Helper::Serializer)
         end

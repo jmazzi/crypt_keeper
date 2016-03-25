@@ -31,6 +31,7 @@ GEM
     arel (6.0.0)
     armor (0.0.3)
     builder (3.2.2)
+    byebug (8.2.2)
     celluloid (0.16.0)
       timers (~> 4.0.0)
     coderay (1.1.0)
@@ -111,6 +112,7 @@ DEPENDENCIES
   activerecord (~> 4.2.0)
   activesupport (~> 4.2.0)
   appraisal (~> 2.1.0)
+  byebug
   coveralls
   crypt_keeper!
   guard (~> 2.6.1)

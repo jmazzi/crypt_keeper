@@ -1,3 +1,4 @@
+require 'byebug'
 require 'crypt_keeper/log_subscriber/postgres_pgp'
 
 module CryptKeeper
@@ -25,13 +26,15 @@ module CryptKeeper
       #
       # Returns an encrypted string
       def encrypt(value)
-        escape_and_execute_sql(["SELECT pgp_sym_encrypt(?, ?, ?)", value.to_s, key, pgcrypto_options])['pgp_sym_encrypt']
+        puts "in: #{value}"
+        escape_and_execute_sql(["SELECT pgp_sym_encrypt(?, ?, ?)", value, key, pgcrypto_options])['pgp_sym_encrypt']
       end
 
       # Public: Decrypts a string
       #
       # Returns a plaintext string
       def decrypt(value)
+        puts "out: #{value}"
         escape_and_execute_sql(["SELECT pgp_sym_decrypt(?, ?)", value, key])['pgp_sym_decrypt']
       end
 
