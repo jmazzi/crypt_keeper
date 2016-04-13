@@ -20,7 +20,7 @@ module CryptKeeper
 
     module Serializer
       def dump(value)
-        if value.blank?
+        if value.blank? || CryptKeeper.stub_encryption?
           value
         else
           encrypt(value.to_s)
@@ -28,7 +28,7 @@ module CryptKeeper
       end
 
       def load(value)
-        if value.blank?
+        if value.blank? || CryptKeeper.stub_encryption?
           value
         else
           decrypt(value)

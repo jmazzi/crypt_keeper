@@ -8,6 +8,10 @@ module CryptKeeper
 
     subject { create_model }
 
+    after do
+      CryptKeeper.stub_encryption = false
+    end
+
     describe "#crypt_keeper" do
       context "Fields" do
         it "enables encryption for the given fields" do
@@ -76,6 +80,20 @@ module CryptKeeper
       it "converts numbers to strings" do
         data = subject.create!(storage: 1)
         data.reload.storage.should == "1"
+      end
+
+      it "does not decrypt when stubbing is enabled" do
+        CryptKeeper.stub_encryption = true
+        record = subject.create!(storage: "testing")
+        CryptKeeper::Provider::Encryptor.any_instance.should_not_receive(:decrypt)
+        subject.find(record.id).storage
+      end
+
+      it "does not decrypt when stubbing is enabled after model is created" do
+        record = subject.create!(storage: "testing")
+        CryptKeeper.stub_encryption = true
+        CryptKeeper::Provider::Encryptor.any_instance.should_not_receive(:decrypt)
+        subject.find(record.id).storage
       end
     end
 
