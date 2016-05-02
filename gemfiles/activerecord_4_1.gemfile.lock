@@ -24,13 +24,14 @@ GEM
       thread_safe (~> 0.1)
       tzinfo (~> 1.1)
     aes (0.5.0)
-    appraisal (1.0.0)
+    appraisal (2.1.0)
       bundler
       rake
       thor (>= 0.14.0)
     arel (5.0.1.20140414130214)
     armor (0.0.3)
     builder (3.2.2)
+    byebug (8.2.2)
     celluloid (0.15.2)
       timers (~> 1.1.0)
     celluloid-io (0.15.0)
@@ -111,7 +112,8 @@ PLATFORMS
 DEPENDENCIES
   activerecord (~> 4.1.0)
   activesupport (~> 4.1.0)
-  appraisal (~> 1.0.0)
+  appraisal (~> 2.1.0)
+  byebug
   coveralls
   crypt_keeper!
   guard (~> 2.6.1)

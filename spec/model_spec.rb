@@ -4,7 +4,7 @@ require 'spec_helper'
 
 module CryptKeeper
   describe Model do
-    use_sqlite
+    use_postgres
 
     subject { create_model }
 
