@@ -13,9 +13,26 @@ gemfile:
   - gemfiles/activerecord_4_2.gemfile
 
 matrix:
+  exclude:
+    - rvm: 1.9.3
+      gemfile: gemfiles/activerecord_4_0.gemfile
+    - rvm: 1.9.3
+      gemfile: gemfiles/activerecord_4_1.gemfile
+    - rvm: 2.0.0
+      gemfile: gemfiles/activerecord_4_1.gemfile
+    - rvm: 1.9.3
+      gemfile: gemfiles/activerecord_4_2.gemfile
+    - rvm: 2.0.0
+      gemfile: gemfiles/activerecord_3_1.gemfile
+    - rvm: 2.0.0
+      gemfile: gemfiles/activerecord_3_2.gemfile
   include:
     - rvm: 2.2.0
       gemfile: gemfiles/activerecord_4_2.gemfile
+    - rvm: 2.2.0
+      gemfile: gemfiles/activerecord_5_0.gemfile
+    - rvm: 2.3.0
+      gemfile: gemfiles/activerecord_5_0.gemfile
 
 addons:
   postgresql: 9.3
