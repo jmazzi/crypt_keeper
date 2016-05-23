@@ -85,7 +85,11 @@ module CryptKeeper
       # Public: Encrypt a table for the first time.
       def encrypt_table!
         enc       = encryptor_klass.new(crypt_keeper_options)
-        tmp_table = Class.new(ActiveRecord::Base).tap { |c| c.table_name = self.table_name }
+
+        tmp_table = Class.new(ActiveRecord::Base).tap do |c|
+          c.table_name = self.table_name
+          c.inheritance_column = :type_disabled
+        end
 
         transaction do
           tmp_table.find_each do |r|
