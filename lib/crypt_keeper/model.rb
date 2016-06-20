@@ -5,34 +5,6 @@ module CryptKeeper
   module Model
     extend ActiveSupport::Concern
 
-    # Public: Ensures that each field exist and is of type text. This prevents
-    # encrypted data from being truncated.
-    def ensure_valid_field!(field)
-      if self.class.columns_hash["#{field}"].nil?
-        raise ArgumentError, "Column :#{field} does not exist"
-      elsif self.class.columns_hash["#{field}"].type != :text
-        raise ArgumentError, "Column :#{field} must be of type 'text' to be used for encryption"
-      end
-    end
-
-    private
-
-    # Private: Run each crypt_keeper_fields through ensure_valid_field!
-    def enforce_column_types_callback
-      crypt_keeper_fields.each do |field|
-        ensure_valid_field! field
-      end
-    end
-
-    # Private: Force string encodings if the option is set
-    def force_encodings_on_fields
-      crypt_keeper_fields.each do |field|
-        if attributes.has_key?(field.to_s) && send(field).respond_to?(:force_encoding)
-          send(field).force_encoding(crypt_keeper_encoding)
-        end
-      end
-    end
-
     module ClassMethods
       # Public: Setup fields for encryption
       #
@@ -50,33 +22,24 @@ module CryptKeeper
       def crypt_keeper(*args)
         class_attribute :crypt_keeper_fields
         class_attribute :crypt_keeper_encryptor
+        class_attribute :crypt_keeper_encryptor_instance
         class_attribute :crypt_keeper_options
         class_attribute :crypt_keeper_encoding
 
-        self.crypt_keeper_options   = args.extract_options!
-        self.crypt_keeper_encryptor = crypt_keeper_options.delete(:encryptor)
-        self.crypt_keeper_encoding  = crypt_keeper_options.delete(:encoding)
-        self.crypt_keeper_fields    = args
+        self.crypt_keeper_options            = args.extract_options!
+        self.crypt_keeper_encryptor          = crypt_keeper_options.delete(:encryptor)
+        self.crypt_keeper_encoding           = crypt_keeper_options.delete(:encoding)
+        self.crypt_keeper_fields             = args
+        self.crypt_keeper_encryptor_instance = build_encryptor!
 
-        ensure_valid_encryptor!
-
-        before_save :enforce_column_types_callback
-
-        if self.crypt_keeper_encoding
-          after_find :force_encodings_on_fields
-          before_save :force_encodings_on_fields
-        end
-
-        crypt_keeper_fields.each do |field|
-          serialize field, encryptor_klass.new(crypt_keeper_options).
-            extend(::CryptKeeper::Helper::Serializer)
-        end
+        before_save CryptKeeper::Callbacks
+        after_save CryptKeeper::Callbacks
+        after_find CryptKeeper::Callbacks
       end
 
       def search_by_plaintext(field, criteria)
         if crypt_keeper_fields.include?(field.to_sym)
-          encryptor = encryptor_klass.new(crypt_keeper_options)
-          encryptor.search(scoping_strategy, field.to_s, criteria)
+          crypt_keeper_encryptor_instance.search(scoping_strategy, field.to_s, criteria)
         else
           raise "#{field} is not a crypt_keeper field"
         end
@@ -84,7 +47,7 @@ module CryptKeeper
 
       # Public: Encrypt a table for the first time.
       def encrypt_table!
-        enc       = encryptor_klass.new(crypt_keeper_options)
+        enc       = crypt_keeper_encryptor_instance
         tmp_table = Class.new(ActiveRecord::Base).tap { |c| c.table_name = self.table_name }
 
         transaction do
@@ -100,7 +63,7 @@ module CryptKeeper
 
       # Public: Decrypt a table (reverse of encrypt_table!)
       def decrypt_table!
-        enc       = encryptor_klass.new(crypt_keeper_options)
+        enc       = crypt_keeper_encryptor_instance
         tmp_table = Class.new(ActiveRecord::Base).tap { |c| c.table_name = self.table_name }
 
         transaction do
@@ -122,10 +85,12 @@ module CryptKeeper
       end
 
       # Private: Ensure that the encryptor responds to new
-      def ensure_valid_encryptor!
+      def build_encryptor!
         unless defined?(encryptor_klass) && encryptor_klass.respond_to?(:new)
           raise "You must specify a valid encryptor `crypt_keeper :encryptor => :aes`"
         end
+
+        encryptor_klass.new(crypt_keeper_options)
       end
 
       def scoping_strategy

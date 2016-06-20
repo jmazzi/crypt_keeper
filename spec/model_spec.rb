@@ -165,5 +165,26 @@ module CryptKeeper
         expect { subject.select(:id).first }.to_not raise_error
       end
     end
+
+    context "Dirty Attributes" do
+      subject { create_encrypted_model :storage, key: 'tool', salt: 'salt', encryptor: :aes_new, encoding: 'utf-8' }
+
+      it "doesn't leave dirty attributes after_find" do
+        subject.after_find do
+          self.name = "changed"
+        end
+
+        id = subject.create!(storage: "blah").id
+
+        changes = subject.find(id).changes
+
+        expect(changes).to have_key("name")
+        expect(changes).to_not have_key("storage")
+      end
+
+      it "doesn't leave dirty attributes after_save" do
+        expect(subject.create!(storage: "blah").changes).to be_empty
+      end
+    end
   end
 end
