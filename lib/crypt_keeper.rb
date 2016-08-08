@@ -9,6 +9,7 @@ require 'crypt_keeper/provider/mysql_aes'
 require 'crypt_keeper/provider/mysql_aes_new'
 require 'crypt_keeper/provider/postgres_pgp'
 require 'crypt_keeper/provider/postgres_pgp_public_key'
+require 'crypt_keeper/provider/postgres_raw'
 
 module CryptKeeper
   class << self
