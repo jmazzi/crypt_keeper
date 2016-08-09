@@ -1,4 +1,4 @@
-require 'crypt_keeper/log_subscriber/postgres_pgp'
+require 'crypt_keeper/log_subscriber/postgres_raw'
 
 module CryptKeeper
   module Provider
