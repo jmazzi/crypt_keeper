@@ -107,6 +107,15 @@ There are four supported encryptors: `aes_new`, `mysql_aes_new`, `postgres_pgp`,
     filtered for you to protect senitive data from being logged.
   * Accepts a public and private_key. The private key is optional. If the private key is not present the ciphertext value is returned instead of the plaintext. This allows you to keep the private key off certain servers. Encryption is possible with only a public key. Any server that needs access to the plaintext will need the private key.
   * Passphrases are hashed by PostgresSQL itself using a [String2Key (S2K)](http://www.postgresql.org/docs/9.2/static/pgcrypto.html) algorithm. This is rather similar to crypt() algorithms — purposefully slow and with random salt — but it produces a full-length binary key.
+  
+* [PostgresSQL Raw](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/postgres_raw.rb)
+  * Encryption is performed using PostgreSQL's native [Raw Encryption Functions](https://www.postgresql.org/docs/9.1/static/pgcrypto.html#AEN142171)
+  * It requires the `pgcrypto` PostgresSQL extension:
+      `CREATE EXTENSION IF NOT EXISTS pgcrypto`
+  * ActiveRecord logs are [automatically](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/log_subscriber/postgres_raw.rb)
+    filtered for you to protect sensitive data from being logged.
+  * Accepts encryption with initial vector (optional) and `:pgcrypto_options` (optional). E.g. `crypt_keeper :field, encryptor: :postgres_raw, iv: 'secret', pgcrypto_options: 'bf-cbc/pad:pkcs'
+  * Comparing to PGP encryption, usage of raw encryption functions is discouraged. However, it is useful if the performance of the search or query function is concerned, and security level can be a bit compromised.   
 
 ## Deprecated Encryptors
 These encryptors are now deprecated and should be migrated from as soon as possible using the included `bin/crypt_keeper` script.
@@ -133,6 +142,9 @@ Searching ciphertext is a complex problem that varies depending on the encryptio
 * PostgresSQL PGP
  * PGP also uses a random initialization vector which means it generates unique output each time you encrypt plaintext. Although the database can be searched by performing row level decryption and comparing the plaintext, it will not be able to use an index. A scope or batch is suggested when searching.
 
+* PostgresSQL Raw
+ * PostgreSQL's Raw Encryption does not use or uses a non-random initial vector which means it is less securer but better for searching.
+ 
 ## How the search interface is used
 
 ```ruby
