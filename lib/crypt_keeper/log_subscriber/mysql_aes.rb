@@ -16,6 +16,8 @@ module CryptKeeper
         payload = event.payload[:sql]
           .encode('UTF-8', 'binary', invalid: :replace, undef: :replace, replace: '')
 
+        return if CryptKeeper.silence_logs? && payload =~ filter
+
         event.payload[:sql] = payload.gsub(filter) do |_|
           "#{$1}([FILTERED])"
         end

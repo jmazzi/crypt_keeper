@@ -2,6 +2,10 @@ require 'spec_helper'
 
 module CryptKeeper::LogSubscriber
   describe MysqlAes do
+    before do
+      CryptKeeper.silence_logs = false
+    end
+
     use_mysql
 
     context "AES encryption" do
@@ -55,6 +59,14 @@ module CryptKeeper::LogSubscriber
       it "forces string encodings" do
         string_encoding_query = "SELECT aes_encrypt('hi \255', 'test')"
         subject.sql(ActiveSupport::Notifications::Event.new(:sql, 1, 1, 1, { sql: string_encoding_query }))
+      end
+
+      it "skips logging if CryptKeeper.silence_logs is set" do
+        CryptKeeper.silence_logs = true
+
+        subject.should_not_receive(:sql_without_mysql_aes)
+
+        subject.sql(ActiveSupport::Notifications::Event.new(:sql, 1, 1, 1, { sql: input_query }))
       end
     end
   end

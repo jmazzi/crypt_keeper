@@ -2,6 +2,10 @@ require 'spec_helper'
 
 module CryptKeeper::LogSubscriber
   describe PostgresPgp do
+    before do
+      CryptKeeper.silence_logs = false
+    end
+
     use_postgres
 
     context "Symmetric encryption" do
@@ -56,6 +60,14 @@ module CryptKeeper::LogSubscriber
         string_encoding_query = "SELECT pgp_sym_encrypt('hi \255', 'test')"
         subject.sql(ActiveSupport::Notifications::Event.new(:sql, 1, 1, 1, { sql: string_encoding_query }))
       end
+
+      it "skips logging if CryptKeeper.silence_logs is set" do
+        CryptKeeper.silence_logs = true
+
+        subject.should_not_receive(:sql_without_postgres_pgp)
+
+        subject.sql(ActiveSupport::Notifications::Event.new(:sql, 1, 1, 1, { sql: input_query }))
+      end
     end
 
     context "Public key encryption" do
@@ -97,6 +109,14 @@ module CryptKeeper::LogSubscriber
         end
 
         subject.sql(ActiveSupport::Notifications::Event.new(:sql, 1, 1, 1, { sql: input_query.downcase }))
+      end
+
+      it "skips logging if CryptKeeper.silence_logs is set" do
+        CryptKeeper.silence_logs = true
+
+        subject.should_not_receive(:sql_without_postgres_pgp)
+
+        subject.sql(ActiveSupport::Notifications::Event.new(:sql, 1, 1, 1, { sql: input_query }))
       end
     end
   end

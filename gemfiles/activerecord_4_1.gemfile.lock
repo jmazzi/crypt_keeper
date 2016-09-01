@@ -1,7 +1,7 @@
 PATH
   remote: ../
   specs:
-    crypt_keeper (0.20.0)
+    crypt_keeper (0.21.0)
       activerecord (>= 3.1, < 4.3)
       activesupport (>= 3.1, < 4.3)
       aes (~> 0.5.0)
@@ -117,4 +117,4 @@ DEPENDENCIES
   sqlite3
 
 BUNDLED WITH
-   1.12.4
+   1.12.5
