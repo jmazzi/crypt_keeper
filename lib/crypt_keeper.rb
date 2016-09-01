@@ -13,7 +13,10 @@ require 'crypt_keeper/provider/postgres_pgp_public_key'
 module CryptKeeper
   class << self
     attr_accessor :stub_encryption
-    alias_method :stub_encryption?, :stub_encryption 
+    alias_method :stub_encryption?, :stub_encryption
+
+    attr_accessor :silence_logs
+    alias_method :silence_logs?, :silence_logs
   end
 end
 
