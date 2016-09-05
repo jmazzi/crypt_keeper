@@ -203,3 +203,8 @@ Or install it yourself as:
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
+
+### Running Tests
+1. Create your own `database.yml` from `default.database.yml`.
+2. Create testing databases by `bundle exec rake db:create`
+3. Run the test suite by `bundle exec rspec`
