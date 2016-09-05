@@ -2,6 +2,10 @@ require 'spec_helper'
 
 module CryptKeeper::LogSubscriber
   describe PostgresRaw do
+    before do
+      CryptKeeper.silence_logs = false
+    end
+
     use_postgres
 
     context "Without IV" do
@@ -28,7 +32,7 @@ module CryptKeeper::LogSubscriber
         "SELECT \"sensitive_data\".* FROM \"sensitive_data\" WHERE decrypt([FILTERED]) AND secret = 'testing'"
       end
 
-      it "filters pgp functions" do
+      it "filters postgresql_raw functions" do
         subject.should_receive(:sql_without_postgres_raw) do |event|
           event.payload[:sql].should == output_query
         end
@@ -36,7 +40,7 @@ module CryptKeeper::LogSubscriber
         subject.sql(ActiveSupport::Notifications::Event.new(:sql, 1, 1, 1, { sql: input_query }))
       end
 
-      it "filters pgp functions in lowercase" do
+      it "filters postgresql_raw functions in lowercase" do
         subject.should_receive(:sql_without_postgres_raw) do |event|
           event.payload[:sql].should == output_query.downcase.gsub(/filtered/, 'FILTERED')
         end
@@ -44,7 +48,7 @@ module CryptKeeper::LogSubscriber
         subject.sql(ActiveSupport::Notifications::Event.new(:sql, 1, 1, 1, { sql: input_query.downcase }))
       end
 
-      it "filters pgp functions when searching" do
+      it "filters postgresql_raw functions when searching" do
         subject.should_receive(:sql_without_postgres_raw) do |event|
           event.payload[:sql].should == output_search_query
         end
@@ -55,6 +59,12 @@ module CryptKeeper::LogSubscriber
       it "forces string encodings" do
         string_encoding_query = "SELECT encrypt('hi \255', 'test', 'aes')"
         subject.sql(ActiveSupport::Notifications::Event.new(:sql, 1, 1, 1, { sql: string_encoding_query }))
+      end
+
+      it "skips logging if CryptKeeper.silence_logs is set" do
+        CryptKeeper.silence_logs = true
+        subject.should_not_receive(:sql_without_postgres_raw)
+        subject.sql(ActiveSupport::Notifications::Event.new(:sql, 1, 1, 1, { sql: input_query }))
       end
     end
 
@@ -82,7 +92,7 @@ module CryptKeeper::LogSubscriber
         "SELECT \"sensitive_data\".* FROM \"sensitive_data\" WHERE decrypt([FILTERED]) AND secret = 'testing'"
       end
 
-      it "filters pgp functions" do
+      it "filters postgresql_raw functions" do
         subject.should_receive(:sql_without_postgres_raw) do |event|
           event.payload[:sql].should == output_query
         end
@@ -90,7 +100,7 @@ module CryptKeeper::LogSubscriber
         subject.sql(ActiveSupport::Notifications::Event.new(:sql, 1, 1, 1, { sql: input_query }))
       end
 
-      it "filters pgp functions in lowercase" do
+      it "filters postgresql_raw functions in lowercase" do
         subject.should_receive(:sql_without_postgres_raw) do |event|
           event.payload[:sql].should == output_query.downcase.gsub(/filtered/, 'FILTERED')
         end
@@ -98,7 +108,7 @@ module CryptKeeper::LogSubscriber
         subject.sql(ActiveSupport::Notifications::Event.new(:sql, 1, 1, 1, { sql: input_query.downcase }))
       end
 
-      it "filters pgp functions when searching" do
+      it "filters postgresql_raw functions when searching" do
         subject.should_receive(:sql_without_postgres_raw) do |event|
           event.payload[:sql].should == output_search_query
         end
@@ -109,6 +119,12 @@ module CryptKeeper::LogSubscriber
       it "forces string encodings" do
         string_encoding_query = "SELECT encrypt('hi \255', 'test', 'aes')"
         subject.sql(ActiveSupport::Notifications::Event.new(:sql, 1, 1, 1, { sql: string_encoding_query }))
+      end
+
+      it "skips logging if CryptKeeper.silence_logs is set" do
+        CryptKeeper.silence_logs = true
+        subject.should_not_receive(:sql_without_postgres_raw)
+        subject.sql(ActiveSupport::Notifications::Event.new(:sql, 1, 1, 1, { sql: input_query }))
       end
     end
   end
