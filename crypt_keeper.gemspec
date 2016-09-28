@@ -16,8 +16,8 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.version       = CryptKeeper::VERSION
 
-  gem.add_runtime_dependency 'activerecord',  '>= 3.1', '< 4.3'
-  gem.add_runtime_dependency 'activesupport', '>= 3.1', '< 4.3'
+  gem.add_runtime_dependency 'activerecord',  '>= 4.2', '< 5.1'
+  gem.add_runtime_dependency 'activesupport', '>= 4.2', '< 5.1'
   gem.add_runtime_dependency 'aes',           '~> 0.5.0'
   gem.add_runtime_dependency 'armor',         '~> 0.0.2'
 
@@ -36,7 +36,7 @@ Gem::Specification.new do |gem|
     gem.add_development_dependency 'activerecord-jdbcmysql-adapter'
   else
     gem.add_development_dependency 'sqlite3'
-    gem.add_development_dependency 'pg', '~> 0.17.1'
+    gem.add_development_dependency 'pg', '~> 0.18.0'
     gem.add_development_dependency 'mysql2', '~> 0.3.11'
   end
 end
