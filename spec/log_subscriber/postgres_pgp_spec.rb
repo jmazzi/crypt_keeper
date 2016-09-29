@@ -14,8 +14,6 @@ module CryptKeeper::LogSubscriber
         CryptKeeper::Provider::PostgresPgp.new key: 'secret'
       end
 
-      subject { ::ActiveRecord::LogSubscriber.new }
-
       let(:input_query) do
         "SELECT pgp_sym_encrypt('encrypt_value', 'encrypt_key'), pgp_sym_decrypt('decrypt_value', 'decrypt_key') FROM DUAL;"
       end
@@ -33,40 +31,27 @@ module CryptKeeper::LogSubscriber
       end
 
       it "filters pgp functions" do
-        subject.should_receive(:sql_without_postgres_pgp) do |event|
-          event.payload[:sql].should == output_query
-        end
-
-        subject.sql(ActiveSupport::Notifications::Event.new(:sql, 1, 1, 1, { sql: input_query }))
+        should_log_scrubbed_query(input: input_query, output: output_query)
       end
 
       it "filters pgp functions in lowercase" do
-        subject.should_receive(:sql_without_postgres_pgp) do |event|
-          event.payload[:sql].should == output_query.downcase.gsub(/filtered/, 'FILTERED')
-        end
-
-        subject.sql(ActiveSupport::Notifications::Event.new(:sql, 1, 1, 1, { sql: input_query.downcase }))
+        should_log_scrubbed_query(input: input_query.downcase, output: output_query.downcase.gsub(/filtered/, 'FILTERED'))
       end
 
       it "filters pgp functions when searching" do
-        subject.should_receive(:sql_without_postgres_pgp) do |event|
-          event.payload[:sql].should == output_search_query
-        end
-
-        subject.sql(ActiveSupport::Notifications::Event.new(:sql, 1, 1, 1, { sql: input_search_query }))
+        should_log_scrubbed_query(input: input_search_query, output: output_search_query)
       end
 
       it "forces string encodings" do
-        string_encoding_query = "SELECT pgp_sym_encrypt('hi \255', 'test')"
-        subject.sql(ActiveSupport::Notifications::Event.new(:sql, 1, 1, 1, { sql: string_encoding_query }))
+        input_query = "SELECT pgp_sym_encrypt('hi \255', 'test') FROM DUAL;"
+
+        should_log_scrubbed_query(input: input_query, output: output_query)
       end
 
       it "skips logging if CryptKeeper.silence_logs is set" do
         CryptKeeper.silence_logs = true
 
-        subject.should_not_receive(:sql_without_postgres_pgp)
-
-        subject.sql(ActiveSupport::Notifications::Event.new(:sql, 1, 1, 1, { sql: input_query }))
+        should_not_log_query(input_query)
       end
     end
 
@@ -84,8 +69,6 @@ module CryptKeeper::LogSubscriber
         CryptKeeper::Provider::PostgresPgpPublicKey.new key: 'secret', public_key: public_key, private_key: private_key
       end
 
-      subject { ::ActiveRecord::LogSubscriber.new }
-
       let(:input_query) do
         "SELECT pgp_pub_encrypt('test', dearmor('#{public_key}
         '))"
@@ -96,27 +79,17 @@ module CryptKeeper::LogSubscriber
       end
 
       it "filters pgp functions" do
-        subject.should_receive(:sql_without_postgres_pgp) do |event|
-          event.payload[:sql].should == output_query
-        end
-
-        subject.sql(ActiveSupport::Notifications::Event.new(:sql, 1, 1, 1, { sql: input_query }))
+        should_log_scrubbed_query(input: input_query, output: output_query)
       end
 
       it "filters pgp functions in lowercase" do
-        subject.should_receive(:sql_without_postgres_pgp) do |event|
-          event.payload[:sql].should == output_query.downcase.gsub(/filtered/, 'FILTERED')
-        end
-
-        subject.sql(ActiveSupport::Notifications::Event.new(:sql, 1, 1, 1, { sql: input_query.downcase }))
+        should_log_scrubbed_query(input: input_query.downcase, output: output_query.downcase.gsub(/filtered/, 'FILTERED'))
       end
 
       it "skips logging if CryptKeeper.silence_logs is set" do
         CryptKeeper.silence_logs = true
 
-        subject.should_not_receive(:sql_without_postgres_pgp)
-
-        subject.sql(ActiveSupport::Notifications::Event.new(:sql, 1, 1, 1, { sql: input_query }))
+        should_not_log_query(input_query)
       end
     end
   end
