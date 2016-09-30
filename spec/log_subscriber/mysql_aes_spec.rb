@@ -14,8 +14,6 @@ module CryptKeeper::LogSubscriber
         CryptKeeper::Provider::MysqlAesNew.new key: 'secret', salt: 'salt'
       end
 
-      subject { ::ActiveRecord::LogSubscriber.new }
-
       let(:input_query) do
         "SELECT aes_encrypt('encrypt_value', 'encrypt_key'), aes_decrypt('decrypt_value', 'decrypt_key') FROM DUAL;"
       end
@@ -33,40 +31,27 @@ module CryptKeeper::LogSubscriber
       end
 
       it "filters aes functions" do
-        subject.should_receive(:sql_without_mysql_aes) do |event|
-          event.payload[:sql].should == output_query
-        end
-
-        subject.sql(ActiveSupport::Notifications::Event.new(:sql, 1, 1, 1, { sql: input_query }))
+        should_log_scrubbed_query(input: input_query, output: output_query)
       end
 
       it "filters aes functions in lowercase" do
-        subject.should_receive(:sql_without_mysql_aes) do |event|
-          event.payload[:sql].should == output_query.downcase.gsub(/filtered/, 'FILTERED')
-        end
-
-        subject.sql(ActiveSupport::Notifications::Event.new(:sql, 1, 1, 1, { sql: input_query.downcase }))
+        should_log_scrubbed_query(input: input_query.downcase, output: output_query.downcase.gsub(/filtered/, 'FILTERED'))
       end
 
       it "filters aes functions when searching" do
-        subject.should_receive(:sql_without_mysql_aes) do |event|
-          event.payload[:sql].should == output_search_query
-        end
-
-        subject.sql(ActiveSupport::Notifications::Event.new(:sql, 1, 1, 1, { sql: input_search_query }))
+        should_log_scrubbed_query(input: input_search_query, output: output_search_query)
       end
 
       it "forces string encodings" do
-        string_encoding_query = "SELECT aes_encrypt('hi \255', 'test')"
-        subject.sql(ActiveSupport::Notifications::Event.new(:sql, 1, 1, 1, { sql: string_encoding_query }))
+        input_query = "SELECT aes_encrypt('hi \255', 'test') FROM DUAL;"
+
+        should_log_scrubbed_query(input: input_query, output: output_query)
       end
 
       it "skips logging if CryptKeeper.silence_logs is set" do
         CryptKeeper.silence_logs = true
 
-        subject.should_not_receive(:sql_without_mysql_aes)
-
-        subject.sql(ActiveSupport::Notifications::Event.new(:sql, 1, 1, 1, { sql: input_query }))
+        should_not_log_query(input_query)
       end
     end
   end
