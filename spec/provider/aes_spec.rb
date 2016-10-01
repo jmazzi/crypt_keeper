@@ -3,15 +3,15 @@ require 'spec_helper'
 module CryptKeeper
   module Provider
     describe Aes do
-      subject { Aes.new(key: 'cake') }
+      subject { described_class.new(key: 'cake') }
 
       describe "#initialize" do
         let(:hexed_key) do
           Digest::SHA256.digest('cake')
         end
 
-        its(:key) { should == hexed_key }
-        specify { expect { Aes.new }.to raise_error(ArgumentError, "Missing :key") }
+        specify { expect(subject.key).to eq(hexed_key) }
+        specify { expect { described_class.new }.to raise_error(ArgumentError, "Missing :key") }
       end
 
       describe "#encrypt" do
@@ -19,15 +19,15 @@ module CryptKeeper
           subject.encrypt 'string'
         end
 
-        specify { encrypted.should_not == 'string' }
-        specify { encrypted.should_not be_blank }
+        specify { expect(encrypted).to_not eq('string') }
+        specify { expect(encrypted).to_not be_blank }
 
         context "an empty string" do
           let(:encrypted) do
             subject.encrypt ''
           end
 
-          specify { encrypted.should == '' }
+          specify { expect(encrypted).to be_blank }
         end
 
         context "a nil" do
@@ -35,7 +35,7 @@ module CryptKeeper
             subject.encrypt nil
           end
 
-          specify { encrypted.should be_nil }
+          specify { expect(encrypted).to be_nil }
         end
       end
 
@@ -44,14 +44,14 @@ module CryptKeeper
           subject.decrypt "MC41MDk5MjI2NjgxMDI1MDI2OmNyeXB0X2tlZXBlcjpPI/8dCqWXDMVj7Jqs\nuwf/\n"
         end
 
-        specify { decrypted.should == 'string' }
+        specify { expect(decrypted).to eq('string') }
 
         context "an empty string" do
           let(:decrypted) do
             subject.decrypt ''
           end
 
-          specify { decrypted.should == '' }
+          specify { expect(decrypted).to be_blank }
         end
 
         context "a nil" do
@@ -59,7 +59,7 @@ module CryptKeeper
             subject.decrypt nil
           end
 
-          specify { decrypted.should be_nil }
+          specify { expect(decrypted).to be_nil }
         end
       end
     end

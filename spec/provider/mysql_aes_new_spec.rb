@@ -14,22 +14,22 @@ module CryptKeeper
         "fBN8i7bx/DGAA4NJ4EWi0A=="
       end
 
-      subject { MysqlAesNew.new key: ENCRYPTION_PASSWORD, salt: 'salt' }
+      subject { described_class.new key: ENCRYPTION_PASSWORD, salt: 'salt' }
 
-      its(:key) { should == "825e8c5e8ca394818b307b22b8cb7d3df2735e9c1e5838b476e7719135a4f499f2133022c1a0e8597c9ac1507b0f0c44328a40049f9704fab3598c5dec120724" }
+      specify { expect(subject.key).to eq("825e8c5e8ca394818b307b22b8cb7d3df2735e9c1e5838b476e7719135a4f499f2133022c1a0e8597c9ac1507b0f0c44328a40049f9704fab3598c5dec120724") }
 
       describe "#initialize" do
-        specify { expect { MysqlAesNew.new }.to raise_error(ArgumentError, "Missing :key") }
-        specify { expect { MysqlAesNew.new(key: 'blah') }.to raise_error(ArgumentError, "Missing :salt") }
+        specify { expect { described_class.new }.to raise_error(ArgumentError, "Missing :key") }
+        specify { expect { described_class.new(key: 'blah') }.to raise_error(ArgumentError, "Missing :salt") }
       end
 
       describe "#encrypt" do
-        specify { subject.encrypt(plain_text).should_not == plain_text }
-        specify { subject.encrypt(plain_text).should_not be_blank }
+        specify { expect(subject.encrypt(plain_text)).to_not eq(plain_text) }
+        specify { expect(subject.encrypt(plain_text)).to_not be_blank }
       end
 
       describe "#decrypt" do
-        specify { subject.decrypt(cipher_text).should == plain_text }
+        specify { expect(subject.decrypt(cipher_text)).to eq(plain_text) }
       end
 
       describe "#search" do
@@ -38,7 +38,7 @@ module CryptKeeper
         it "finds the matching record" do
           subject.create!(storage: 'blah2')
           match = subject.create!(storage: 'blah')
-          results = subject.search_by_plaintext(:storage, 'blah').first.should == match
+          expect(subject.search_by_plaintext(:storage, 'blah').first).to eq(match)
         end
 
         it "keeps the scope" do
@@ -46,7 +46,7 @@ module CryptKeeper
           subject.create!(storage: 'blah')
 
           scope = subject.limit(1)
-          expect(scope.search_by_plaintext(:storage, 'blah').count).to eql(1)
+          expect(scope.search_by_plaintext(:storage, 'blah').count).to eq(1)
         end
       end
     end

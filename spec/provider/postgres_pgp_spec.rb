@@ -12,29 +12,29 @@ module CryptKeeper
 
       let(:integer_plain_text) { 1 }
 
-      subject { PostgresPgp.new key: ENCRYPTION_PASSWORD }
+      subject { described_class.new key: ENCRYPTION_PASSWORD }
 
-      its(:key) { should == ENCRYPTION_PASSWORD }
+      specify { expect(subject.key).to eq(ENCRYPTION_PASSWORD) }
 
       describe "#initialize" do
-        specify { expect { PostgresPgp.new }.to raise_error(ArgumentError, "Missing :key") }
+        specify { expect { described_class.new }.to raise_error(ArgumentError, "Missing :key") }
       end
 
       describe "#encrypt" do
         context "Strings" do
-          specify { subject.encrypt(plain_text).should_not == plain_text }
-          specify { subject.encrypt(plain_text).should_not be_empty }
+          specify { expect(subject.encrypt(plain_text)).to_not eq(plain_text) }
+          specify { expect(subject.encrypt(plain_text)).to_not be_empty }
         end
 
         context "Integers" do
-          specify { subject.encrypt(integer_plain_text).should_not == integer_plain_text }
-          specify { subject.encrypt(integer_plain_text).should_not be_empty }
+          specify { expect(subject.encrypt(integer_plain_text)).to_not eq(integer_plain_text) }
+          specify { expect(subject.encrypt(integer_plain_text)).to_not be_empty }
         end
       end
 
       describe "#decrypt" do
-        specify { subject.decrypt(cipher_text).should == plain_text }
-        specify { subject.decrypt(integer_cipher_text).should == integer_plain_text.to_s }
+        specify { expect(subject.decrypt(cipher_text)).to eq(plain_text) }
+        specify { expect(subject.decrypt(integer_cipher_text)).to eq(integer_plain_text.to_s) }
       end
 
       describe "#search" do
@@ -43,25 +43,25 @@ module CryptKeeper
         it "finds the matching record" do
           subject.create!(storage: 'blah2')
           match = subject.create!(storage: 'blah')
-          subject.search_by_plaintext(:storage, 'blah').first.should == match
+          expect(subject.search_by_plaintext(:storage, 'blah').first).to eq(match)
         end
       end
 
       describe "Custom pgcrypto options" do
         let(:pgcrypto_options) { 'compress-level=0' }
 
-        subject { PostgresPgp.new key: 'candy', pgcrypto_options: pgcrypto_options }
+        subject { described_class.new key: 'candy', pgcrypto_options: pgcrypto_options }
 
         it "reads and writes" do
           queries = logged_queries do
             encrypted = subject.encrypt(plain_text)
-            subject.decrypt(encrypted).should == plain_text
+            expect(subject.decrypt(encrypted)).to eq(plain_text)
           end
 
-          queries.should_not be_empty
+          expect(queries).to_not be_empty
 
           queries.select { |query| query.include?("pgp_sym_encrypt") }.each do |q|
-            q.should include(pgcrypto_options)
+            expect(q).to include(pgcrypto_options)
           end
         end
       end

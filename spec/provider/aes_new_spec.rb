@@ -3,15 +3,15 @@ require 'spec_helper'
 module CryptKeeper
   module Provider
     describe AesNew do
-      subject { AesNew.new(key: 'cake', salt: 'salt') }
+      subject { described_class.new(key: 'cake', salt: 'salt') }
 
       describe "#initialize" do
         let(:digested_key) do
           ::Armor.digest('cake', 'salt')
         end
 
-        its(:key) { should == digested_key }
-        specify { expect { AesNew.new }.to raise_error(ArgumentError, "Missing :key") }
+        specify { expect(subject.key).to eq(digested_key) }
+        specify { expect { described_class.new }.to raise_error(ArgumentError, "Missing :key") }
       end
 
       describe "#encrypt" do
@@ -19,8 +19,8 @@ module CryptKeeper
           subject.encrypt 'string'
         end
 
-        specify { encrypted.should_not == 'string' }
-        specify { encrypted.should_not be_blank }
+        specify { expect(encrypted).to_not eq('string') }
+        specify { expect(encrypted).to_not be_blank }
       end
 
       describe "#decrypt" do
@@ -28,7 +28,7 @@ module CryptKeeper
           subject.decrypt "V02ebRU2wLk25AizasROVg==$kE+IpRaUNdBfYqR+WjMqvA=="
         end
 
-        specify { decrypted.should == 'string' }
+        specify { expect(decrypted).to eq('string') }
       end
 
       describe "#search" do
