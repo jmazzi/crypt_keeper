@@ -20,49 +20,49 @@ module CryptKeeper
         IO.read(File.join(SPEC_ROOT, 'fixtures', 'private.asc'))
       end
 
-      subject { PostgresPgpPublicKey.new key: ENCRYPTION_PASSWORD, public_key: public_key, private_key: private_key }
+      subject { described_class.new key: ENCRYPTION_PASSWORD, public_key: public_key, private_key: private_key }
 
 
-      its(:key) { should == ENCRYPTION_PASSWORD }
+      specify { expect(subject.key).to eq(ENCRYPTION_PASSWORD) }
 
       describe "#initialize" do
-        specify { expect { PostgresPgpPublicKey.new }.to raise_error(ArgumentError, "Missing :key") }
+        specify { expect { described_class.new }.to raise_error(ArgumentError, "Missing :key") }
       end
 
       describe "#encrypt" do
         context "Strings" do
-          specify { subject.encrypt(plain_text).should_not == plain_text }
-          specify { subject.encrypt(plain_text).should_not be_empty }
+          specify { expect(subject.encrypt(plain_text)).to_not eq(plain_text) }
+          specify { expect(subject.encrypt(plain_text)).to_not be_empty }
 
           it "does not double encrypt" do
-            pgp = PostgresPgpPublicKey.new key: ENCRYPTION_PASSWORD, public_key: public_key
-            pgp.encrypt(cipher_text).should == cipher_text
+            pgp = described_class.new key: ENCRYPTION_PASSWORD, public_key: public_key
+            expect(pgp.encrypt(cipher_text)).to eq(cipher_text)
           end
         end
 
         context "Integers" do
-          specify { subject.encrypt(integer_plain_text).should_not == integer_plain_text }
-          specify { subject.encrypt(integer_plain_text).should_not be_empty }
+          specify { expect(subject.encrypt(integer_plain_text)).to_not eq(integer_plain_text) }
+          specify { expect(subject.encrypt(integer_plain_text)).to_not be_empty }
         end
       end
 
       describe "#decrypt" do
-        specify { subject.decrypt(cipher_text).should == plain_text }
-        specify { subject.decrypt(integer_cipher_text).should == integer_plain_text.to_s }
+        specify { expect(subject.decrypt(cipher_text)).to eq(plain_text) }
+        specify { expect(subject.decrypt(integer_cipher_text)).to eq(integer_plain_text.to_s) }
 
         it "does not decrypt w/o private key" do
-          pgp = PostgresPgpPublicKey.new key: ENCRYPTION_PASSWORD, public_key: public_key
-          pgp.decrypt(cipher_text).should eql(cipher_text)
+          pgp = described_class.new key: ENCRYPTION_PASSWORD, public_key: public_key
+          expect(pgp.decrypt(cipher_text)).to eq(cipher_text)
         end
       end
 
       describe "#encrypted?" do
         it "returns true for encrypted strings" do
-          subject.encrypted?(cipher_text).should be_true
+          expect(subject.encrypted?(cipher_text)).to be_truthy
         end
 
         it "returns false for non-encrypted strings" do
-          subject.encrypted?(plain_text).should be_false
+          expect(subject.encrypted?(plain_text)).to be_falsey
         end
       end
     end

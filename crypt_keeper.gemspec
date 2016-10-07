@@ -21,7 +21,7 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency 'aes',           '~> 0.5.0'
   gem.add_runtime_dependency 'armor',         '~> 0.0.2'
 
-  gem.add_development_dependency 'rspec',       '~> 2.14.0'
+  gem.add_development_dependency 'rspec',       '~> 3.5.0'
   gem.add_development_dependency 'guard',       '~> 2.6.1'
   gem.add_development_dependency 'guard-rspec', '~> 4.2.9'
   gem.add_development_dependency 'rake',        '~> 10.3.1'

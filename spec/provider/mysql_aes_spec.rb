@@ -14,21 +14,21 @@ module CryptKeeper
         "nbKOoWn8kvAw9k/C2Mex6Q==\n"
       end
 
-      subject { MysqlAes.new key: 'candy' }
+      subject { described_class.new key: 'candy' }
 
-      its(:key) { should == 'candy' }
+      specify { expect(subject.key).to eq('candy') }
 
       describe "#initialize" do
-        specify { expect { MysqlAes.new }.to raise_error(ArgumentError, "Missing :key") }
+        specify { expect { described_class.new }.to raise_error(ArgumentError, "Missing :key") }
       end
 
       describe "#encrypt" do
-        specify { subject.encrypt(plain_text).should_not == plain_text }
-        specify { subject.encrypt(plain_text).should_not be_blank }
+        specify { expect(subject.encrypt(plain_text)).to_not eq(plain_text) }
+        specify { expect(subject.encrypt(plain_text)).to_not be_blank }
       end
 
       describe "#decrypt" do
-        specify { subject.decrypt(cipher_text).should == plain_text }
+        specify { expect(subject.decrypt(cipher_text)).to eq(plain_text) }
       end
     end
   end

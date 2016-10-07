@@ -16,7 +16,7 @@ module CryptKeeper
       context "Fields" do
         it "enables encryption for the given fields" do
           subject.crypt_keeper :storage, :secret, encryptor: :fake_encryptor
-          subject.crypt_keeper_fields.should == [:storage, :secret]
+          expect(subject.crypt_keeper_fields).to eq([:storage, :secret])
         end
 
         it "raises an exception for missing field" do
@@ -35,7 +35,7 @@ module CryptKeeper
       context "Options" do
         it "accepts the class name as a string" do
           subject.crypt_keeper :storage, :secret, key1: 1, key2: 2, encryptor: "FakeEncryptor"
-          subject.send(:encryptor_klass).should == CryptKeeper::Provider::FakeEncryptor
+          expect(subject.send(:encryptor_klass)).to eq(CryptKeeper::Provider::FakeEncryptor)
         end
 
         it "raises an error on missing encryptor" do
@@ -52,47 +52,47 @@ module CryptKeeper
       subject { create_encrypted_model :storage, passphrase: 'tool', encryptor: :encryptor }
 
       it "encrypts the data" do
-        CryptKeeper::Provider::Encryptor.any_instance.should_receive(:encrypt).with('testing')
+        expect_any_instance_of(CryptKeeper::Provider::Encryptor).to receive(:encrypt).with('testing')
         subject.create!(storage: 'testing')
       end
 
       it "decrypts the data" do
         record = subject.create!(storage: 'testing')
-        CryptKeeper::Provider::Encryptor.any_instance.should_receive(:decrypt).at_least(1).times.with('toolgnitset')
+        expect_any_instance_of(CryptKeeper::Provider::Encryptor).to receive(:decrypt).at_least(1).times.with('toolgnitset')
         subject.find(record.id).storage
       end
 
       it "returns the plaintext on decrypt" do
         record = subject.create!(storage: 'testing')
-        subject.find(record.id).storage.should == 'testing'
+        expect(subject.find(record.id).storage).to eq('testing')
       end
 
       it "does not encrypt or decrypt nil" do
         data = subject.create!(storage: nil)
-        data.storage.should be_nil
+        expect(data.storage).to be_nil
       end
 
       it "does not encrypt or decrypt empty strings" do
         data = subject.create!(storage: "")
-        data.storage.should be_empty
+        expect(data.storage).to be_empty
       end
 
       it "converts numbers to strings" do
         data = subject.create!(storage: 1)
-        data.reload.storage.should == "1"
+        expect(data.reload.storage).to eq("1")
       end
 
       it "does not decrypt when stubbing is enabled" do
         CryptKeeper.stub_encryption = true
         record = subject.create!(storage: "testing")
-        CryptKeeper::Provider::Encryptor.any_instance.should_not_receive(:decrypt)
+        expect_any_instance_of(CryptKeeper::Provider::Encryptor).to_not receive(:decrypt)
         subject.find(record.id).storage
       end
 
       it "does not decrypt when stubbing is enabled after model is created" do
         record = subject.create!(storage: "testing")
         CryptKeeper.stub_encryption = true
-        CryptKeeper::Provider::Encryptor.any_instance.should_not_receive(:decrypt)
+        expect_any_instance_of(CryptKeeper::Provider::Encryptor).to_not receive(:decrypt)
         subject.find(record.id).storage
       end
     end
