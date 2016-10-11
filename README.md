@@ -15,7 +15,7 @@ is a simple class that does 3 things.
 Note: Any options defined using `crypt_keeper` will be passed to `new` as a
 hash.
 
-You can see an AES example [here](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/aes.rb).
+You can see an AES example [here](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/aes_new.rb).
 
 ## Why?
 
@@ -107,19 +107,6 @@ There are four supported encryptors: `aes_new`, `mysql_aes_new`, `postgres_pgp`,
     filtered for you to protect senitive data from being logged.
   * Accepts a public and private_key. The private key is optional. If the private key is not present the ciphertext value is returned instead of the plaintext. This allows you to keep the private key off certain servers. Encryption is possible with only a public key. Any server that needs access to the plaintext will need the private key.
   * Passphrases are hashed by PostgresSQL itself using a [String2Key (S2K)](http://www.postgresql.org/docs/9.2/static/pgcrypto.html) algorithm. This is rather similar to crypt() algorithms — purposefully slow and with random salt — but it produces a full-length binary key.
-
-## Deprecated Encryptors
-These encryptors are now deprecated and should be migrated from as soon as possible using the included `bin/crypt_keeper` script.
-
-* [AES Legacy](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/aes.rb) *DEPRECATED*
-  * Encryption is peformed using AES-256 via OpenSSL.
-  * [How to migrate to AES New](https://github.com/jmazzi/crypt_keeper/wiki/AES-Legacy-Migration-Instructions)
-
-* [MySQL AES Legacy](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/provider/mysql_aes.rb) *DEPRECATED*
-  * Encryption is peformed MySQL's native AES functions.
-  * ActiveRecord logs are [automatically](https://github.com/jmazzi/crypt_keeper/blob/master/lib/crypt_keeper/log_subscriber/mysql_aes.rb)
-    filtered for you to protect senitive data from being logged.
-  * [How to migrate to MySQL AES New](https://github.com/jmazzi/crypt_keeper/wiki/MysqlAes-Legacy-Migration-Instructions)
 
 ## Searching
 Searching ciphertext is a complex problem that varies depending on the encryption algorithm you choose. All of the bundled providers include search support, but they have some caveats.
