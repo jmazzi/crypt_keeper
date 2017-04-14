@@ -2,6 +2,8 @@ require 'active_support/concern'
 require 'active_support/core_ext/array/extract_options'
 
 module CryptKeeper
+  class Exception < StandardError; end
+
   module Model
     extend ActiveSupport::Concern
 
@@ -126,8 +128,10 @@ module CryptKeeper
 
       # Private: Ensure that the encryptor responds to new
       def ensure_valid_encryptor!
-        unless defined?(encryptor_klass) && encryptor_klass.respond_to?(:new)
-          raise "You must specify a valid encryptor `crypt_keeper :encryptor => :aes`"
+        unless defined?(encryptor_klass) && encryptor_klass.respond_to?(:new) &&
+          encryptor_klass.superclass == Provider::Base
+          raise Exception, "You must specify a valid encryptor that inherits the " \
+            "base behavior from CryptKeeper::Provider::Base `crypt_keeper :encryptor => :aes`"
         end
       end
     end

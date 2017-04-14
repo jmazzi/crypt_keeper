@@ -39,7 +39,12 @@ describe CryptKeeper::Model do
 
       it "raises an error on missing encryptor" do
         expect { subject.crypt_keeper :storage, :secret }.
-          to raise_error(RuntimeError, /You must specify a valid encryptor/)
+          to raise_error(CryptKeeper::Exception, /You must specify a valid encryptor/)
+      end
+
+      it "raises an error on encryptor without base" do
+        expect { subject.crypt_keeper :storage, encryptor: "InvalidEncryptor" }.
+          to raise_error(CryptKeeper::Exception, /You must specify a valid encryptor/)
       end
     end
   end

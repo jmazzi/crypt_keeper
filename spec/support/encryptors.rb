@@ -1,6 +1,10 @@
 module CryptKeeper
   module Provider
     # A fake class that does no encryption
+    class InvalidEncryptor
+    end
+
+    # A fake class that does no encryption
     class FakeEncryptor < Base
       def initialize(*args)
       end
