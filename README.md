@@ -131,12 +131,13 @@ Model.where(something: 'blah').search_by_plaintext(:field, 'searchstring')
 ## Creating your own encryptor
 
 Creating your own encryptor is easy. All you have to do is create a class
-under the `CryptKeeper::Provider` namespace, like this:
+under the `CryptKeeper::Provider` namespace, and inherit from the `Base` encryptor,
+like this:
 
 ```ruby
 module CryptKeeper
   module Provider
-    class MyEncryptor
+    class MyEncryptor < Base
       def initialize(options = {})
       end
 

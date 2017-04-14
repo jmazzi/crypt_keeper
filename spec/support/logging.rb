@@ -19,6 +19,8 @@
 #
 #     should_not_log_query input: "SELECT pgp_sym_encrypt('val', 'key')"
 #   end
+require "active_record/log_subscriber"
+
 module CryptKeeper
   module Testing
     module Logging

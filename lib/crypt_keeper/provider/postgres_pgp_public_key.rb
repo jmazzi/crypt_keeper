@@ -2,7 +2,7 @@ require 'crypt_keeper/log_subscriber/postgres_pgp'
 
 module CryptKeeper
   module Provider
-    class PostgresPgpPublicKey
+    class PostgresPgpPublicKey < Base
       include CryptKeeper::Helper::SQL
 
       attr_accessor :key

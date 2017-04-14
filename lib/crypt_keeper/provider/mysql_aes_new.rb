@@ -2,7 +2,7 @@ require 'crypt_keeper/log_subscriber/mysql_aes'
 
 module CryptKeeper
   module Provider
-    class MysqlAesNew
+    class MysqlAesNew < Base
       include CryptKeeper::Helper::SQL
       include CryptKeeper::Helper::DigestPassphrase
 

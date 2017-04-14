@@ -68,8 +68,7 @@ module CryptKeeper
         end
 
         crypt_keeper_fields.each do |field|
-          serialize field, encryptor_klass.new(crypt_keeper_options).
-            extend(::CryptKeeper::Helper::Serializer)
+          serialize field, encryptor_klass.new(crypt_keeper_options)
         end
       end
 
@@ -84,7 +83,7 @@ module CryptKeeper
 
       # Public: Encrypt a table for the first time.
       def encrypt_table!
-        enc       = encryptor_klass.new(crypt_keeper_options)
+        enc = encryptor_klass.new(crypt_keeper_options)
 
         tmp_table = Class.new(ActiveRecord::Base).tap do |c|
           c.table_name = self.table_name
