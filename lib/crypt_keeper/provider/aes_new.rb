@@ -3,7 +3,7 @@ require 'armor'
 
 module CryptKeeper
   module Provider
-    class AesNew
+    class AesNew < Base
       include CryptKeeper::Helper::DigestPassphrase
 
       # Public: The encryption key

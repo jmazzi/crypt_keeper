@@ -68,24 +68,20 @@ module CryptKeeper
         end
 
         crypt_keeper_fields.each do |field|
-          serialize field, encryptor_klass.new(crypt_keeper_options).
-            extend(::CryptKeeper::Helper::Serializer)
+          serialize field, encryptor
         end
       end
 
       def search_by_plaintext(field, criteria)
         if crypt_keeper_fields.include?(field.to_sym)
-          encryptor = encryptor_klass.new(crypt_keeper_options)
           encryptor.search(all, field.to_s, criteria)
         else
-          raise "#{field} is not a crypt_keeper field"
+          raise ArgumentError, "#{field} is not a crypt_keeper field"
         end
       end
 
       # Public: Encrypt a table for the first time.
       def encrypt_table!
-        enc       = encryptor_klass.new(crypt_keeper_options)
-
         tmp_table = Class.new(ActiveRecord::Base).tap do |c|
           c.table_name = self.table_name
           c.inheritance_column = :type_disabled
@@ -94,7 +90,7 @@ module CryptKeeper
         transaction do
           tmp_table.find_each do |r|
             crypt_keeper_fields.each do |field|
-              r.send("#{field}=", enc.encrypt(r[field])) if r[field].present?
+              r.send("#{field}=", encryptor.encrypt(r[field])) if r[field].present?
             end
 
             r.save!
@@ -104,13 +100,12 @@ module CryptKeeper
 
       # Public: Decrypt a table (reverse of encrypt_table!)
       def decrypt_table!
-        enc       = encryptor_klass.new(crypt_keeper_options)
         tmp_table = Class.new(ActiveRecord::Base).tap { |c| c.table_name = self.table_name }
 
         transaction do
           tmp_table.find_each do |r|
             crypt_keeper_fields.each do |field|
-              r.send("#{field}=", enc.decrypt(r[field])) if r[field].present?
+              r.send("#{field}=", encryptor.decrypt(r[field])) if r[field].present?
             end
 
             r.save!
@@ -125,10 +120,17 @@ module CryptKeeper
         @encryptor_klass ||= "CryptKeeper::Provider::#{crypt_keeper_encryptor.to_s.camelize}".constantize
       end
 
-      # Private: Ensure that the encryptor responds to new
+      # Private: The encryptor instance.
+      def encryptor
+        @encryptor ||= encryptor_klass.new(crypt_keeper_options)
+      end
+
+      # Private: Ensure we have a valid encryptor.
       def ensure_valid_encryptor!
-        unless defined?(encryptor_klass) && encryptor_klass.respond_to?(:new)
-          raise "You must specify a valid encryptor `crypt_keeper :encryptor => :aes`"
+        unless defined?(encryptor_klass) && encryptor_klass.respond_to?(:new) &&
+          %i(load dump).all? { |m| encryptor.respond_to?(m) }
+          raise ArgumentError, "You must specify a valid encryptor that implements " \
+            "the `load` and `dump` methods (you can inherit from CryptKeeper::Provider::Base). Example: `crypt_keeper :encryptor => :aes`"
         end
       end
     end
