@@ -24,8 +24,14 @@ describe CryptKeeper::Model do
         expect { subject.new.save }.to raise_error(ArgumentError, msg)
       end
 
-      it "raises an exception for non text fields" do
-        msg = "Column :name must be of type 'text' to be used for encryption"
+      it "allows binary as a valid type" do
+        subject.crypt_keeper :storage, encryptor: :fake_encryptor
+        allow(subject.columns_hash['storage']).to receive(:type).and_return(:binary)
+        expect(subject.new.save).to be_truthy
+      end
+
+      it "raises an exception for non text or binary fields" do
+        msg = "Column :name must be of type 'text' or 'binary' to be used for encryption"
         subject.crypt_keeper :name, encryptor: :fake_encryptor
         expect { subject.new.save }.to raise_error(ArgumentError, msg)
       end
