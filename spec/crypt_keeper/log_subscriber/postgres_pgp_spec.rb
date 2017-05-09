@@ -1,11 +1,27 @@
 require 'spec_helper'
 
 describe CryptKeeper::LogSubscriber::PostgresPgp do
-  before do
+  let(:io) { StringIO.new }
+
+  around do |example|
     CryptKeeper.silence_logs = false
+    original_logger = ActiveRecord::Base.logger
+
+    ActiveRecord::Base.logger = Logger.new(io)
+    example.run
+    ActiveRecord::Base.logger = original_logger
   end
 
   use_postgres
+
+  context "Symmetric encryption" do
+    subject { CryptKeeper::Provider::PostgresPgp.new key: ENCRYPTION_PASSWORD }
+
+    it "sets log" do
+      subject.encrypt("TEXT")
+      puts io.string.split("\n")
+    end
+  end
 
   context "Symmetric encryption" do
     # Fire the ActiveSupport.on_load

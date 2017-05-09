@@ -1,10 +1,8 @@
-require 'crypt_keeper/log_subscriber/postgres_pgp'
+require 'crypt_keeper/provider/postgres_base'
 
 module CryptKeeper
   module Provider
-    class PostgresPgpPublicKey < Base
-      include CryptKeeper::Helper::SQL
-
+    class PostgresPgpPublicKey < PostgresBase
       attr_accessor :key
 
       def initialize(options = {})
@@ -25,7 +23,10 @@ module CryptKeeper
         if !@private_key.present? && encrypted?(value)
           value
         else
-          escape_and_execute_sql(["SELECT pgp_pub_encrypt(?, dearmor(?))", value.to_s, @public_key])['pgp_pub_encrypt']
+          escape_and_execute_sql("SELECT pgp_pub_encrypt($1, dearmor($2))",
+            "value" => value.to_s,
+            "key" => @public_key
+          )['pgp_pub_encrypt']
         end
       end
 
@@ -34,7 +35,11 @@ module CryptKeeper
       # Returns a plaintext string
       def decrypt(value)
         if @private_key.present?
-          escape_and_execute_sql(["SELECT pgp_pub_decrypt(?, dearmor(?), ?)", value, @private_key, @key])['pgp_pub_decrypt']
+          escape_and_execute_sql("SELECT pgp_pub_decrypt($1, dearmor($2), $3)",
+            "value" => value,
+            "private_key" => @private_key,
+            "key" => @key,
+          )['pgp_pub_decrypt']
         else
           value
         end
@@ -46,7 +51,9 @@ module CryptKeeper
       def encrypted?(value)
         begin
           ActiveRecord::Base.transaction(requires_new: true) do
-            escape_and_execute_sql(["SELECT pgp_key_id(?)", value.to_s])['pgp_key_id'].present?
+            escape_and_execute_sql("SELECT pgp_key_id($1)",
+              "value" => value.to_s
+            )['pgp_key_id'].present?
           end
         rescue ActiveRecord::StatementInvalid
           false

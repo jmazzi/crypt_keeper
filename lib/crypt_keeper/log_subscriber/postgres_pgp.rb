@@ -46,6 +46,6 @@ module CryptKeeper
   end
 end
 
-ActiveSupport.on_load :crypt_keeper_postgres_pgp_log do
-  ActiveRecord::LogSubscriber.prepend CryptKeeper::LogSubscriber::PostgresPgp
-end
+# ActiveSupport.on_load :crypt_keeper_postgres_pgp_log do
+#   ActiveRecord::LogSubscriber.prepend CryptKeeper::LogSubscriber::PostgresPgp
+# end
