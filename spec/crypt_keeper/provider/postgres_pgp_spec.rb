@@ -28,11 +28,31 @@ describe CryptKeeper::Provider::PostgresPgp do
       specify { expect(subject.encrypt(integer_plain_text)).to_not eq(integer_plain_text) }
       specify { expect(subject.encrypt(integer_plain_text)).to_not be_empty }
     end
+
+    it "filters StatementInvalid errors" do
+      subject.pgcrypto_options = "invalid"
+
+      begin
+        subject.encrypt(plain_text)
+      rescue ActiveRecord::StatementInvalid => e
+        expect(e.message).to_not include("invalid")
+        expect(e.message).to_not include(ENCRYPTION_PASSWORD)
+      end
+    end
   end
 
   describe "#decrypt" do
     specify { expect(subject.decrypt(cipher_text)).to eq(plain_text) }
     specify { expect(subject.decrypt(integer_cipher_text)).to eq(integer_plain_text.to_s) }
+
+    it "filters StatementInvalid errors" do
+      begin
+        subject.decrypt("invalid")
+      rescue ActiveRecord::StatementInvalid => e
+        expect(e.message).to_not include("invalid")
+        expect(e.message).to_not include(ENCRYPTION_PASSWORD)
+      end
+    end
   end
 
   describe "#search" do
