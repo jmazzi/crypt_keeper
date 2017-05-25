@@ -1,11 +1,8 @@
-require 'crypt_keeper/log_subscriber/postgres_pgp'
+require 'crypt_keeper/provider/postgres_base'
 
 module CryptKeeper
   module Provider
-    class PostgresPgp < Base
-      include CryptKeeper::Helper::SQL
-      include CryptKeeper::LogSubscriber::PostgresPgp
-
+    class PostgresPgp < PostgresBase
       attr_accessor :key
       attr_accessor :pgcrypto_options
 
@@ -26,37 +23,26 @@ module CryptKeeper
       #
       # Returns an encrypted string
       def encrypt(value)
-        rescue_invalid_statement do
-          escape_and_execute_sql(["SELECT pgp_sym_encrypt(?, ?, ?)",
-            value.to_s, key, pgcrypto_options])['pgp_sym_encrypt']
-        end
+        escape_and_execute_sql("SELECT pgp_sym_encrypt($1, $2, $3)",
+          "value" => value.to_s,
+          "key" => key,
+          "options" => pgcrypto_options
+        )['pgp_sym_encrypt']
       end
 
       # Public: Decrypts a string
       #
       # Returns a plaintext string
       def decrypt(value)
-        rescue_invalid_statement do
-          escape_and_execute_sql(["SELECT pgp_sym_decrypt(?, ?)",
-            value, key])['pgp_sym_decrypt']
-        end
+        escape_and_execute_sql("SELECT pgp_sym_decrypt($1, $2)",
+          "value" => value,
+          "key" => key,
+        )['pgp_sym_decrypt']
       end
 
       def search(records, field, criteria)
         records.where("(pgp_sym_decrypt(cast(\"#{field}\" AS bytea), ?) = ?)",
           key, criteria)
-      end
-
-      private
-
-      # Private: Rescues and filters invalid statement errors. Run the code
-      # within a block for it to be rescued.
-      def rescue_invalid_statement
-        yield
-      rescue ActiveRecord::StatementInvalid => e
-        message = crypt_keeper_payload_parse(e.message)
-        message = crypt_keeper_filter_postgres_log(message)
-        raise ActiveRecord::StatementInvalid, message
       end
     end
   end

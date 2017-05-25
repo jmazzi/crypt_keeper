@@ -3,7 +3,6 @@ require 'crypt_keeper/log_subscriber/mysql_aes'
 module CryptKeeper
   module Provider
     class MysqlAesNew < Base
-      include CryptKeeper::Helper::SQL
       include CryptKeeper::Helper::DigestPassphrase
 
       attr_accessor :key
@@ -37,6 +36,18 @@ module CryptKeeper
       # Returns an Enumerable
       def search(records, field, criteria)
         records.where("#{field} = ?", encrypt(criteria))
+      end
+
+      private
+
+      # Private: Sanitize an sql query and then execute it.
+      #
+      # query - the sql query
+      #
+      # Returns the response.
+      def escape_and_execute_sql(query)
+        query = ::ActiveRecord::Base.send :sanitize_sql_array, query
+        ::ActiveRecord::Base.connection.execute(query).first
       end
     end
   end
