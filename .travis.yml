@@ -7,11 +7,11 @@ rvm:
 
 gemfile:
   - gemfiles/activerecord_4_2.gemfile
-  - gemfiles/activerecord_5_0.gemfile
+  - gemfiles/activerecord_5_1.gemfile
 
 matrix:
   exclude:
-    - gemfile: gemfiles/activerecord_5_0.gemfile
+    - gemfile: gemfiles/activerecord_5_1.gemfile
       rvm: 2.1.10
 
 addons:
