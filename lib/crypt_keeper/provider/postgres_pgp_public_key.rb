@@ -34,6 +34,15 @@ module CryptKeeper
       # Returns a plaintext string
       def decrypt(value)
         if @private_key.present?
+          begin
+            # check if the value is an encrypted value by querying its key id
+            escape_and_execute_sql(["SELECT pgp_key_id(?)", value])
+          rescue ActiveRecord::StatementInvalid
+            # 'Wrong key or corrupt data', means the value is not an encrypted
+            # value, so just the plaintext value
+            return value
+          end
+
           escape_and_execute_sql(["SELECT pgp_pub_decrypt(?, dearmor(?), ?)", value, @private_key, @key])['pgp_pub_decrypt']
         else
           value
