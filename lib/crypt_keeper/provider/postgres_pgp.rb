@@ -1,11 +1,6 @@
-require 'crypt_keeper/log_subscriber/postgres_pgp'
-
 module CryptKeeper
   module Provider
-    class PostgresPgp < Base
-      include CryptKeeper::Helper::SQL
-      include CryptKeeper::LogSubscriber::PostgresPgp
-
+    class PostgresPgp < PostgresBase
       attr_accessor :key
       attr_accessor :pgcrypto_options
 
@@ -37,17 +32,12 @@ module CryptKeeper
       # Returns a plaintext string
       def decrypt(value)
         rescue_invalid_statement do
-          begin
-            # check if the value is an encrypted value by querying its key id
-            escape_and_execute_sql(["SELECT pgp_key_id(?)", value])
-          rescue ActiveRecord::StatementInvalid
-            # 'Wrong key or corrupt data', means the value is not an encrypted
-            # value, so just the plaintext value
-            return value
+          if encrypted?(value)
+            escape_and_execute_sql(["SELECT pgp_sym_decrypt(?, ?)",
+              value, key])['pgp_sym_decrypt']
+          else
+            value
           end
-
-          escape_and_execute_sql(["SELECT pgp_sym_decrypt(?, ?)",
-            value, key])['pgp_sym_decrypt']
         end
       end
 
