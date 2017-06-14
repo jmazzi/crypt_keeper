@@ -4,7 +4,7 @@ require 'active_support/lazy_load_hooks'
 module CryptKeeper
   module LogSubscriber
     module PostgresPgp
-      FILTER = /(\(*)pgp_(sym|pub)_(?<operation>decrypt|encrypt)(\(+.*\)+)/im
+      FILTER = /(\(*)(?<operation>pgp_sym_encrypt|pgp_sym_decrypt|pgp_pub_encrypt|pgp_pub_decrypt|pgp_key_id)(\(+.*\)+)/im
 
       # Public: Prevents sensitive data from being logged
       #
