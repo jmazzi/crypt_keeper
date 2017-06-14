@@ -40,14 +40,6 @@ describe CryptKeeper::LogSubscriber::PostgresPgp do
         should_log_scrubbed_query(input: k, output: v)
       end
     end
-
-    it "skips logging if CryptKeeper.silence_logs is set" do
-      CryptKeeper.silence_logs = true
-
-      queries.each do |k, v|
-        should_not_log_query(k)
-      end
-    end
   end
 
   context "Public key encryption" do
@@ -80,14 +72,6 @@ describe CryptKeeper::LogSubscriber::PostgresPgp do
     it "filters pgp functions in lowercase" do
       queries.each do |k, v|
         should_log_scrubbed_query(input: k.downcase, output: v.downcase.gsub(/filtered/, 'FILTERED'))
-      end
-    end
-
-    it "skips logging if CryptKeeper.silence_logs is set" do
-      CryptKeeper.silence_logs = true
-
-      queries.each do |k, v|
-        should_not_log_query(k)
       end
     end
   end

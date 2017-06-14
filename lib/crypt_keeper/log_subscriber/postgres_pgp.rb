@@ -13,9 +13,6 @@ module CryptKeeper
       # Returns a boolean.
       def sql(event)
         payload = crypt_keeper_payload_parse(event.payload[:sql])
-
-        return if CryptKeeper.silence_logs? && payload =~ FILTER
-
         event.payload[:sql] = crypt_keeper_filter_postgres_log(payload)
         super(event)
       end
