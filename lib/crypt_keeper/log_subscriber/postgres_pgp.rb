@@ -4,7 +4,7 @@ require 'active_support/lazy_load_hooks'
 module CryptKeeper
   module LogSubscriber
     module PostgresPgp
-      FILTER = /(\(*)pgp_(sym|pub)_(?<operation>decrypt|encrypt)(\(+.*\)+)/im
+      FILTER = /(\(*)(?<operation>pgp_sym_encrypt|pgp_sym_decrypt|pgp_pub_encrypt|pgp_pub_decrypt|pgp_key_id)(\(+.*\)+)/im
 
       # Public: Prevents sensitive data from being logged
       #
@@ -13,9 +13,6 @@ module CryptKeeper
       # Returns a boolean.
       def sql(event)
         payload = crypt_keeper_payload_parse(event.payload[:sql])
-
-        return if CryptKeeper.silence_logs? && payload =~ FILTER
-
         event.payload[:sql] = crypt_keeper_filter_postgres_log(payload)
         super(event)
       end

@@ -47,11 +47,8 @@ module CryptKeeper
       def should_log_scrubbed_query(input:, output:)
         queries = sql(input)
 
-        valid_input = queries.none? { |line| line.include? input }
-        expect(valid_input).to eq(true), "found unscrubbed SQL query logged!"
-
-        valid_output = queries.any? { |line| line.include? output }
-        expect(valid_output).to eq(true), "output query was not logged!"
+        expect(queries.join("\n")).to_not include(input)
+        expect(queries.join("\n")).to include(output)
       end
 
       # Public: Verifies that the given input query was not logged.

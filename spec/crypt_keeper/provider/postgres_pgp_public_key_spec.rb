@@ -47,6 +47,7 @@ describe CryptKeeper::Provider::PostgresPgpPublicKey do
   describe "#decrypt" do
     specify { expect(subject.decrypt(cipher_text)).to eq(plain_text) }
     specify { expect(subject.decrypt(integer_cipher_text)).to eq(integer_plain_text.to_s) }
+    specify { expect(subject.decrypt(plain_text)).to eq(plain_text) }
 
     it "does not decrypt w/o private key" do
       pgp = described_class.new key: ENCRYPTION_PASSWORD, public_key: public_key

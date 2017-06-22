@@ -13,44 +13,32 @@ describe CryptKeeper::LogSubscriber::PostgresPgp do
       CryptKeeper::Provider::PostgresPgp.new key: 'secret'
     end
 
-    let(:input_query) do
-      "SELECT pgp_sym_encrypt('encrypt_value', 'encrypt_key'), pgp_sym_decrypt('decrypt_value', 'decrypt_key') FROM DUAL;"
-    end
-
-    let(:output_query) do
-      "SELECT encrypt([FILTERED]) FROM DUAL;"
-    end
-
-    let(:input_search_query) do
-      "SELECT \"sensitive_data\".* FROM \"sensitive_data\" WHERE ((pgp_sym_decrypt('f'), 'tool') = 'blah')) AND secret = 'testing'"
-    end
-
-    let(:output_search_query) do
-      "SELECT \"sensitive_data\".* FROM \"sensitive_data\" WHERE decrypt([FILTERED]) AND secret = 'testing'"
-    end
+    let(:queries) {
+      {
+        "SELECT pgp_sym_encrypt('encrypt_value', 'encrypt_key') FROM DUAL;" => "SELECT pgp_sym_encrypt([FILTERED]) FROM DUAL;",
+        "SELECT pgp_sym_decrypt('encrypt_value') FROM DUAL;" => "SELECT pgp_sym_decrypt([FILTERED]) FROM DUAL;",
+        "SELECT pgp_key_id('encrypt_value') FROM DUAL;" => "SELECT pgp_key_id([FILTERED]) FROM DUAL;",
+        "SELECT \"sensitive_data\".* FROM \"sensitive_data\" WHERE ((pgp_sym_decrypt('f'), 'tool') = 'blah')) AND secret = 'testing'" => "SELECT \"sensitive_data\".* FROM \"sensitive_data\" WHERE pgp_sym_decrypt([FILTERED]) AND secret = 'testing'",
+      }
+    }
 
     it "filters pgp functions" do
-      should_log_scrubbed_query(input: input_query, output: output_query)
+      queries.each do |k, v|
+        should_log_scrubbed_query(input: k, output: v)
+      end
     end
 
     it "filters pgp functions in lowercase" do
-      should_log_scrubbed_query(input: input_query.downcase, output: output_query.downcase.gsub(/filtered/, 'FILTERED'))
-    end
-
-    it "filters pgp functions when searching" do
-      should_log_scrubbed_query(input: input_search_query, output: output_search_query)
+      queries.each do |k, v|
+        should_log_scrubbed_query(input: k.downcase, output: v.downcase.gsub(/filtered/, 'FILTERED'))
+      end
     end
 
     it "forces string encodings" do
-      input_query = "SELECT pgp_sym_encrypt('hi \255', 'test') FROM DUAL;"
-
-      should_log_scrubbed_query(input: input_query, output: output_query)
-    end
-
-    it "skips logging if CryptKeeper.silence_logs is set" do
-      CryptKeeper.silence_logs = true
-
-      should_not_log_query(input_query)
+      queries.each do |k, v|
+        k = "#{k}\255"
+        should_log_scrubbed_query(input: k, output: v)
+      end
     end
   end
 
@@ -68,27 +56,23 @@ describe CryptKeeper::LogSubscriber::PostgresPgp do
       CryptKeeper::Provider::PostgresPgpPublicKey.new key: 'secret', public_key: public_key, private_key: private_key
     end
 
-    let(:input_query) do
-      "SELECT pgp_pub_encrypt('test', dearmor('#{public_key}
-      '))"
-    end
-
-    let(:output_query) do
-      "SELECT encrypt([FILTERED])"
-    end
+    let(:queries) {
+      {
+        "SELECT pgp_pub_encrypt('test', dearmor('#{public_key}')) FROM DUAL;" => "SELECT pgp_pub_encrypt([FILTERED]) FROM DUAL;",
+        "SELECT pgp_pub_decrypt('test', dearmor('#{public_key}'), '#{private_key}') FROM DUAL;" => "SELECT pgp_pub_decrypt([FILTERED]) FROM DUAL;",
+      }
+    }
 
     it "filters pgp functions" do
-      should_log_scrubbed_query(input: input_query, output: output_query)
+      queries.each do |k, v|
+        should_log_scrubbed_query(input: k, output: v)
+      end
     end
 
     it "filters pgp functions in lowercase" do
-      should_log_scrubbed_query(input: input_query.downcase, output: output_query.downcase.gsub(/filtered/, 'FILTERED'))
-    end
-
-    it "skips logging if CryptKeeper.silence_logs is set" do
-      CryptKeeper.silence_logs = true
-
-      should_not_log_query(input_query)
+      queries.each do |k, v|
+        should_log_scrubbed_query(input: k.downcase, output: v.downcase.gsub(/filtered/, 'FILTERED'))
+      end
     end
   end
 end

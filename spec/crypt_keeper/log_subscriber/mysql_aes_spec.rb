@@ -46,11 +46,5 @@ describe CryptKeeper::LogSubscriber::MysqlAes do
 
       should_log_scrubbed_query(input: input_query, output: output_query)
     end
-
-    it "skips logging if CryptKeeper.silence_logs is set" do
-      CryptKeeper.silence_logs = true
-
-      should_not_log_query(input_query)
-    end
   end
 end

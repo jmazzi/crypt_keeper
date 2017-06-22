@@ -1,11 +1,6 @@
-require 'crypt_keeper/log_subscriber/postgres_pgp'
-
 module CryptKeeper
   module Provider
-    class PostgresPgp < Base
-      include CryptKeeper::Helper::SQL
-      include CryptKeeper::LogSubscriber::PostgresPgp
-
+    class PostgresPgp < PostgresBase
       attr_accessor :key
       attr_accessor :pgcrypto_options
 
@@ -37,8 +32,12 @@ module CryptKeeper
       # Returns a plaintext string
       def decrypt(value)
         rescue_invalid_statement do
-          escape_and_execute_sql(["SELECT pgp_sym_decrypt(?, ?)",
-            value, key])['pgp_sym_decrypt']
+          if encrypted?(value)
+            escape_and_execute_sql(["SELECT pgp_sym_decrypt(?, ?)",
+              value, key])['pgp_sym_decrypt']
+          else
+            value
+          end
         end
       end
 

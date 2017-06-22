@@ -6,6 +6,7 @@ require 'crypt_keeper/helper'
 require 'crypt_keeper/provider/base'
 require 'crypt_keeper/provider/aes_new'
 require 'crypt_keeper/provider/mysql_aes_new'
+require 'crypt_keeper/provider/postgres_base'
 require 'crypt_keeper/provider/postgres_pgp'
 require 'crypt_keeper/provider/postgres_pgp_public_key'
 
