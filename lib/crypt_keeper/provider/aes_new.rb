@@ -24,6 +24,8 @@ module CryptKeeper
       #
       # Returns a String
       def encrypt(value)
+        return value if value == '' || value.nil?
+
         AES.encrypt(value, key)
       end
 
@@ -35,6 +37,8 @@ module CryptKeeper
       #
       # Returns a String
       def decrypt(value)
+        return value if value == '' || value.nil?
+
         AES.decrypt(value, key)
       end
 
