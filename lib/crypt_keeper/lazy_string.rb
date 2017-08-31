@@ -47,7 +47,20 @@ module CryptKeeper
     # *args - the methods args
     # block - a block if needed
     def method_missing(name, *args, &block)
-      decrypted_string.send(name, *args, &block)
+      # Forward string methods to the decrypted_string.
+      #
+      # Some classes implemented in C will try to convert a non String object
+      # (like LazyString) calling a conversion method (for example,
+      # OpenSSL::PKey::RSA.new will try to call `to_der` on the LazyString).
+      #
+      # String does not respond to that, but it happened because the C
+      # implementation expected an actual String. In that case, just return
+      # the decrypted_string directly.
+      if decrypted_string.respond_to?(name)
+        decrypted_string.send(name, *args, &block)
+      else
+        decrypted_string
+      end
     end
 
     # Private: Decrypts the encrypted string using the provider.
