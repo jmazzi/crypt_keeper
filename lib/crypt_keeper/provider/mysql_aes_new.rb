@@ -27,7 +27,7 @@ module CryptKeeper
       # Public: Decrypts a string
       #
       # Returns a plaintext string
-      def decrypt(value)
+      def lazy_decrypt(value)
         escape_and_execute_sql(
           ["SELECT AES_DECRYPT(?, ?)", Base64.decode64(value), key]).first
       end
