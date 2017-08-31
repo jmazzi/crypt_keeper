@@ -31,6 +31,7 @@ module CryptKeeper
       decrypted_string
     end
 
+    # TODO: RSPEC ASKS FOR THIS, WHY?
     # Public: Implements to_ary for String compatibility.
     #
     # Returns the decrypted string.
