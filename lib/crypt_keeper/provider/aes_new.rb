@@ -34,7 +34,7 @@ module CryptKeeper
       # Otherwise, returns the decrypted string
       #
       # Returns a String
-      def decrypt(value)
+      def lazy_decrypt(value)
         AES.decrypt(value, key)
       end
 

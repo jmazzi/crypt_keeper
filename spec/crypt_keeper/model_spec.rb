@@ -146,7 +146,7 @@ describe CryptKeeper::Model do
     end
 
     it "encrypts the table" do
-      expect { subject.first(5).map(&:storage) }.to raise_error(OpenSSL::Cipher::CipherError)
+      expect { subject.first(5).map(&:storage).map(&:to_s) }.to raise_error(OpenSSL::Cipher::CipherError)
       subject.encrypt_table!
       expect { subject.first(5).map(&:storage) }.not_to raise_error
     end

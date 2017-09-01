@@ -25,10 +25,7 @@ module CryptKeeper
         end
       end
 
-      # Public: Decrypts a string
-      #
-      # Returns a plaintext string
-      def decrypt(value)
+      def lazy_decrypt(value)
         if @private_key.present? && encrypted?(value)
           escape_and_execute_sql(["SELECT pgp_pub_decrypt(?, dearmor(?), ?)",
             value, @private_key, @key])['pgp_pub_decrypt']

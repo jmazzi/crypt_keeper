@@ -30,7 +30,7 @@ module CryptKeeper
       # Public: Decrypts a string
       #
       # Returns a plaintext string
-      def decrypt(value)
+      def lazy_decrypt(value)
         rescue_invalid_statement do
           if encrypted?(value)
             escape_and_execute_sql(["SELECT pgp_sym_decrypt(?, ?)",
