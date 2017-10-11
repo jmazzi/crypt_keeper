@@ -54,6 +54,17 @@ describe CryptKeeper::Provider::PostgresPgp do
         expect(e.message).to_not include(ENCRYPTION_PASSWORD)
       end
     end
+
+    context "with fallback key" do
+      let(:fallback_cipher_text) { '\xc30d040703026366dd2927a800726ed235010ac8e27923e3b6636f8e0d81068015e3a2aacf40e2c9a40b06022b9d574e8616cceeacb4a345ee4ddbf30ea8c1f006c9b41ce265' }
+      let(:fallback_integer_cypher_text) { '\xc30d04070302b774cafc9795e64c74d232010f568008cbd5e5362f38f7c3ce6356f1e4052bee2de34d7fa32db8501ab7510738e8adcdf9e62bf47a224fd710a0334751' }
+
+      subject { described_class.new key: ENCRYPTION_PASSWORD, fallback_key: FALLBACK_ENCRYPTION_PASSWORD }
+
+      specify { expect(subject.decrypt(fallback_cipher_text)).to eq(plain_text) }
+      specify { expect(subject.decrypt(fallback_integer_cypher_text)).to eq(integer_plain_text.to_s) }
+      specify { expect(subject.decrypt(plain_text)).to eq(plain_text) }
+    end
   end
 
   describe "#search" do
