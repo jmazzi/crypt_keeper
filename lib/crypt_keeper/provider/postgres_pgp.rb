@@ -73,11 +73,25 @@ module CryptKeeper
       # Private: Rescues and filters invalid statement errors. Run the code
       # within a block for it to be rescued.
       def rescue_invalid_statement
-        yield
-      rescue ActiveRecord::StatementInvalid => e
-        message = crypt_keeper_payload_parse(e.message)
-        message = crypt_keeper_filter_postgres_log(message)
-        raise ActiveRecord::StatementInvalid, message
+        result = begin
+          yield
+        rescue ActiveRecord::StatementInvalid => e
+          e
+        end
+
+        # Manually check for the exception instead of using a normal
+        # begin/rescue because if you raise an exception inside a rescue,
+        # the raised exception will also include the `cause`.
+        #
+        # Due to `cause` being created by Ruby internals, we can't manipulate
+        # its value to hide the pgcrypto secrets, so avoid it instead.
+        if result.is_a?(ActiveRecord::StatementInvalid)
+          message = crypt_keeper_payload_parse(result.message)
+          message = crypt_keeper_filter_postgres_log(message)
+          raise ActiveRecord::StatementInvalid, message
+        else
+          result
+        end
       end
     end
   end
