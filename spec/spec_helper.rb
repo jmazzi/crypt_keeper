@@ -4,9 +4,10 @@ require 'coveralls'
 Coveralls.wear!
 require 'crypt_keeper'
 
-SPEC_ROOT           = Pathname.new File.expand_path File.dirname __FILE__
-AR_LOG              = SPEC_ROOT.join('debug.log').to_s
-ENCRYPTION_PASSWORD = "supermadsecretstring"
+SPEC_ROOT                    = Pathname.new File.expand_path File.dirname __FILE__
+AR_LOG                       = SPEC_ROOT.join('debug.log').to_s
+ENCRYPTION_PASSWORD          = "supermadsecretstring"
+FALLBACK_ENCRYPTION_PASSWORD = "fallbacksecretstring"
 
 Dir[SPEC_ROOT.join('support/*.rb')].each{|f| require f }
 

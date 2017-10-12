@@ -7,8 +7,9 @@ describe CryptKeeper::Provider::PostgresPgp do
   let(:plain_text)  { 'test' }
 
   let(:integer_cipher_text) { '\xc30d04070302c8d266353bcf2fc07dd23201153f9d9c32fbb3c36b9b0db137bf8b6c609172210d89ded63f11dff23d1ddbf5111c0266549dde26175c4425e06bb4bd6f' }
-
   let(:integer_plain_text) { 1 }
+
+  let(:invalid_cipher) { '\xc30d040703026366dd2927a800726ed235010ac8e27923e3b6636f8e0d81068015e3a2aacf40e2c9a40b06022b9d574e8616cceeacb4a345ee4ddbf30ea8c1f006c9b41ce333' }
 
   subject { described_class.new key: ENCRYPTION_PASSWORD }
 
@@ -47,11 +48,39 @@ describe CryptKeeper::Provider::PostgresPgp do
     specify { expect(subject.decrypt(plain_text)).to eq(plain_text) }
 
     it "filters StatementInvalid errors" do
+      expect { subject.decrypt(invalid_cipher) }
+        .to raise_error(ActiveRecord::StatementInvalid)
+
       begin
-        subject.decrypt("invalid")
+        subject.decrypt(invalid_cipher)
       rescue ActiveRecord::StatementInvalid => e
-        expect(e.message).to_not include("invalid")
         expect(e.message).to_not include(ENCRYPTION_PASSWORD)
+      end
+    end
+
+    context "with fallback key" do
+      let(:fallback_cipher_text) { '\xc30d040703026366dd2927a800726ed235010ac8e27923e3b6636f8e0d81068015e3a2aacf40e2c9a40b06022b9d574e8616cceeacb4a345ee4ddbf30ea8c1f006c9b41ce265' }
+      let(:fallback_integer_cypher_text) { '\xc30d04070302b774cafc9795e64c74d232010f568008cbd5e5362f38f7c3ce6356f1e4052bee2de34d7fa32db8501ab7510738e8adcdf9e62bf47a224fd710a0334751' }
+
+      subject { described_class.new key: ENCRYPTION_PASSWORD, fallback_key: FALLBACK_ENCRYPTION_PASSWORD }
+
+      specify { expect(subject.decrypt(fallback_cipher_text)).to eq(plain_text) }
+      specify { expect(subject.decrypt(fallback_integer_cypher_text)).to eq(integer_plain_text.to_s) }
+      specify { expect(subject.decrypt(plain_text)).to eq(plain_text) }
+
+      it "filters StatementInvalid errors" do
+        expect { subject.decrypt(invalid_cipher) }
+          .to raise_error(ActiveRecord::StatementInvalid)
+
+        begin
+          subject.decrypt(invalid_cipher)
+        rescue ActiveRecord::StatementInvalid => e
+          expect(e.message).to_not include(ENCRYPTION_PASSWORD)
+          expect(e.message).to_not include(FALLBACK_ENCRYPTION_PASSWORD)
+
+          # make sure we avoid a `cause` for the exception
+          expect(e.cause).to be_nil
+        end
       end
     end
   end

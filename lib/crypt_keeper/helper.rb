@@ -6,33 +6,27 @@ module CryptKeeper
       # Private: Sanitize an sql query and then execute it.
       #
       # query - the sql query
-      # new_transaction - if the query should run inside a new transaction
       #
       # Returns the ActiveRecord response.
-      def escape_and_execute_sql(query, new_transaction: false)
+      def escape_and_execute_sql(query)
         query = ::ActiveRecord::Base.send :sanitize_sql_array, query
 
         if CryptKeeper.silence_logs?
           ::ActiveRecord::Base.logger.silence do
-            execute_sql(query, new_transaction: new_transaction)
+            execute_sql(query)
           end
         else
-          execute_sql(query, new_transaction: new_transaction)
+          execute_sql(query)
         end
       end
 
       # Private: Executes the query.
       #
       # query - the sql query
-      # new_transaction - if the query should run inside a new transaction
       #
       # Returns an Array.
-      def execute_sql(query, new_transaction: false)
-        if new_transaction
-          ::ActiveRecord::Base.transaction(requires_new: true) do
-            ::ActiveRecord::Base.connection.execute(query).first
-          end
-        else
+      def execute_sql(query)
+        ::ActiveRecord::Base.transaction(requires_new: true) do
           ::ActiveRecord::Base.connection.execute(query).first
         end
       end
