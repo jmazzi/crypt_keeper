@@ -191,3 +191,29 @@ Or install it yourself as:
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
+
+### Contributors: Maintain changelog
+
+Maintain the changelog in an easy way is using `git changelog` from `git-extras` project:
+
+```
+brew instal git-extras
+```
+
+
+```
+# tag the new version you want (major/minor/patch):
+VER=v2.1.0
+
+git changelog # will open editor for CHANGELOG.md file
+
+git add CHANGELOG.md
+
+git commit -m "Release $VER"
+git tag $VER -m "$VER"
+
+git push --follow-tags
+```
+
+Optionally, the flag `git changelog --no-merges` will filter out the merge commits
+
