@@ -3,7 +3,7 @@ require 'active_support/core_ext/array/extract_options'
 
 module CryptKeeper
   module Model
-    extend ActiveSupport::Concern
+    extend ::ActiveSupport::Concern
 
     # Public: Ensures that each field exist and is of type text. This prevents
     # encrypted data from being truncated.

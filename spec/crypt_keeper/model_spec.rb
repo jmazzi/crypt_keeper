@@ -120,7 +120,7 @@ describe CryptKeeper::Model do
   end
 
   context "Encodings" do
-    subject { create_encrypted_model :storage, key: 'tool', salt: 'salt', encryptor: :aes_new, encoding: 'utf-8' }
+    subject { create_encrypted_model :storage, key: 'tool', salt: 'salt', encryptor: :active_support, encoding: 'utf-8' }
 
     it "forces the encoding on decrypt" do
       record = subject.create!(storage: 'Tromsø')
@@ -137,7 +137,7 @@ describe CryptKeeper::Model do
   end
 
   context "Initial Table Encryption" do
-    subject { create_encrypted_model :storage, key: 'tool', salt: 'salt', encryptor: :aes_new }
+    subject { create_encrypted_model :storage, key: 'tool', salt: 'salt', encryptor: :active_support }
 
     before do
       subject.delete_all
@@ -146,14 +146,14 @@ describe CryptKeeper::Model do
     end
 
     it "encrypts the table" do
-      expect { subject.first(5).map(&:storage) }.to raise_error(OpenSSL::Cipher::CipherError)
+      expect { subject.first(5).map(&:storage) }.to raise_error(ActiveSupport::MessageVerifier::InvalidSignature)
       subject.encrypt_table!
       expect { subject.first(5).map(&:storage) }.not_to raise_error
     end
   end
 
   context "Table Decryption (Reverse of Initial Table Encryption)" do
-    subject { create_encrypted_model :storage, key: 'tool', salt: 'salt', encryptor: :aes_new }
+    subject { create_encrypted_model :storage, key: 'tool', salt: 'salt', encryptor: :active_support }
     let!(:storage_entries) { 5.times.map { |i| "testing#{i}" } }
 
     before do
@@ -168,7 +168,7 @@ describe CryptKeeper::Model do
   end
 
   context "Missing Attributes" do
-    subject { create_encrypted_model :storage, key: 'tool', salt: 'salt', encryptor: :aes_new, encoding: 'utf-8' }
+    subject { create_encrypted_model :storage, key: 'tool', salt: 'salt', encryptor: :active_support, encoding: 'utf-8' }
 
     it "doesn't attempt decryption of missing attributes" do
       subject.create!(storage: 'blah')
