@@ -40,6 +40,7 @@ module CryptKeeper
 
     module DigestPassphrase
       def digest_passphrase(key, salt)
+        require "armor"
         raise ArgumentError.new("Missing :key") if key.blank?
         raise ArgumentError.new("Missing :salt") if salt.blank?
         ::Armor.digest(key, salt)
