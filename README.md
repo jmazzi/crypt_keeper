@@ -47,6 +47,42 @@ expected behavior, and has its use cases. An example would be migrating from
 one type of encryption to another. Using `update_column` would allow you to
 update the content without going through the current encryptor.
 
+## Generating Keys/Salts
+
+For encryptors requiring secret keys/salts, you can generate them via
+`rails secret`:
+
+```
+rails secret
+ef209071bd76143a75eda57b99425da63ce6c2d44581d652aa4302a90dcd7d7e99cbc22091c01a19f93ea484f40b142612f9bf76de8eb2d51ff9b3eb02a7782c
+```
+
+Or manually (this is the same implementation that Rails uses):
+
+```
+ruby -e "require 'securerandom'; puts SecureRandom.hex(64)"
+```
+
+These values should be stored outside of your application repository for added
+security. For example, one could use [dotenv][] and reference them as `ENV`
+variables.
+
+```
+# .env
+CRYPT_KEEPER_KEY=75d942f3d3b3492772e0330f717eaf5e689673ea8b983475ef8f6551f6e99d280cd89972706e46b48240cc01c4d0f7df5ffa3524566b789d147ed04cc4ea4eab
+CRYPT_KEEPER_SALT=b16a153e99a5db616a861ea5a6febc64d8a758c4aef3b8c8fc6675ac9daf03f7965f16e8b4b2bdfd28ff65f5203afb8102b8f41c514c3667bb3512015b1e77e8
+```
+
+Then in your model:
+
+```ruby
+class MyModel < ActiveRecord::Base
+  crypt_keeper :field, :other_field, encryptor: :active_support, key: ENV["CRYPT_KEEPER_KEY"], salt: ENV["CRYPT_KEEPER_SALT"]
+end
+```
+
+[dotenv]: https://github.com/bkeepers/dotenv
+
 ## Encodings
 
 You can force an encoding on the plaintext before encryption and after decryption by using the `encoding` option. This is useful when dealing with multibyte strings:
