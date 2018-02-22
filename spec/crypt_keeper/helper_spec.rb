@@ -1,0 +1,94 @@
+require "spec_helper"
+
+describe CryptKeeper::Helper::DigestPassphrase do
+  # gem "armor"
+  # require "armor"
+  #
+  # 10.times.with_index(1).map do |_, i|
+  #   hash = { key: SecureRandom.hex(64), salt: SecureRandom.hex(64) }
+  #   hash[:armor] = Armor.digest(h[:key], h[:salt])
+  #   hash
+  # end
+  let :armor_passphrases do
+    [
+      {
+        key: "c458da1abe465b15563e0f72e567594ca760214f2d11c668c6c0b923c8b5cc972b167410da6290feef3cc652a03d46f9ead9ce6da4cd197b4f66dd40f234aabc",
+        salt: "978279087fe82fd33b295df2ca38ae719d93c73d154110f9cd9e6c1859cd1525af1a9f9c25768b4bd7cfe6ce6fcd473d5f702c67fb5552369aeb7b5ab9c0573c",
+        armor: "2493abd50731ffbd80129bd9f2b77bcbffbb42a44f0e263668f9cf5f3d1804e1f9a56a9c85856be87b21b72a8b09aa21e111a646edae4a14b651019a73074066"
+      },
+      {
+        key: "3d4dd8193cf4c0ecaac0f3a1502a1e21a9bad969c97ace34399a4829a3457b56aa598b60a3031b6a10961e1558c7147d3895ec522eba0283a962bd82c6f558ef",
+        salt: "f5e7225b5add4a81e93773d543246ba2f7052e65f5adb651f8f47ba129e71053e04839db2ffb5b491223f589b2c74d4440b2c07d41e064df940aa433591a37b1",
+        armor: "1e9386895b6d33fed5caf24c6db598df888354ad2605679181d7e2b7c4b59611579d2b1a4e72b834f230848dd715a0b7e37280f2304a2fc78c6f5037a0ef3e9c"
+      },
+      {
+        key: "2d19e58724b7bb62d6129e2af692854919daeb6cf477c1e5dd5f8c846dbae3768baaaa8ba79d39c765b88b68d510f3b2fb59389af5f99c68c2e77620fe610393",
+        salt: "a96bfc08af98c063e0f9b3e6498d90a33cf279d12d38d6f5aabd6b7691d5ed25346bc2e9cfee1c98b8cea243b7e79ad69e281800207ea022007dc42e2f49dce3",
+        armor: "e86340f12e833d8cc722249f7190184562d4b7b27755ca3ece1950cf9158629536b16609406f230902f6f15c15afa652c35c0b0239c90167efd438b1e1233fd1"
+      },
+      {
+        key: "e78715a772f930027b0e6353e3be578ebc8fd5631401be9e723f747e03f3bed90cb051fa25024e8179e8fc3c65072d74eee92a636e5c2fa89f61f3f1dc2d043b",
+        salt: "536d128ba1f2453040d31eaddb87d1b1d2ac157f2ec7f6d2ef530a5ae01f19afea43cae3ca5783440c90decc9cedf78ec6aad474b2e67637abd640dc9d8b1665",
+        armor: "96c617786de65bda0d287851a189d50b56a14f3fccc72886943609e0644a593c4d51221d93f10287a79becb3f8f26322413c5c4e65a1e6564b4da55d1f175402"
+      },
+      {
+        key: "941e93a03156121bf565d62d9fadfc5f56ec5ecfc274a5ad1298d358419b8e18b5e4c4b17426ae031676e11633f875a5e3e39e50a4b08685427a72ab6289e465",
+        salt: "114b89e478b19e5e0d4df10b1914892a7434fdd0857bbb236bb21d9d8fae03b5401b1a53d64390ffa18fc74bc80139a8f216eb6a0c79155bcd89955a36be0322",
+        armor: "ead4be935420a772cc2c2637229431ee093ebcadb1f432d394eeca45515c4b74b732eec76c6d8aff33f0aafd33cab7e2d967796a271d3e8a10be5655d1025708"
+      },
+      {
+        key: "c7c7dbd592beb79178cdbbd45f91654a40c44fd632de0d89398dc1f0c8b241210b8db538a3cb3699796323fc1c54877c3df959e94bf5765fafd03c05fb4d4d7f",
+        salt: "1cd67ceaf2c1635eda3d1bbea60f228fd95d59c59a34624b4abf6846a2ae774f359a48695e6a9df5aef34f42dcfa69ad6dbd5be1e7190b050e0c58f5a0ff0cce",
+        armor: "387c92c591510bf56677a4de231065d271c6553c8b75a1a1710bb4a7c1404a527e5cbd9f0b812eedc162e5bd5dae4e11e9b5f3782eb4fd4616e2725fa98093e4"
+      },
+      {
+        key: "6fa240131e1aaf2214dc4a5f52709721c078ef8cb4aba1ab926650b202cfeb8db90acaebb0109667613768be3e0af1decf739c108861aa5ac55248bd307e8cbe",
+        salt: "de1d28b96bf570bcc8c26949d1d9f4c03b30f4d2e7799df3d4f981384b731f15b5494095cb6bd8d71f374d1bde10b6f9048bb6eb6a763af74af6b70a8320e651",
+        armor: "e9b72ed9330477421c63d38a3dfe056fa5ee5d2097af6f024b4452df6010e2563daca906b7ec49c04071973c49cc010f41b5c4503e691d2bc2066a5ff9766be5"
+      },
+      {
+        key: "2accf78dc18db506512c5aa36b6d50950ec98473873fe75a2fd6322883346a02d77f014f9fd5e02d1d3ab34e4c46e93bb17b5d2436f76ec13fade56cdb97ce04",
+        salt: "e1ee82d540543beda0a6f8c362e2890665a5b6cdfcb115bf4af3808ac49e43e7ca286d7fc4921f6ad5344a1b082db2e47913cd4616b23e0299f45c09487c65dc",
+        armor: "ad84346e9bec6885902390f7a45d674e48b53481400d7008b45780c2677f3a93635c6000b2760ccee184839edb2bd2b34914dc70f322005e58216e013d73cdeb"
+      },
+      {
+        key: "05e3508b0f4a1116fadbbd04a6c4c0a38c29724c76d7c406313813300cefbf9dbe426c28f65ca7297927707abaa4788572b1b9835a421d8699f29096055bc156",
+        salt: "371380fde21244493ec04928154c6af685d16e4a7feeb79b5916b484d485f3137eb30ebffdd0bebd77f86a2f092155e798acc0dac91b1704244614b0940da88e",
+        armor: "d573f9bb1ed0f7dac9a4f087abe7400cb366cda2877ed8c1660bd6dd2b96533f1210883079921a35fa09339d5f84fbe8b4977a6621e783ee5c3ac85e80b3685c"
+      },
+      {
+        key: "9dd15dc718b7ae4a87652e51b64aa545b6b6f26726e76fb0c45ec256be9359318d68e94858b0d782ba8505201c1b7a604492ba831ad0e93185fc5ccffbc7007d",
+        salt: "971bc4fada6fdc5ba3484d7a2ef34a4a2c9f7cc7e8c67d00fc2c774b2db2ef3a4f81c4bc4977055248256fe68f1525fa2f8673d56b41a5e15aae45b68d7f6fc6",
+        armor: "3d9d44881595a083efae99e710bd1fe68321152ac61e2d225974d5e2c2d4ae24849cc7b0f7f9af325fb4aa20524d12565e9e4c36cad91f9165df3af2f4692a07"
+      }
+    ]
+  end
+
+  let :example_key do
+    "ff17f8eeeb25e8647cda72fc577b1e9f3f68f6f18997efcdb043f171ad93949b39150b886d4866230add5a0ef6285b37c20bca5194a4dc76ae8845ed88ccb2db"
+  end
+
+  let :example_salt do
+    "8f273e1ffae67cf5582dd5fcec9d7f99e996861a985e502aa1283088a27d9fdda63869007474ef689381f10ea4f8f5e9e72255a9e47304cd80fbfafd414d77a7"
+  end
+
+  let :example_passphrase do
+    "01096fb7199ac8051d24a350204df61a0ab5b7c6bc393a3325d5dc686de39df7084d7cab12065eb06f2e09f4bc5b6a3851ce459e7eca47088fd9d1bf1d9f35b5"
+  end
+
+  let :encryptor do
+    Class.new do
+      include CryptKeeper::Helper::DigestPassphrase
+    end.new
+  end
+
+  it "returns passphrases that are backwards compatible with Armor" do
+    armor_passphrases.each do |ex|
+      expect(encryptor.digest_passphrase(ex[:key], ex[:salt])).to eq(ex[:armor])
+    end
+  end
+
+  it "generates a passphrase from key/salt" do
+    expect(encryptor.digest_passphrase(example_key, example_salt)).to eq(example_passphrase)
+  end
+end

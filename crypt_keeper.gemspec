@@ -20,7 +20,6 @@ Gem::Specification.new do |gem|
 
   gem.add_runtime_dependency 'activerecord',  '>= 4.2', '< 5.2'
   gem.add_runtime_dependency 'activesupport', '>= 4.2', '< 5.2'
-  gem.add_runtime_dependency 'armor',         '~> 0.0.2'
 
   gem.add_development_dependency 'rspec',       '~> 3.5.0'
   gem.add_development_dependency 'guard',       '~> 2.6.1'
