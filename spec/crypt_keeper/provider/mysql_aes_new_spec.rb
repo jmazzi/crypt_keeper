@@ -7,14 +7,16 @@ describe CryptKeeper::Provider::MysqlAesNew do
 
   # MySQL stores AES encrypted strings in binary which you can't paste
   # into a spec :). This is a Base64 encoded string of 'test' AES encrypted
-  # by AES_ENCRYPT()
+  # by AES_ENCRYPT():
+  #
+  #   SELECT TO_BASE64(AES_ENCRYPT('test', 'cd9c9275c80ccaec820f988edafd92bd0403d2055aed2b7094f569bc5314b88720c155f7f377addc35eff90c8bd11c34d5daaab5051c3435d2f5ad0c09d4b43e'));
   let(:cipher_text) do
-    "fBN8i7bx/DGAA4NJ4EWi0A=="
+    "qlwlvp6+otN1qnchZ48zNQ=="
   end
 
   subject { described_class.new key: ENCRYPTION_PASSWORD, salt: 'salt' }
 
-  specify { expect(subject.key).to eq("825e8c5e8ca394818b307b22b8cb7d3df2735e9c1e5838b476e7719135a4f499f2133022c1a0e8597c9ac1507b0f0c44328a40049f9704fab3598c5dec120724") }
+  specify { expect(subject.key).to eq("cd9c9275c80ccaec820f988edafd92bd0403d2055aed2b7094f569bc5314b88720c155f7f377addc35eff90c8bd11c34d5daaab5051c3435d2f5ad0c09d4b43e") }
 
   describe "#initialize" do
     specify { expect { described_class.new }.to raise_error(ArgumentError, "Missing :key") }
