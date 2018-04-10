@@ -9,6 +9,7 @@ gemfile:
   - gemfiles/activerecord_4_2.gemfile
   - gemfiles/activerecord_5_0.gemfile
   - gemfiles/activerecord_5_1.gemfile
+  - gemfiles/activerecord_5_2.gemfile
 
 addons:
   postgresql: 9.3
