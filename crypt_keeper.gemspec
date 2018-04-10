@@ -37,6 +37,6 @@ Gem::Specification.new do |gem|
   else
     gem.add_development_dependency 'sqlite3'
     gem.add_development_dependency 'pg', '~> 0.18.0'
-    gem.add_development_dependency 'mysql2', '~> 0.3.11'
+    gem.add_development_dependency 'mysql2', '>= 0.3.13', '< 0.6.0'
   end
 end
