@@ -13,7 +13,7 @@ module CryptKeeper
       # Returns boolean
       def encrypted?(value)
         begin
-          escape_and_execute_sql(["SELECT pgp_key_id(?)", value.to_s],
+          escape_and_execute_sql(["SELECT \"public\".pgp_key_id(?)", value.to_s],
             new_transaction: true)['pgp_key_id'].present?
         rescue ActiveRecord::StatementInvalid => e
           if e.message.include?(INVALID_DATA_ERROR)
