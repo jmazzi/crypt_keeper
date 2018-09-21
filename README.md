@@ -23,6 +23,11 @@ The options available were either too complicated under the hood or had weird
 edge cases that made the library hard to use. I wanted to write something
 simple that *just works*.
 
+## Considerations
+- **Searching** is more complicated with encryption because indexes don't work. See the [Searching section
+below](#searching)
+- **Dirty fields** in ActiveRecord don't work with encryption because the field is always changed (decrypted) upon loading. You can however easily detect changes with `is_dirty = (my_object.my_encrypted_field == my_object.my_encrypted_field_was)`
+
 ## Usage
 
 ```ruby
