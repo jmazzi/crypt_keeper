@@ -64,6 +64,42 @@ describe CryptKeeper::Provider::PostgresPgp do
       match = subject.create!(storage: 'blah')
       expect(subject.search_by_plaintext(:storage, 'blah').first).to eq(match)
     end
+
+    it "successfully accesses result when the data has empty strings and nil" do
+      subject.create!(storage: nil)
+      subject.create!(storage: '')
+      subject.create!(storage: '   ')
+      match = subject.create!(storage: 'blah')
+
+      results = subject.search_by_plaintext(:storage, 'blah')
+
+      expect(results).to match_array([match])
+    end
+
+    it "finds an empty string" do
+      subject.create!(storage: nil)
+      subject.create!(storage: 'blah')
+      match = subject.create!(storage: '')
+
+      expect(subject.search_by_plaintext(:storage, '')).to match_array([match])
+    end
+
+    it "finds the empty string with the right number of spaces" do
+      subject.create!(storage: '')
+      match = subject.create!(storage: '   ')
+
+      results = subject.search_by_plaintext(:storage, '   ')
+
+      expect(results).to match_array([match])
+    end
+
+    it "finds nil results" do
+      subject.create!(storage: '')
+      subject.create!(storage: 'blah')
+      match = subject.create!(storage: nil)
+
+      expect(subject.search_by_plaintext(:storage, nil)).to match_array([match])
+    end
   end
 
   describe "Custom pgcrypto options" do
