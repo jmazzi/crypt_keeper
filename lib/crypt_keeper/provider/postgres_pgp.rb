@@ -48,7 +48,7 @@ module CryptKeeper
             .where("(pgp_sym_decrypt(cast(\"#{field}\" AS bytea), ?) = ?)",
                    key, criteria)
         else
-          records.where("#{field}" => criteria)
+          records.where(field => criteria)
         end
       end
 
