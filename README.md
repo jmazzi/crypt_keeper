@@ -224,8 +224,8 @@ In case you experience problems, the rollback procedure is as follows:
 
 ## Requirements
 
-CryptKeeper has been tested against ActiveRecord 4.2 and 5.0 using Ruby
-2.1.10, 2.2.5 and 2.3.1.
+CryptKeeper has been tested against ActiveRecord 4.2, 5.0, and 6.0 using Ruby
+2.2, 2.3, 2.4, 2.5, and 2.6.
 
 ActiveRecord 4.2 is supported starting with v0.19.0.
 ActiveRecord 5.0 is supported starting with v0.23.0.
