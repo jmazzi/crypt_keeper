@@ -1,11 +1,11 @@
 language: ruby
 
 rvm:
-  - 2.2.7
-  - 2.3.4
-  - 2.4.1
+  - 2.2.10
+  - 2.3.8
+  - 2.4.5
   - 2.5.3
-  - 2.6.0
+  - 2.6.4
 
 gemfile:
   - gemfiles/activerecord_4_2.gemfile
@@ -13,10 +13,32 @@ gemfile:
   - gemfiles/activerecord_5_1.gemfile
   - gemfiles/activerecord_5_2.gemfile
 
-addons:
-  postgresql: 9.3
+matrix:
+  exclude:
+  - rvm: 2.2.10
+    gemfile: gemfiles/activerecord_5_0.gemfile
+  - rvm: 2.2.10
+    gemfile: gemfiles/activerecord_5_1.gemfile
+  - rvm: 2.3.8
+    gemfile: gemfiles/activerecord_5_0.gemfile
+  - rvm: 2.3.8
+    gemfile: gemfiles/activerecord_5_1.gemfile
+  - rvm: 2.4.5
+    gemfile: gemfiles/activerecord_5_0.gemfile
+  - rvm: 2.4.5
+    gemfile: gemfiles/activerecord_5_1.gemfile
+  - rvm: 2.5.3
+    gemfile: gemfiles/activerecord_5_0.gemfile
+  - rvm: 2.5.3
+    gemfile: gemfiles/activerecord_5_1.gemfile
+  - rvm: 2.6.4
+    gemfile: gemfiles/activerecord_5_0.gemfile
+  - rvm: 2.6.4
+    gemfile: gemfiles/activerecord_5_1.gemfile
 
-sudo: false
+services:
+  - postgresql
+  - mysql
 
 before_script:
   - cp spec/default.database.yml spec/database.yml
