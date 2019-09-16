@@ -19,6 +19,7 @@ appraise "activerecord_5_2" do
 end
 
 appraise "activerecord_6_0" do
-  gem "activerecord",  "~> 6.0.0.beta3"
-  gem "activesupport", "~> 6.0.0.beta3"
+  ruby "2.6.0"
+  gem "activerecord",  "~> 6.0"
+  gem "activesupport", "~> 6.0"
 end
