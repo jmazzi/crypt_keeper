@@ -12,6 +12,7 @@ gemfile:
   - gemfiles/activerecord_5_0.gemfile
   - gemfiles/activerecord_5_1.gemfile
   - gemfiles/activerecord_5_2.gemfile
+  - gemfiles/activerecord_6_0.gemfile
 
 matrix:
   exclude:
