@@ -14,7 +14,11 @@ RSpec.configure do |config|
   config.filter_run :focus
 
   config.after :each do
-    ActiveRecord::Base.descendants.each do |model|
+    descendants = ActiveRecord::Base.descendants.delete_if do |descendant|
+      descendant.to_s.include?("SchemaMigration")
+    end
+
+    descendants.each do |model|
       model.method(:delete_all).call
     end
   end
