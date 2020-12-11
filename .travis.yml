@@ -6,6 +6,7 @@ rvm:
   - 2.4.5
   - 2.5.3
   - 2.6.4
+  - 2.7.2
 
 gemfile:
   - gemfiles/activerecord_4_2.gemfile
@@ -13,6 +14,8 @@ gemfile:
   - gemfiles/activerecord_5_1.gemfile
   - gemfiles/activerecord_5_2.gemfile
   - gemfiles/activerecord_6_0.gemfile
+  - gemfiles/activerecord_6_1.gemfile
+  
 
 matrix:
   exclude:
@@ -22,18 +25,24 @@ matrix:
     gemfile: gemfiles/activerecord_5_1.gemfile
   - rvm: 2.2.10
     gemfile: gemfiles/activerecord_6_0.gemfile
+  - rvm: 2.2.10
+    gemfile: gemfiles/activerecord_6_1.gemfile
   - rvm: 2.3.8
     gemfile: gemfiles/activerecord_5_0.gemfile
   - rvm: 2.3.8
     gemfile: gemfiles/activerecord_5_1.gemfile
   - rvm: 2.3.8
     gemfile: gemfiles/activerecord_6_0.gemfile
+  - rvm: 2.3.8
+    gemfile: gemfiles/activerecord_6_1.gemfile
   - rvm: 2.4.5
     gemfile: gemfiles/activerecord_5_0.gemfile
   - rvm: 2.4.5
     gemfile: gemfiles/activerecord_5_1.gemfile
   - rvm: 2.4.5
     gemfile: gemfiles/activerecord_6_0.gemfile
+  - rvm: 2.4.5
+    gemfile: gemfiles/activerecord_6_1.gemfile
   - rvm: 2.5.3
     gemfile: gemfiles/activerecord_5_0.gemfile
   - rvm: 2.5.3
@@ -53,7 +62,9 @@ before_script:
   - psql crypt_keeper_providers -c 'CREATE EXTENSION IF NOT EXISTS pgcrypto;' -U postgres
   - mysql -e 'CREATE DATABASE crypt_keeper_providers'
 
-branches: master
+branches: 
+  - master
+  - allow-6-1
 
 notifications:
   email:

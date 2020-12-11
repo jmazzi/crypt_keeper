@@ -12,6 +12,10 @@ module CryptKeeper
       def escape_and_execute_sql(query, new_transaction: false)
         query = ::ActiveRecord::Base.send :sanitize_sql_array, query
 
+        # force binary encoding to avoid "invalid byte sequence in UTF-8" errors
+        # when we send binary AES keys (f.ex) to the database
+        query = query.b if query.respond_to?(:b)
+
         if CryptKeeper.silence_logs?
           ::ActiveRecord::Base.logger.silence do
             execute_sql(query, new_transaction: new_transaction)
