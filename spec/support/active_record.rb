@@ -18,6 +18,7 @@ module CryptKeeper
           create_table :sensitive_data, :force => true do |t|
             t.column :name, :string
             t.column :storage, :text
+            t.column :storage_binary, :binary
             t.column :secret, :text
           end
         end

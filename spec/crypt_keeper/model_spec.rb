@@ -25,8 +25,7 @@ describe CryptKeeper::Model do
       end
 
       it "allows binary as a valid type" do
-        subject.crypt_keeper :storage, encryptor: :fake_encryptor
-        allow(subject.columns_hash['storage']).to receive(:type).and_return(:binary)
+        subject.crypt_keeper :storage_binary, encryptor: :fake_encryptor
         expect(subject.new.save).to be_truthy
       end
 
