@@ -64,7 +64,6 @@ before_script:
 
 branches: 
   - master
-  - allow-6-1
 
 notifications:
   email:
