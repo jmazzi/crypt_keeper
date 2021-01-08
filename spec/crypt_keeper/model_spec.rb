@@ -54,6 +54,7 @@ describe CryptKeeper::Model do
     end
   end
 
+  
   context "Encryption and Decryption" do
     let(:plain_text) { 'plain_text' }
     let(:cipher_text) { 'tooltxet_nialp' }
@@ -103,6 +104,21 @@ describe CryptKeeper::Model do
       CryptKeeper.stub_encryption = true
       expect_any_instance_of(CryptKeeper::Provider::Encryptor).to_not receive(:decrypt)
       subject.find(record.id).storage
+    end
+
+    context "with a binary database field" do
+       subject { create_encrypted_model :storage_binary, passphrase: 'tool', encryptor: :encryptor }
+
+      it "encrypts the data" do
+        expect_any_instance_of(CryptKeeper::Provider::Encryptor).to receive(:encrypt).with('testing')
+        subject.create!(storage_binary: 'testing')
+      end
+
+      it "decrypts the data" do
+        record = subject.create!(storage_binary: 'testing')
+        expect_any_instance_of(CryptKeeper::Provider::Encryptor).to receive(:decrypt).at_least(1).times.with('toolgnitset')
+        subject.find(record.id).storage_binary
+      end
     end
   end
 
