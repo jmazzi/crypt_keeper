@@ -18,8 +18,8 @@ Gem::Specification.new do |gem|
 
   gem.post_install_message = "WARNING: CryptKeeper 2.0 contains breaking changes and may require you to reencrypt your data! Please view the README at https://github.com/jmazzi/crypt_keeper for more information."
 
-  gem.add_runtime_dependency 'activerecord',  '>= 4.2', '< 6.1'
-  gem.add_runtime_dependency 'activesupport', '>= 4.2', '< 6.1'
+  gem.add_runtime_dependency 'activerecord',  '>= 4.2', '< 6.2'
+  gem.add_runtime_dependency 'activesupport', '>= 4.2', '< 6.2'
 
   gem.add_development_dependency 'rspec',       '~> 3.5.0'
   gem.add_development_dependency 'guard',       '~> 2.6.1'

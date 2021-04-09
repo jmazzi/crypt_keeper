@@ -25,8 +25,7 @@ describe CryptKeeper::Model do
       end
 
       it "allows binary as a valid type" do
-        subject.crypt_keeper :storage, encryptor: :fake_encryptor
-        allow(subject.columns_hash['storage']).to receive(:type).and_return(:binary)
+        subject.crypt_keeper :storage_binary, encryptor: :fake_encryptor
         expect(subject.new.save).to be_truthy
       end
 
@@ -55,6 +54,7 @@ describe CryptKeeper::Model do
     end
   end
 
+  
   context "Encryption and Decryption" do
     let(:plain_text) { 'plain_text' }
     let(:cipher_text) { 'tooltxet_nialp' }
@@ -104,6 +104,21 @@ describe CryptKeeper::Model do
       CryptKeeper.stub_encryption = true
       expect_any_instance_of(CryptKeeper::Provider::Encryptor).to_not receive(:decrypt)
       subject.find(record.id).storage
+    end
+
+    context "with a binary database field" do
+       subject { create_encrypted_model :storage_binary, passphrase: 'tool', encryptor: :encryptor }
+
+      it "encrypts the data" do
+        expect_any_instance_of(CryptKeeper::Provider::Encryptor).to receive(:encrypt).with('testing')
+        subject.create!(storage_binary: 'testing')
+      end
+
+      it "decrypts the data" do
+        record = subject.create!(storage_binary: 'testing')
+        expect_any_instance_of(CryptKeeper::Provider::Encryptor).to receive(:decrypt).at_least(1).times.with('toolgnitset')
+        subject.find(record.id).storage_binary
+      end
     end
   end
 
