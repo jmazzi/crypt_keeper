@@ -29,7 +29,7 @@ to be used for encryption"
     def force_encodings_on_fields
       crypt_keeper_fields.each do |field|
         if attributes.has_key?(field.to_s) && send(field).respond_to?(:force_encoding)
-          send(field).force_encoding(crypt_keeper_encoding)
+          send(field).dup.force_encoding(crypt_keeper_encoding)
         end
       end
     end
