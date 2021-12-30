@@ -36,8 +36,10 @@ appraise "activerecord_6_1" do
 end
 
 appraise "activerecord_7_0" do
+
   # We need this PR https://github.com/rails/rails/pull/43951 in order to support ruby 3.1
   gem "activerecord",  github: "rails/rails", branch: "7-0-stable"
   gem "activesupport",  github: "rails/rails", branch: "7-0-stable"
+
   gem "pg", "~> 1.1"
 end
