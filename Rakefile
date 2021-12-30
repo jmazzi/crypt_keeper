@@ -6,7 +6,7 @@ require "appraisal"
 RSpec::Core::RakeTask.new :spec
 Bundler::GemHelper.install_tasks
 
-if !ENV["APPRAISAL_INITIALIZED"] && !ENV["TRAVIS"]
+if !ENV["APPRAISAL_INITIALIZED"] && !ENV["TRAVIS"] && !ENV["GITHUB_ACTIONS"]
   task default: :appraisal
 else
   task default: :spec

@@ -11,7 +11,7 @@ appraise "activerecord_5_0" do
   gem "activerecord",  "~> 5.0.0"
   gem "activesupport", "~> 5.0.0"
 
-  gem "sqlite3", "~> 1.3.6"
+  gem "sqlite3", "~> 1.3.11"
 end
 
 appraise "activerecord_5_1" do
@@ -32,5 +32,12 @@ end
 appraise "activerecord_6_1" do
   gem "activerecord",  "~> 6.1.0"
   gem "activesupport", "~> 6.1.0"
+  gem "pg", "~> 1.1"
+end
+
+appraise "activerecord_7_0" do
+  # We need this PR https://github.com/rails/rails/pull/43951 in order to support ruby 3.1
+  gem "activerecord",  github: "rails/rails", branch: "7-0-stable"
+  gem "activesupport",  github: "rails/rails", branch: "7-0-stable"
   gem "pg", "~> 1.1"
 end
