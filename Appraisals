@@ -36,7 +36,7 @@ appraise "activerecord_6_1" do
 end
 
 appraise "activerecord_7_0" do
-  gem "activerecord",  "~> 7.0"
-  gem "activesupport", "~> 7.0"
+  gem "activerecord",  "~> 7.0.0"
+  gem "activesupport", "~> 7.0.0"
   gem "pg", "~> 1.1"
 end
