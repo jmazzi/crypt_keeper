@@ -11,7 +11,7 @@ appraise "activerecord_5_0" do
   gem "activerecord",  "~> 5.0.0"
   gem "activesupport", "~> 5.0.0"
 
-  gem "sqlite3", "~> 1.3.6"
+  gem "sqlite3", "~> 1.3.11"
 end
 
 appraise "activerecord_5_1" do

@@ -26,7 +26,7 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'guard-rspec', '~> 4.2.9'
   gem.add_development_dependency 'rake'
   gem.add_development_dependency 'rb-fsevent',  '~> 0.9.1'
-  gem.add_development_dependency 'coveralls'
+  gem.add_development_dependency 'coveralls_reborn'
   gem.add_development_dependency 'appraisal',   '~> 2.1.0'
 
   if RUBY_PLATFORM == 'java'

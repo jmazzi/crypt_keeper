@@ -1,0 +1,79 @@
+name: Tests
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    name: Test on Ruby ${{ matrix.ruby-version }} / Active Record ${{ matrix.rails }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby-version: [ '2.7', '3.0', '3.1']
+        rails: ['5_0', '5_1', '5_2', '6_0', '6_1', '7_0']  
+        exclude:
+          # exclude unsupported ruby versions: https://github.com/rails/rails/issues/40938
+          - ruby-version: '3.0'
+            rails: '5_0'
+          - ruby-version: '3.0'
+            rails: '5_1'
+          - ruby-version: '3.0'
+            rails: '5_2'
+          - ruby-version: '3.1'
+            rails: '5_0'
+          - ruby-version: '3.1'
+            rails: '5_1'
+          - ruby-version: '3.1'
+            rails: '5_2'
+
+    env:
+      TESTING_RAILS_VERSION: ${{ matrix.rails }}
+      BUNDLE_GEMFILE: ${{ github.workspace }}/gemfiles/activerecord_${{ matrix.rails }}.gemfile
+
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: crypt_keeper
+          POSTGRES_PASSWORD: crypt_keeper
+          POSTGRES_DB: crypt_keeper_providers
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5   
+        ports:
+          - 5432:5432
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_DATABASE: crypt_keeper_providers
+          MYSQL_USER: crypt_keeper
+          MYSQL_PASSWORD: crypt_keeper
+          MYSQL_ROOT_PASSWORD: rootpassword
+        ports:
+          - 33306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3      
+    
+    steps:
+      - uses: actions/checkout@v2
+    
+      - name: Setup System
+        run: sudo apt-get install libsqlite3-dev
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby-version }}
+          bundler-cache: true
+                  
+      - name: Copy database config
+        run: |
+          cp spec/github_actions.database.yml spec/database.yml
+
+      - name: Enable pgcrypto extension
+        run: |
+          PGPASSWORD=crypt_keeper psql crypt_keeper_providers -h localhost -p 5432 -U crypt_keeper -tc "CREATE EXTENSION IF NOT EXISTS pgcrypto;"
+    
+      - name: Run tests
+        run: bundle exec rake
