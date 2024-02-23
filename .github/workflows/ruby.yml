@@ -10,7 +10,7 @@ jobs:
       fail-fast: false
       matrix:
         ruby-version: [ '2.7', '3.0', '3.1']
-        rails: ['5_0', '5_1', '5_2', '6_0', '6_1', '7_0']  
+        rails: ['5_0', '5_1', '5_2', '6_0', '6_1', '7_0', '7_1']
         exclude:
           # exclude unsupported ruby versions: https://github.com/rails/rails/issues/40938
           - ruby-version: '3.0'
